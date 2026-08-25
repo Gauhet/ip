@@ -14,6 +14,9 @@ public class AlfredTheButler {
     /** Name the chatbot introduces itself by. */
     private static final String NAME = "AlfredTheButler";
 
+    /** Maximum number of tasks that can be stored, as fixed by the requirements. */
+    private static final int MAX_TASKS = 100;
+
     /** ASCII-art logo shown once at startup. */
     private static final String BANNER =
             "            _     _      _____  ____   _____  ____\n"
@@ -28,8 +31,8 @@ public class AlfredTheButler {
     /** Greets the user, then echoes each command until {@code bye} is entered. */
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        String[] list = new String[100];
-        int i = 0;
+        String[] tasks = new String[MAX_TASKS];
+        int taskCount = 0;
 
         greet();
         while (true) {
@@ -38,10 +41,10 @@ public class AlfredTheButler {
                 break;
             }
             if (command.equals("list")) {
-                printList(list, i);
+                printList(tasks, taskCount);
                 continue;
             }
-            list[i++] = command;
+            tasks[taskCount++] = command;
             reply("added: " + command);
         }
         reply("Bye. Hope to see you again soon!");
@@ -69,11 +72,19 @@ public class AlfredTheButler {
         System.out.println();
     }
 
-    private static void printList(String[] list, int len) {
+    /**
+     * Prints the stored tasks inside a divider block, numbered from 1,
+     * followed by a blank line.
+     *
+     * @param tasks the array holding the tasks, which may have unused trailing slots
+     * @param count how many slots of {@code tasks} are filled, counting from index 0
+     */
+    private static void printList(String[] tasks, int count) {
         System.out.println(DIVIDER);
-        for (int i = 0; i < len; i++) {
-            System.out.println(INDENT + (i+1) + ". " + list[i]);
+        for (int i = 0; i < count; i++) {
+            System.out.println(INDENT + (i + 1) + ". " + tasks[i]);
         }
         System.out.println(DIVIDER);
+        System.out.println();
     }
 }
