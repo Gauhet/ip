@@ -108,12 +108,12 @@ public class AlfredTheButler {
                 case BYE_COMMAND -> isRunning = false;
                 case LIST_COMMAND -> printList(tasks, taskCount);
                 case UNMARK_COMMAND -> {
-                    int index = parseTaskIndex(arguments);
+                    int index = parseTaskIndex(arguments, taskCount);
                     tasks[index].unmarkDone();
                     reply("OK, I've marked this task as not done yet:", SUB_INDENT + tasks[index]);
                 }
                 case MARK_COMMAND -> {
-                    int index = parseTaskIndex(arguments);
+                    int index = parseTaskIndex(arguments, taskCount);
                     tasks[index].markDone();
                     reply("Nice! I've marked this task as done:", SUB_INDENT + tasks[index]);
                 }
@@ -222,10 +222,28 @@ public class AlfredTheButler {
      * user numbers tasks from 1 but the array is indexed from 0.
      *
      * @param arguments everything typed after {@code mark} or {@code unmark}
+     * @param taskCount how many tasks are stored
      * @return the index of the task the user meant
+     * @throws AlfredException if the arguments are not a number, or name a
+     *         task that is not in the list
      */
-    private static int parseTaskIndex(String arguments) {
-        return Integer.parseInt(arguments) - 1;
+    private static int parseTaskIndex(String arguments, int taskCount) throws AlfredException {
+        int number;
+        try {
+            number = Integer.parseInt(arguments);
+        } catch (NumberFormatException e) {
+            // Also covers a missing number, since parsing an empty string
+            // fails the same way.
+            throw new AlfredException("That is not a task number, sir.");
+        }
+        int index = number - 1;
+        // Checked against the number of tasks stored, not the length of the
+        // array: its later slots exist but are still empty, so leaving the
+        // check to the array would mean a null task rather than a message.
+        if (index < 0 || index >= taskCount) {
+            throw new AlfredException("There is no such task, sir.");
+        }
+        return index;
     }
 
     /** Prints the banner and the welcome message. */

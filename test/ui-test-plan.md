@@ -658,34 +658,111 @@ bye
 
 ---
 
+## TC12: Bad task numbers are refused
+
+**Aim:** `mark` and `unmark` check the number they are given before using it.
+Anything that is not a number, and any number that does not name a task in the
+list, draws a message rather than a crash.
+
+The inputs cover both messages and every route to them: a word, no number at
+all, a negative, zero, a number past the end of the list, and a number given
+when the list is empty. The first line runs before anything has been added,
+which is the empty-list case; it shares the out-of-range message rather than
+having one of its own.
+
+The closing `list` shows the task still unmarked, proving that none of the
+refused commands changed anything on its way to being refused.
+
+**Input:**
+
+```
+mark 1
+todo read book
+mark abc
+mark
+mark -1
+mark 0
+mark 2
+unmark 9
+list
+bye
+```
+
+**Expected output:**
+
+```
+    ____________________________________________________________
+            _     _      _____  ____   _____  ____
+           / \   | |    |  ___||  _ \ | ____||  _ \
+          / _ \  | |    | |_   | |_) ||  _|  | | | |
+         / ___ \ | |___ |  _|  |  _ < | |___ | |_| |
+        /_/   \_\|_____||_|    |_| \_\|_____||____/
+                    P E N N Y W O R T H
+
+      Butler to the Wayne family  --  At your service
+     Hello! I'm AlfredTheButler
+     What can I do for you?
+    ____________________________________________________________
+
+    ____________________________________________________________
+     There is no such task, sir.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Got it. I've added this task:
+       [T][ ] read book
+     Now you have 1 tasks in the list.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     That is not a task number, sir.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     That is not a task number, sir.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     There is no such task, sir.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     There is no such task, sir.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     There is no such task, sir.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     There is no such task, sir.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Here are the tasks in your list:
+     1.[T][ ] read book
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Bye. Hope to see you again soon!
+    ____________________________________________________________
+```
+
+---
+
 ## Known gaps (not yet covered)
 
-These are behaviours the program does not handle yet, so there is nothing stable
-to assert. Add cases here as the features are implemented.
+No invalid command crashes the program any more. Blank input, an unknown
+keyword, a missing description or separator, and a bad task number are all
+refused with a message, covered by TC7, TC10, TC11 and TC12.
 
-* A bad task number still crashes rather than drawing an error message. Each of
-  these was tried by hand against the current code:
+What is left are the program's own limits rather than mistakes in what was
+typed. There is nothing stable to assert about them yet, so add cases here as
+each is handled.
 
-  | Input | What happens today |
-  | --- | --- |
-  | `mark abc` | `NumberFormatException` |
-  | `mark` | `NumberFormatException` (empty string) |
-  | `mark 99` | `NullPointerException` (empty slot in the array) |
-  | `mark 0` | `ArrayIndexOutOfBoundsException` (index -1) |
-
-  `unmark` fails in exactly the same ways, since both read their number the
-  same way.
-
-  These are not test cases yet because a stack trace is not correct behaviour
-  to assert, and the line numbers in it change on every edit. Write the cases
-  once the numbers are checked, using the new error messages as expected
-  output.
-
-  The rows that used to sit here for blank input, a missing description and a
-  missing `/by` or `/to` are gone: those are handled now, and TC7, TC10 and
-  TC11 cover them.
-* Two crashes that are not caused by invalid input: adding a 101st task
-  overruns the fixed-size array, and input that ends without `bye` leaves the
-  program reading from a stream that has ended.
-* The 100-task limit and the wording "Now you have 1 tasks in the list."
-  (singular/plural) are known rough edges.
+* Adding a 101st task overruns the fixed-size array.
+* Input that ends without `bye` leaves the program reading from a stream that
+  has ended.
+* "Now you have 1 tasks in the list." does not change for the singular. This
+  one is only cosmetic, so it is the odd entry here: nothing crashes and no
+  case is blocked by it.
