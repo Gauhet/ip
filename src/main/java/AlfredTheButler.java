@@ -49,17 +49,21 @@ public class AlfredTheButler {
     /** Command that adds a deadline. */
     private static final String DEADLINE_COMMAND = "deadline";
 
-    /** Keyword that separates a deadline's description from its due time. */
-    private static final String BY_SEPARATOR = " /by ";
+    /**
+     * Keyword that separates a deadline's description from its due time. The
+     * surrounding spaces are not part of it, so that a missing description can
+     * be told apart from a missing keyword rather than looking the same.
+     */
+    private static final String BY_SEPARATOR = "/by";
 
     /** Command that adds an event. */
     private static final String EVENT_COMMAND = "event";
 
     /** Keyword that separates an event's description from its start time. */
-    private static final String FROM_SEPARATOR = " /from ";
+    private static final String FROM_SEPARATOR = "/from";
 
     /** Keyword that separates an event's start time from its end time. */
-    private static final String TO_SEPARATOR = " /to ";
+    private static final String TO_SEPARATOR = "/to";
 
     /**
      * Greets the user, then handles one command per line until {@code bye}:
@@ -113,7 +117,7 @@ public class AlfredTheButler {
                     tasks[index].markDone();
                     reply("Nice! I've marked this task as done:", SUB_INDENT + tasks[index]);
                 }
-                case TODO_COMMAND -> added = new ToDo(arguments);
+                case TODO_COMMAND -> added = parseToDo(arguments);
                 case DEADLINE_COMMAND -> added = parseDeadline(arguments);
                 case EVENT_COMMAND -> added = parseEvent(arguments);
                 // Only the keyword is quoted back. Repeating the whole line
@@ -136,16 +140,38 @@ public class AlfredTheButler {
     }
 
     /**
+     * Builds a todo from the description part of a {@code todo} command.
+     *
+     * @param arguments everything the user typed after the keyword
+     * @return the todo the arguments describe
+     * @throws AlfredException if no description was given
+     */
+    private static ToDo parseToDo(String arguments) throws AlfredException {
+        if (arguments.isEmpty()) {
+            throw new AlfredException("A todo needs a description, sir.");
+        }
+        return new ToDo(arguments);
+    }
+
+    /**
      * Builds a deadline from the {@code <description> /by <time>} part of a
      * {@code deadline} command.
      *
      * @param arguments everything the user typed after the keyword
      * @return the deadline the arguments describe
+     * @throws AlfredException if the description or the due time is missing
      */
-    private static Deadline parseDeadline(String arguments) {
+    private static Deadline parseDeadline(String arguments) throws AlfredException {
+        String complaint = "A deadline needs a description and a /by time, sir.";
         int separator = arguments.indexOf(BY_SEPARATOR);
-        String description = arguments.substring(0, separator);
-        String by = arguments.substring(separator + BY_SEPARATOR.length());
+        if (separator == -1) {
+            throw new AlfredException(complaint);
+        }
+        String description = arguments.substring(0, separator).trim();
+        String by = arguments.substring(separator + BY_SEPARATOR.length()).trim();
+        if (description.isEmpty() || by.isEmpty()) {
+            throw new AlfredException(complaint);
+        }
         return new Deadline(description, by);
     }
 
@@ -155,15 +181,26 @@ public class AlfredTheButler {
      *
      * @param arguments everything the user typed after the keyword
      * @return the event the arguments describe
+     * @throws AlfredException if the description, the start or the end is missing
      */
-    private static Event parseEvent(String arguments) {
+    private static Event parseEvent(String arguments) throws AlfredException {
+        String complaint = "An event needs a description, a /from time and a /to time, sir.";
         int fromSeparator = arguments.indexOf(FROM_SEPARATOR);
+        if (fromSeparator == -1) {
+            throw new AlfredException(complaint);
+        }
         // Looked for after /from, so that a /to inside the description
         // is not mistaken for the one that starts the end time.
         int toSeparator = arguments.indexOf(TO_SEPARATOR, fromSeparator + FROM_SEPARATOR.length());
-        String description = arguments.substring(0, fromSeparator);
-        String from = arguments.substring(fromSeparator + FROM_SEPARATOR.length(), toSeparator);
-        String to = arguments.substring(toSeparator + TO_SEPARATOR.length());
+        if (toSeparator == -1) {
+            throw new AlfredException(complaint);
+        }
+        String description = arguments.substring(0, fromSeparator).trim();
+        String from = arguments.substring(fromSeparator + FROM_SEPARATOR.length(), toSeparator).trim();
+        String to = arguments.substring(toSeparator + TO_SEPARATOR.length()).trim();
+        if (description.isEmpty() || from.isEmpty() || to.isEmpty()) {
+            throw new AlfredException(complaint);
+        }
         return new Event(description, from, to);
     }
 

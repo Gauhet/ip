@@ -579,31 +579,111 @@ bye
 
 ---
 
+## TC11: Task commands with missing parts are refused
+
+**Aim:** `todo`, `deadline` and `event` each check that every part they need is
+present, and refuse the command with one message naming all of those parts
+rather than crashing or storing a half-built task.
+
+The six inputs cover every way a part can go missing: no arguments at all, a
+keyword with no separator, a separator with nothing before it, and a separator
+with nothing after it. `deadline /by Sunday` is the case that needs the
+separator to be matched without its surrounding spaces; matched with them, it
+would look like a missing `/by` rather than a missing description.
+
+As in TC10, the closing `list` is the assertion that matters: an empty list
+shows none of the six was stored.
+
+**Input:**
+
+```
+todo
+deadline return book
+deadline /by Sunday
+deadline return book /by
+event project meeting
+event project meeting /from Mon 2pm
+list
+bye
+```
+
+**Expected output:**
+
+```
+    ____________________________________________________________
+            _     _      _____  ____   _____  ____
+           / \   | |    |  ___||  _ \ | ____||  _ \
+          / _ \  | |    | |_   | |_) ||  _|  | | | |
+         / ___ \ | |___ |  _|  |  _ < | |___ | |_| |
+        /_/   \_\|_____||_|    |_| \_\|_____||____/
+                    P E N N Y W O R T H
+
+      Butler to the Wayne family  --  At your service
+     Hello! I'm AlfredTheButler
+     What can I do for you?
+    ____________________________________________________________
+
+    ____________________________________________________________
+     A todo needs a description, sir.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     A deadline needs a description and a /by time, sir.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     A deadline needs a description and a /by time, sir.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     A deadline needs a description and a /by time, sir.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     An event needs a description, a /from time and a /to time, sir.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     An event needs a description, a /from time and a /to time, sir.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Here are the tasks in your list:
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Bye. Hope to see you again soon!
+    ____________________________________________________________
+```
+
+---
+
 ## Known gaps (not yet covered)
 
 These are behaviours the program does not handle yet, so there is nothing stable
 to assert. Add cases here as the features are implemented.
 
-* Invalid input is still unhandled, so it crashes or is quietly accepted rather
-  than drawing an error message. Each of these was tried by hand against the
-  current code:
+* A bad task number still crashes rather than drawing an error message. Each of
+  these was tried by hand against the current code:
 
   | Input | What happens today |
   | --- | --- |
   | `mark abc` | `NumberFormatException` |
+  | `mark` | `NumberFormatException` (empty string) |
   | `mark 99` | `NullPointerException` (empty slot in the array) |
   | `mark 0` | `ArrayIndexOutOfBoundsException` (index -1) |
-  | `deadline foo` | `StringIndexOutOfBoundsException` (no `/by`) |
-  | `event foo /from Mon` | `StringIndexOutOfBoundsException` (no `/to`) |
-  | `todo` | silently adds a task with a blank description |
 
-  Blank input used to belong on this list, quietly adding `[T][ ]` with nothing
-  after it. It is now refused with a message, and TC7 covers it.
+  `unmark` fails in exactly the same ways, since both read their number the
+  same way.
 
-  The rest are not test cases yet because a stack trace is not correct behaviour
-  to assert, and the line numbers in it change on every edit. The `todo` row is
-  the quiet one that does not crash, so it will not announce itself. Write the
-  cases as each is handled, using the new error message as expected output.
+  These are not test cases yet because a stack trace is not correct behaviour
+  to assert, and the line numbers in it change on every edit. Write the cases
+  once the numbers are checked, using the new error messages as expected
+  output.
+
+  The rows that used to sit here for blank input, a missing description and a
+  missing `/by` or `/to` are gone: those are handled now, and TC7, TC10 and
+  TC11 cover them.
 * Two crashes that are not caused by invalid input: adding a 101st task
   overruns the fixed-size array, and input that ends without `bye` leaves the
   program reading from a stream that has ended.
