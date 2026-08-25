@@ -31,20 +31,26 @@ public class AlfredTheButler {
             + "\n"
             + "      Butler to the Wayne family  --  At your service";
 
-    /** Prefix of the command that marks a task as done, including its trailing space. */
-    private static final String MARK_COMMAND = "mark ";
+    /** Command that ends the conversation. */
+    private static final String BYE_COMMAND = "bye";
 
-    /** Prefix of the command that marks a task as not done, including its trailing space. */
-    private static final String UNMARK_COMMAND = "unmark ";
+    /** Command that shows every stored task. */
+    private static final String LIST_COMMAND = "list";
 
-    /** Prefix of the command that adds a deadline, including its trailing space. */
-    private static final String DEADLINE_COMMAND = "deadline ";
+    /** Command that marks a task as done. */
+    private static final String MARK_COMMAND = "mark";
+
+    /** Command that marks a task as not done. */
+    private static final String UNMARK_COMMAND = "unmark";
+
+    /** Command that adds a deadline. */
+    private static final String DEADLINE_COMMAND = "deadline";
 
     /** Keyword that separates a deadline's description from its due time. */
     private static final String BY_SEPARATOR = " /by ";
 
-    /** Prefix of the command that adds an event, including its trailing space. */
-    private static final String EVENT_COMMAND = "event ";
+    /** Command that adds an event. */
+    private static final String EVENT_COMMAND = "event";
 
     /** Keyword that separates an event's description from its start time. */
     private static final String FROM_SEPARATOR = " /from ";
@@ -65,49 +71,58 @@ public class AlfredTheButler {
         Scanner scanner = new Scanner(System.in);
         Task[] tasks = new Task[MAX_TASKS];
         int taskCount = 0;
+        boolean isRunning = true;
 
         greet();
-        while (true) {
-            String command = scanner.nextLine();
-            if (command.equals("bye")) {
-                break;
-            }
+        while (isRunning) {
+            // Trimmed so that a stray space around a command does not stop it
+            // being recognised.
+            String line = scanner.nextLine().trim();
             try {
                 // Worth its own message: saying the command was not recognised
                 // would be misleading when none was typed.
-                if (command.isBlank()) {
+                if (line.isEmpty()) {
                     throw new AlfredException("You'll have to give me something to work with, sir.");
                 }
-                if (command.equals("list")) {
-                    printList(tasks, taskCount);
-                    continue;
-                }
-                // Checked before MARK_COMMAND would be, but the prefixes cannot
-                // overlap anyway: "unmark 2" does not start with "mark ".
-                if (command.startsWith(UNMARK_COMMAND)) {
-                    int index = parseTaskIndex(command, UNMARK_COMMAND);
+                // Everything up to the first space names the command; the rest
+                // is that command's own input, which only it knows how to read.
+                String[] parts = line.split(" ", 2);
+                String keyword = parts[0];
+                String arguments = parts.length > 1 ? parts[1].trim() : "";
+
+                // An arrow switch, so no arm can fall through into the next by
+                // accident, and so `break` keeps its usual meaning in the loop.
+                switch (keyword) {
+                case BYE_COMMAND -> isRunning = false;
+                case LIST_COMMAND -> printList(tasks, taskCount);
+                case UNMARK_COMMAND -> {
+                    int index = parseTaskIndex(arguments);
                     tasks[index].unmarkDone();
                     reply("OK, I've marked this task as not done yet:", SUB_INDENT + tasks[index]);
-                    continue;
                 }
-                if (command.startsWith(MARK_COMMAND)) {
-                    int index = parseTaskIndex(command, MARK_COMMAND);
+                case MARK_COMMAND -> {
+                    int index = parseTaskIndex(arguments);
                     tasks[index].markDone();
                     reply("Nice! I've marked this task as done:", SUB_INDENT + tasks[index]);
-                    continue;
                 }
-                // Anything that is not a recognised command becomes a todo,
-                // so a deadline or an event has to be spotted before that fallback.
-                Task added;
-                if (command.startsWith(DEADLINE_COMMAND)) {
-                    added = parseDeadline(command);
-                } else if (command.startsWith(EVENT_COMMAND)) {
-                    added = parseEvent(command);
-                } else {
-                    added = new ToDo(command);
+                case DEADLINE_COMMAND -> {
+                    Task added = parseDeadline(arguments);
+                    tasks[taskCount++] = added;
+                    replyAdded(added, taskCount);
                 }
-                tasks[taskCount++] = added;
-                replyAdded(added, taskCount);
+                case EVENT_COMMAND -> {
+                    Task added = parseEvent(arguments);
+                    tasks[taskCount++] = added;
+                    replyAdded(added, taskCount);
+                }
+                // Anything unrecognised is still stored as a todo, described by
+                // the whole line rather than by its arguments alone.
+                default -> {
+                    Task added = new ToDo(line);
+                    tasks[taskCount++] = added;
+                    replyAdded(added, taskCount);
+                }
+                }
             } catch (AlfredException e) {
                 reply(e.getMessage());
             }
@@ -116,35 +131,34 @@ public class AlfredTheButler {
     }
 
     /**
-     * Builds a deadline from a {@code deadline <description> /by <time>} line.
+     * Builds a deadline from the {@code <description> /by <time>} part of a
+     * {@code deadline} command.
      *
-     * @param command the whole line the user typed
-     * @return the deadline the line describes
+     * @param arguments everything the user typed after the keyword
+     * @return the deadline the arguments describe
      */
-    private static Deadline parseDeadline(String command) {
-        String details = command.substring(DEADLINE_COMMAND.length());
-        int separator = details.indexOf(BY_SEPARATOR);
-        String description = details.substring(0, separator);
-        String by = details.substring(separator + BY_SEPARATOR.length());
+    private static Deadline parseDeadline(String arguments) {
+        int separator = arguments.indexOf(BY_SEPARATOR);
+        String description = arguments.substring(0, separator);
+        String by = arguments.substring(separator + BY_SEPARATOR.length());
         return new Deadline(description, by);
     }
 
     /**
-     * Builds an event from an
-     * {@code event <description> /from <start> /to <end>} line.
+     * Builds an event from the {@code <description> /from <start> /to <end>}
+     * part of an {@code event} command.
      *
-     * @param command the whole line the user typed
-     * @return the event the line describes
+     * @param arguments everything the user typed after the keyword
+     * @return the event the arguments describe
      */
-    private static Event parseEvent(String command) {
-        String details = command.substring(EVENT_COMMAND.length());
-        int fromSeparator = details.indexOf(FROM_SEPARATOR);
+    private static Event parseEvent(String arguments) {
+        int fromSeparator = arguments.indexOf(FROM_SEPARATOR);
         // Looked for after /from, so that a /to inside the description
         // is not mistaken for the one that starts the end time.
-        int toSeparator = details.indexOf(TO_SEPARATOR, fromSeparator + FROM_SEPARATOR.length());
-        String description = details.substring(0, fromSeparator);
-        String from = details.substring(fromSeparator + FROM_SEPARATOR.length(), toSeparator);
-        String to = details.substring(toSeparator + TO_SEPARATOR.length());
+        int toSeparator = arguments.indexOf(TO_SEPARATOR, fromSeparator + FROM_SEPARATOR.length());
+        String description = arguments.substring(0, fromSeparator);
+        String from = arguments.substring(fromSeparator + FROM_SEPARATOR.length(), toSeparator);
+        String to = arguments.substring(toSeparator + TO_SEPARATOR.length());
         return new Event(description, from, to);
     }
 
@@ -162,16 +176,14 @@ public class AlfredTheButler {
     }
 
     /**
-     * Reads the task number that follows a command prefix and converts it
-     * to an array index, since the user numbers tasks from 1 but the array
-     * is indexed from 0.
+     * Converts a task number typed by the user into an array index, since the
+     * user numbers tasks from 1 but the array is indexed from 0.
      *
-     * @param command the whole line the user typed, such as {@code mark 2}
-     * @param commandPrefix the prefix to skip, such as {@code "mark "}
+     * @param arguments everything typed after {@code mark} or {@code unmark}
      * @return the index of the task the user meant
      */
-    private static int parseTaskIndex(String command, String commandPrefix) {
-        return Integer.parseInt(command.substring(commandPrefix.length()).trim()) - 1;
+    private static int parseTaskIndex(String arguments) {
+        return Integer.parseInt(arguments) - 1;
     }
 
     /** Prints the banner and the welcome message. */

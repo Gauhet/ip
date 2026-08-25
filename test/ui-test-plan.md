@@ -19,8 +19,10 @@ to add the tasks itself.
 
 * Every case has three fenced blocks, in this order: **Input**, then
   **Expected output**. The aim is the prose line above them.
-* The last input line must be `bye`. Without it the program would keep reading
-  from a stream that has ended and crash instead of exiting cleanly.
+* The last input line must be one that exits, which in practice means `bye`.
+  Without it the program would keep reading from a stream that has ended and
+  crash instead of exiting cleanly. Extra words after the keyword are ignored,
+  so `bye now` also exits; only TC8 relies on that, to prove it.
 * `Expected output` is the **entire** console output of the run, starting with
   the greeting banner and ending with the farewell message.
 * Comparison is line-by-line and exact, except that trailing whitespace,
@@ -406,6 +408,54 @@ bye
 
     ____________________________________________________________
      You'll have to give me something to work with, sir.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Bye. Hope to see you again soon!
+    ____________________________________________________________
+```
+
+---
+
+## TC8: Spacing and extra words do not stop a command
+
+**Aim:** A command is found by its first word, so spaces around the line are
+ignored and words after the keyword are ignored too. `   list   ` and
+`list all` both list, and `bye now` still exits.
+
+The list is left empty on purpose, so the case tests only how the line is read
+and does not have to be rewritten whenever the way tasks are added changes.
+
+**Input:**
+
+```
+   list   
+list all
+bye now
+```
+
+**Expected output:**
+
+```
+    ____________________________________________________________
+            _     _      _____  ____   _____  ____
+           / \   | |    |  ___||  _ \ | ____||  _ \
+          / _ \  | |    | |_   | |_) ||  _|  | | | |
+         / ___ \ | |___ |  _|  |  _ < | |___ | |_| |
+        /_/   \_\|_____||_|    |_| \_\|_____||____/
+                    P E N N Y W O R T H
+
+      Butler to the Wayne family  --  At your service
+     Hello! I'm AlfredTheButler
+     What can I do for you?
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Here are the tasks in your list:
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Here are the tasks in your list:
     ____________________________________________________________
 
     ____________________________________________________________
