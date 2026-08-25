@@ -34,10 +34,14 @@ public class AlfredTheButler {
     /** Prefix of the command that marks a task as done, including its trailing space. */
     private static final String MARK_COMMAND = "mark ";
 
+    /** Prefix of the command that marks a task as not done, including its trailing space. */
+    private static final String UNMARK_COMMAND = "unmark ";
+
     /**
      * Greets the user, then stores each command as a task and confirms it,
-     * listing the stored tasks on {@code list} and completing one on
-     * {@code mark <number>}, until {@code bye} is entered.
+     * listing the stored tasks on {@code list} and changing whether one is
+     * done on {@code mark <number>} and {@code unmark <number>},
+     * until {@code bye} is entered.
      */
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -54,9 +58,16 @@ public class AlfredTheButler {
                 printList(tasks, taskCount);
                 continue;
             }
+            // Checked before MARK_COMMAND would be, but the prefixes cannot
+            // overlap anyway: "unmark 2" does not start with "mark ".
+            if (command.startsWith(UNMARK_COMMAND)) {
+                int index = parseTaskIndex(command, UNMARK_COMMAND);
+                tasks[index].unmarkDone();
+                reply("OK, I've marked this task as not done yet:", SUB_INDENT + tasks[index]);
+                continue;
+            }
             if (command.startsWith(MARK_COMMAND)) {
-                // The user numbers tasks from 1, but the array is indexed from 0.
-                int index = Integer.parseInt(command.substring(MARK_COMMAND.length()).trim()) - 1;
+                int index = parseTaskIndex(command, MARK_COMMAND);
                 tasks[index].markDone();
                 reply("Nice! I've marked this task as done:", SUB_INDENT + tasks[index]);
                 continue;
@@ -65,6 +76,19 @@ public class AlfredTheButler {
             reply("added: " + command);
         }
         reply("Bye. Hope to see you again soon!");
+    }
+
+    /**
+     * Reads the task number that follows a command prefix and converts it
+     * to an array index, since the user numbers tasks from 1 but the array
+     * is indexed from 0.
+     *
+     * @param command the whole line the user typed, such as {@code mark 2}
+     * @param commandPrefix the prefix to skip, such as {@code "mark "}
+     * @return the index of the task the user meant
+     */
+    private static int parseTaskIndex(String command, String commandPrefix) {
+        return Integer.parseInt(command.substring(commandPrefix.length()).trim()) - 1;
     }
 
     /** Prints the banner and the welcome message. */
