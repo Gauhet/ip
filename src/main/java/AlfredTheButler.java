@@ -45,6 +45,9 @@ public class AlfredTheButler {
     /** Command that marks a task as not done. */
     private static final String UNMARK_COMMAND = "unmark";
 
+    /** Command that removes a task from the list. */
+    private static final String DELETE_COMMAND = "delete";
+
     /** Command that adds a deadline. */
     private static final String DEADLINE_COMMAND = "deadline";
 
@@ -66,9 +69,10 @@ public class AlfredTheButler {
 
     /**
      * Greets the user, then handles one command per line until {@code bye}:
-     * {@code list}, {@code mark <number>}, {@code unmark <number>}, and the
-     * three that add a task, {@code todo}, {@code deadline} and {@code event}.
-     * Any other word is refused rather than guessed at.
+     * {@code list}, {@code mark <number>}, {@code unmark <number>},
+     * {@code delete <number>}, and the three that add a task, {@code todo},
+     * {@code deadline} and {@code event}. Any other word is refused rather
+     * than guessed at.
      *
      * <p>Commands run inside a {@code try} so that a mistake in what was typed
      * becomes an ordinary reply and the loop carries on. Catching in one place
@@ -114,6 +118,13 @@ public class AlfredTheButler {
                     int index = parseTaskIndex(arguments, tasks.size());
                     tasks.get(index).markDone();
                     reply("Nice! I've marked this task as done:", SUB_INDENT + tasks.get(index));
+                }
+                case DELETE_COMMAND -> {
+                    int index = parseTaskIndex(arguments, tasks.size());
+                    Task removed = tasks.remove(index);
+                    reply("Noted. I've removed this task:",
+                            SUB_INDENT + removed,
+                            "Now you have " + tasks.size() + " tasks in the list.");
                 }
                 case TODO_COMMAND -> added = parseToDo(arguments);
                 case DEADLINE_COMMAND -> added = parseDeadline(arguments);
@@ -219,7 +230,8 @@ public class AlfredTheButler {
      * Converts a task number typed by the user into a list index, since the
      * user numbers tasks from 1 but the list is indexed from 0.
      *
-     * @param arguments everything typed after {@code mark} or {@code unmark}
+     * @param arguments everything typed after {@code mark}, {@code unmark}
+     *        or {@code delete}
      * @param taskCount how many tasks are stored
      * @return the index of the task the user meant
      * @throws AlfredException if the arguments are not a number, or name a

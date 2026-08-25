@@ -660,9 +660,9 @@ bye
 
 ## TC12: Bad task numbers are refused
 
-**Aim:** `mark` and `unmark` check the number they are given before using it.
-Anything that is not a number, and any number that does not name a task in the
-list, draws a message rather than a crash.
+**Aim:** `mark`, `unmark` and `delete` check the number they are given before
+using it. Anything that is not a number, and any number that does not name a
+task in the list, draws a message rather than a crash.
 
 The inputs cover both messages and every route to them: a word, no number at
 all, a negative, zero, a number past the end of the list, and a number given
@@ -670,8 +670,13 @@ when the list is empty. The first line runs before anything has been added,
 which is the empty-list case; it shares the out-of-range message rather than
 having one of its own.
 
-The closing `list` shows the task still unmarked, proving that none of the
-refused commands changed anything on its way to being refused.
+All three commands read their number through the same helper, so the two
+`delete` lines are there to show that `delete` uses it too, rather than to
+retest the checks themselves.
+
+The closing `list` shows the task still present and still unmarked, proving
+that none of the refused commands changed anything on its way to being
+refused — in particular that a refused `delete` removed nothing.
 
 **Input:**
 
@@ -684,6 +689,8 @@ mark -1
 mark 0
 mark 2
 unmark 9
+delete xyz
+delete 2
 list
 bye
 ```
@@ -739,8 +746,119 @@ bye
     ____________________________________________________________
 
     ____________________________________________________________
+     That is not a task number, sir.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     There is no such task, sir.
+    ____________________________________________________________
+
+    ____________________________________________________________
      Here are the tasks in your list:
      1.[T][ ] read book
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Bye. Hope to see you again soon!
+    ____________________________________________________________
+```
+
+---
+
+## TC13: Delete a task
+
+**Aim:** `delete <n>` removes the n-th task, confirms it by showing the task
+that was removed and the number left, and the tasks after it move up so the
+list stays numbered from 1 with no gap.
+
+The task deleted is the middle one of three, which is what makes the
+renumbering visible: after `delete 2` the third task has to become number 2.
+The two `list` commands bracket the deletion so the before and after can be
+compared directly. Deleting the last remaining task afterwards checks the
+count reaches zero and the list comes back empty rather than breaking.
+
+**Input:**
+
+```
+todo read book
+deadline return book /by Sunday
+event project meeting /from Mon 2pm /to 4pm
+list
+delete 2
+list
+delete 1
+delete 1
+list
+bye
+```
+
+**Expected output:**
+
+```
+    ____________________________________________________________
+            _     _      _____  ____   _____  ____
+           / \   | |    |  ___||  _ \ | ____||  _ \
+          / _ \  | |    | |_   | |_) ||  _|  | | | |
+         / ___ \ | |___ |  _|  |  _ < | |___ | |_| |
+        /_/   \_\|_____||_|    |_| \_\|_____||____/
+                    P E N N Y W O R T H
+
+      Butler to the Wayne family  --  At your service
+     Hello! I'm AlfredTheButler
+     What can I do for you?
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Got it. I've added this task:
+       [T][ ] read book
+     Now you have 1 tasks in the list.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Got it. I've added this task:
+       [D][ ] return book (by: Sunday)
+     Now you have 2 tasks in the list.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Got it. I've added this task:
+       [E][ ] project meeting (from: Mon 2pm to: 4pm)
+     Now you have 3 tasks in the list.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Here are the tasks in your list:
+     1.[T][ ] read book
+     2.[D][ ] return book (by: Sunday)
+     3.[E][ ] project meeting (from: Mon 2pm to: 4pm)
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Noted. I've removed this task:
+       [D][ ] return book (by: Sunday)
+     Now you have 2 tasks in the list.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Here are the tasks in your list:
+     1.[T][ ] read book
+     2.[E][ ] project meeting (from: Mon 2pm to: 4pm)
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Noted. I've removed this task:
+       [T][ ] read book
+     Now you have 1 tasks in the list.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Noted. I've removed this task:
+       [E][ ] project meeting (from: Mon 2pm to: 4pm)
+     Now you have 0 tasks in the list.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Here are the tasks in your list:
     ____________________________________________________________
 
     ____________________________________________________________
