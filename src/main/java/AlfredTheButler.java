@@ -43,10 +43,20 @@ public class AlfredTheButler {
     /** Keyword that separates a deadline's description from its due time. */
     private static final String BY_SEPARATOR = " /by ";
 
+    /** Prefix of the command that adds an event, including its trailing space. */
+    private static final String EVENT_COMMAND = "event ";
+
+    /** Keyword that separates an event's description from its start time. */
+    private static final String FROM_SEPARATOR = " /from ";
+
+    /** Keyword that separates an event's start time from its end time. */
+    private static final String TO_SEPARATOR = " /to ";
+
     /**
      * Greets the user, then stores each command as a task and confirms it,
-     * as a deadline on {@code deadline <description> /by <time>} and as a
-     * todo otherwise, listing the stored tasks on {@code list} and changing
+     * as a deadline on {@code deadline <description> /by <time>}, as an event
+     * on {@code event <description> /from <start> /to <end>} and as a todo
+     * otherwise, listing the stored tasks on {@code list} and changing
      * whether one is done on {@code mark <number>} and
      * {@code unmark <number>}, until {@code bye} is entered.
      */
@@ -80,10 +90,12 @@ public class AlfredTheButler {
                 continue;
             }
             // Anything that is not a recognised command becomes a todo,
-            // so a deadline has to be spotted before that fallback.
+            // so a deadline or an event has to be spotted before that fallback.
             Task added;
             if (command.startsWith(DEADLINE_COMMAND)) {
                 added = parseDeadline(command);
+            } else if (command.startsWith(EVENT_COMMAND)) {
+                added = parseEvent(command);
             } else {
                 added = new ToDo(command);
             }
@@ -106,6 +118,26 @@ public class AlfredTheButler {
         String description = details.substring(0, separator);
         String by = details.substring(separator + BY_SEPARATOR.length());
         return new Deadline(description, by);
+    }
+
+    /**
+     * Builds an event from an
+     * {@code event <description> /from <start> /to <end>} command,
+     * splitting it at the {@code /from} and {@code /to} keywords.
+     *
+     * @param command the whole line the user typed
+     * @return the event the line describes
+     */
+    private static Event parseEvent(String command) {
+        String details = command.substring(EVENT_COMMAND.length());
+        int fromSeparator = details.indexOf(FROM_SEPARATOR);
+        // Looked for after /from, so that a /to inside the description
+        // is not mistaken for the one that starts the end time.
+        int toSeparator = details.indexOf(TO_SEPARATOR, fromSeparator + FROM_SEPARATOR.length());
+        String description = details.substring(0, fromSeparator);
+        String from = details.substring(fromSeparator + FROM_SEPARATOR.length(), toSeparator);
+        String to = details.substring(toSeparator + TO_SEPARATOR.length());
+        return new Event(description, from, to);
     }
 
     /**
