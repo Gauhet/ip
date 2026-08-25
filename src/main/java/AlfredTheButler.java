@@ -53,12 +53,9 @@ public class AlfredTheButler {
     private static final String TO_SEPARATOR = " /to ";
 
     /**
-     * Greets the user, then stores each command as a task and confirms it,
-     * as a deadline on {@code deadline <description> /by <time>}, as an event
-     * on {@code event <description> /from <start> /to <end>} and as a todo
-     * otherwise, listing the stored tasks on {@code list} and changing
-     * whether one is done on {@code mark <number>} and
-     * {@code unmark <number>}, until {@code bye} is entered.
+     * Greets the user, then handles one command per line until {@code bye}:
+     * {@code list}, {@code mark <number>} and {@code unmark <number>}, or
+     * otherwise stores the line as a task and confirms it.
      */
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -106,8 +103,7 @@ public class AlfredTheButler {
     }
 
     /**
-     * Builds a deadline from a {@code deadline <description> /by <time>}
-     * command, splitting it at the {@code /by} keyword.
+     * Builds a deadline from a {@code deadline <description> /by <time>} line.
      *
      * @param command the whole line the user typed
      * @return the deadline the line describes
@@ -122,8 +118,7 @@ public class AlfredTheButler {
 
     /**
      * Builds an event from an
-     * {@code event <description> /from <start> /to <end>} command,
-     * splitting it at the {@code /from} and {@code /to} keywords.
+     * {@code event <description> /from <start> /to <end>} line.
      *
      * @param command the whole line the user typed
      * @return the event the line describes
@@ -142,7 +137,7 @@ public class AlfredTheButler {
 
     /**
      * Confirms that a task has been stored, showing the task itself so the
-     * user can see how it was understood, and how many tasks they now have.
+     * user can see how it was understood.
      *
      * @param task the task that was just added
      * @param count how many tasks are stored now that it has been added
