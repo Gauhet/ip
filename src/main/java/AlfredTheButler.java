@@ -28,10 +28,13 @@ public class AlfredTheButler {
             + "\n"
             + "      Butler to the Wayne family  --  At your service";
 
-    /** Greets the user, then echoes each command until {@code bye} is entered. */
+    /**
+     * Greets the user, then stores each command as a task and confirms it,
+     * listing the stored tasks on {@code list}, until {@code bye} is entered.
+     */
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        String[] tasks = new String[MAX_TASKS];
+        Task[] tasks = new Task[MAX_TASKS];
         int taskCount = 0;
 
         greet();
@@ -44,7 +47,7 @@ public class AlfredTheButler {
                 printList(tasks, taskCount);
                 continue;
             }
-            tasks[taskCount++] = command;
+            tasks[taskCount++] = new Task(command);
             reply("added: " + command);
         }
         reply("Bye. Hope to see you again soon!");
@@ -79,10 +82,10 @@ public class AlfredTheButler {
      * @param tasks the array holding the tasks, which may have unused trailing slots
      * @param count how many slots of {@code tasks} are filled, counting from index 0
      */
-    private static void printList(String[] tasks, int count) {
+    private static void printList(Task[] tasks, int count) {
         System.out.println(DIVIDER);
         for (int i = 0; i < count; i++) {
-            System.out.println(INDENT + (i + 1) + ". " + tasks[i]);
+            System.out.println(INDENT + (i + 1) + "." + tasks[i]);
         }
         System.out.println(DIVIDER);
         System.out.println();
