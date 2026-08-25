@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -16,9 +18,6 @@ public class AlfredTheButler {
 
     /** Name the chatbot introduces itself by. */
     private static final String NAME = "AlfredTheButler";
-
-    /** Maximum number of tasks that can be stored, as fixed by the requirements. */
-    private static final int MAX_TASKS = 100;
 
     /** ASCII-art logo shown once at startup. */
     private static final String BANNER =
@@ -77,8 +76,7 @@ public class AlfredTheButler {
      */
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        Task[] tasks = new Task[MAX_TASKS];
-        int taskCount = 0;
+        List<Task> tasks = new ArrayList<>();
         boolean isRunning = true;
 
         greet();
@@ -106,16 +104,16 @@ public class AlfredTheButler {
                 // accident, and so `break` keeps its usual meaning in the loop.
                 switch (keyword) {
                 case BYE_COMMAND -> isRunning = false;
-                case LIST_COMMAND -> printList(tasks, taskCount);
+                case LIST_COMMAND -> printList(tasks);
                 case UNMARK_COMMAND -> {
-                    int index = parseTaskIndex(arguments, taskCount);
-                    tasks[index].unmarkDone();
-                    reply("OK, I've marked this task as not done yet:", SUB_INDENT + tasks[index]);
+                    int index = parseTaskIndex(arguments, tasks.size());
+                    tasks.get(index).unmarkDone();
+                    reply("OK, I've marked this task as not done yet:", SUB_INDENT + tasks.get(index));
                 }
                 case MARK_COMMAND -> {
-                    int index = parseTaskIndex(arguments, taskCount);
-                    tasks[index].markDone();
-                    reply("Nice! I've marked this task as done:", SUB_INDENT + tasks[index]);
+                    int index = parseTaskIndex(arguments, tasks.size());
+                    tasks.get(index).markDone();
+                    reply("Nice! I've marked this task as done:", SUB_INDENT + tasks.get(index));
                 }
                 case TODO_COMMAND -> added = parseToDo(arguments);
                 case DEADLINE_COMMAND -> added = parseDeadline(arguments);
@@ -129,8 +127,8 @@ public class AlfredTheButler {
                 // Storing and confirming is the same for every kind of task, so
                 // it is done once here rather than repeated in each arm above.
                 if (added != null) {
-                    tasks[taskCount++] = added;
-                    replyAdded(added, taskCount);
+                    tasks.add(added);
+                    replyAdded(added, tasks.size());
                 }
             } catch (AlfredException e) {
                 reply(e.getMessage());
@@ -218,8 +216,8 @@ public class AlfredTheButler {
     }
 
     /**
-     * Converts a task number typed by the user into an array index, since the
-     * user numbers tasks from 1 but the array is indexed from 0.
+     * Converts a task number typed by the user into a list index, since the
+     * user numbers tasks from 1 but the list is indexed from 0.
      *
      * @param arguments everything typed after {@code mark} or {@code unmark}
      * @param taskCount how many tasks are stored
@@ -237,9 +235,8 @@ public class AlfredTheButler {
             throw new AlfredException("That is not a task number, sir.");
         }
         int index = number - 1;
-        // Checked against the number of tasks stored, not the length of the
-        // array: its later slots exist but are still empty, so leaving the
-        // check to the array would mean a null task rather than a message.
+        // Checked here because the list would answer an out-of-range index
+        // with an exception, where a mistyped number deserves a reply.
         if (index < 0 || index >= taskCount) {
             throw new AlfredException("There is no such task, sir.");
         }
@@ -275,15 +272,14 @@ public class AlfredTheButler {
      * Prints the stored tasks as a numbered list under a heading,
      * numbered from 1.
      *
-     * @param tasks the array holding the tasks, which may have unused trailing slots
-     * @param count how many slots of {@code tasks} are filled, counting from index 0
+     * @param tasks the tasks to show, in the order they are stored
      */
-    private static void printList(Task[] tasks, int count) {
+    private static void printList(List<Task> tasks) {
         // One line for the heading, then one per task.
-        String[] lines = new String[count + 1];
+        String[] lines = new String[tasks.size() + 1];
         lines[0] = "Here are the tasks in your list:";
-        for (int i = 0; i < count; i++) {
-            lines[i + 1] = (i + 1) + "." + tasks[i];
+        for (int i = 0; i < tasks.size(); i++) {
+            lines[i + 1] = (i + 1) + "." + tasks.get(i);
         }
         reply(lines);
     }

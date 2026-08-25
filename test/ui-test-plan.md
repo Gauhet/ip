@@ -760,7 +760,6 @@ What is left are the program's own limits rather than mistakes in what was
 typed. There is nothing stable to assert about them yet, so add cases here as
 each is handled.
 
-* Adding a 101st task overruns the fixed-size array.
 * Input that ends without `bye` leaves the program reading from a stream that
   has ended.
 * "Now you have 1 tasks in the list." does not change for the singular. This
