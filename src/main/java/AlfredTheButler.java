@@ -56,6 +56,10 @@ public class AlfredTheButler {
      * Greets the user, then handles one command per line until {@code bye}:
      * {@code list}, {@code mark <number>} and {@code unmark <number>}, or
      * otherwise stores the line as a task and confirms it.
+     *
+     * <p>Commands run inside a {@code try} so that a mistake in what was typed
+     * becomes an ordinary reply and the loop carries on. Catching in one place
+     * lets each method throw its own message without knowing how it is printed.
      */
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -68,36 +72,45 @@ public class AlfredTheButler {
             if (command.equals("bye")) {
                 break;
             }
-            if (command.equals("list")) {
-                printList(tasks, taskCount);
-                continue;
+            try {
+                // Worth its own message: saying the command was not recognised
+                // would be misleading when none was typed.
+                if (command.isBlank()) {
+                    throw new AlfredException("You'll have to give me something to work with, sir.");
+                }
+                if (command.equals("list")) {
+                    printList(tasks, taskCount);
+                    continue;
+                }
+                // Checked before MARK_COMMAND would be, but the prefixes cannot
+                // overlap anyway: "unmark 2" does not start with "mark ".
+                if (command.startsWith(UNMARK_COMMAND)) {
+                    int index = parseTaskIndex(command, UNMARK_COMMAND);
+                    tasks[index].unmarkDone();
+                    reply("OK, I've marked this task as not done yet:", SUB_INDENT + tasks[index]);
+                    continue;
+                }
+                if (command.startsWith(MARK_COMMAND)) {
+                    int index = parseTaskIndex(command, MARK_COMMAND);
+                    tasks[index].markDone();
+                    reply("Nice! I've marked this task as done:", SUB_INDENT + tasks[index]);
+                    continue;
+                }
+                // Anything that is not a recognised command becomes a todo,
+                // so a deadline or an event has to be spotted before that fallback.
+                Task added;
+                if (command.startsWith(DEADLINE_COMMAND)) {
+                    added = parseDeadline(command);
+                } else if (command.startsWith(EVENT_COMMAND)) {
+                    added = parseEvent(command);
+                } else {
+                    added = new ToDo(command);
+                }
+                tasks[taskCount++] = added;
+                replyAdded(added, taskCount);
+            } catch (AlfredException e) {
+                reply(e.getMessage());
             }
-            // Checked before MARK_COMMAND would be, but the prefixes cannot
-            // overlap anyway: "unmark 2" does not start with "mark ".
-            if (command.startsWith(UNMARK_COMMAND)) {
-                int index = parseTaskIndex(command, UNMARK_COMMAND);
-                tasks[index].unmarkDone();
-                reply("OK, I've marked this task as not done yet:", SUB_INDENT + tasks[index]);
-                continue;
-            }
-            if (command.startsWith(MARK_COMMAND)) {
-                int index = parseTaskIndex(command, MARK_COMMAND);
-                tasks[index].markDone();
-                reply("Nice! I've marked this task as done:", SUB_INDENT + tasks[index]);
-                continue;
-            }
-            // Anything that is not a recognised command becomes a todo,
-            // so a deadline or an event has to be spotted before that fallback.
-            Task added;
-            if (command.startsWith(DEADLINE_COMMAND)) {
-                added = parseDeadline(command);
-            } else if (command.startsWith(EVENT_COMMAND)) {
-                added = parseEvent(command);
-            } else {
-                added = new ToDo(command);
-            }
-            tasks[taskCount++] = added;
-            replyAdded(added, taskCount);
         }
         reply("Bye. Hope to see you again soon!");
     }

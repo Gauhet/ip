@@ -364,13 +364,64 @@ bye
 
 ---
 
+## TC7: Blank input is refused
+
+**Aim:** A line with nothing on it draws an error message instead of being
+stored as a task with an empty description, and the loop carries on afterwards
+rather than exiting.
+
+The case feeds two blank lines: one truly empty, one holding only spaces. The
+second checks that the line is judged by its content rather than its length,
+though the two are indistinguishable when reading this file. That is
+deliberately harmless: if an editor ever strips the trailing spaces, the line
+becomes a second empty line and the expected output is unchanged.
+
+**Input:**
+
+```
+
+   
+bye
+```
+
+**Expected output:**
+
+```
+    ____________________________________________________________
+            _     _      _____  ____   _____  ____
+           / \   | |    |  ___||  _ \ | ____||  _ \
+          / _ \  | |    | |_   | |_) ||  _|  | | | |
+         / ___ \ | |___ |  _|  |  _ < | |___ | |_| |
+        /_/   \_\|_____||_|    |_| \_\|_____||____/
+                    P E N N Y W O R T H
+
+      Butler to the Wayne family  --  At your service
+     Hello! I'm AlfredTheButler
+     What can I do for you?
+    ____________________________________________________________
+
+    ____________________________________________________________
+     You'll have to give me something to work with, sir.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     You'll have to give me something to work with, sir.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Bye. Hope to see you again soon!
+    ____________________________________________________________
+```
+
+---
+
 ## Known gaps (not yet covered)
 
 These are behaviours the program does not handle yet, so there is nothing stable
 to assert. Add cases here as the features are implemented.
 
-* Invalid input crashes the program instead of printing an error message. Each
-  of these was tried by hand against the current code:
+* Invalid input still crashes the program instead of printing an error message.
+  Each of these was tried by hand against the current code:
 
   | Input | What happens today |
   | --- | --- |
@@ -379,14 +430,16 @@ to assert. Add cases here as the features are implemented.
   | `mark 0` | `ArrayIndexOutOfBoundsException` (index -1) |
   | `deadline foo` | `StringIndexOutOfBoundsException` (no `/by`) |
   | `event foo /from Mon` | `StringIndexOutOfBoundsException` (no `/to`) |
-  | *(empty line)* | silently adds a task with a blank description |
 
-  The last one is the quiet one: it does not crash, so it will not show up as
-  an obvious bug, but the list ends up holding `[T][ ]` with nothing after it.
+  Blank input used to belong on this list, quietly adding `[T][ ]` with nothing
+  after it. It is now refused with a message, and TC7 covers it.
 
-  These are not test cases yet because a stack trace is not correct behaviour to
-  assert, and the line numbers in it change on every edit. Write the cases when
-  error handling is added, using the new error messages as expected output.
+  The rest are not test cases yet because a stack trace is not correct behaviour
+  to assert, and the line numbers in it change on every edit. Write the cases as
+  each one is handled, using the new error message as expected output.
+* Two crashes that are not caused by invalid input: adding a 101st task
+  overruns the fixed-size array, and input that ends without `bye` leaves the
+  program reading from a stream that has ended.
 * There is no `todo` keyword yet, so `todo borrow book` is stored as a task
   literally described "todo borrow book".
 * The 100-task limit and the wording "Now you have 1 tasks in the list."
