@@ -37,11 +37,18 @@ public class AlfredTheButler {
     /** Prefix of the command that marks a task as not done, including its trailing space. */
     private static final String UNMARK_COMMAND = "unmark ";
 
+    /** Prefix of the command that adds a deadline, including its trailing space. */
+    private static final String DEADLINE_COMMAND = "deadline ";
+
+    /** Keyword that separates a deadline's description from its due time. */
+    private static final String BY_SEPARATOR = " /by ";
+
     /**
-     * Greets the user, then stores each command as a todo and confirms it,
-     * listing the stored tasks on {@code list} and changing whether one is
-     * done on {@code mark <number>} and {@code unmark <number>},
-     * until {@code bye} is entered.
+     * Greets the user, then stores each command as a task and confirms it,
+     * as a deadline on {@code deadline <description> /by <time>} and as a
+     * todo otherwise, listing the stored tasks on {@code list} and changing
+     * whether one is done on {@code mark <number>} and
+     * {@code unmark <number>}, until {@code bye} is entered.
      */
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -72,10 +79,46 @@ public class AlfredTheButler {
                 reply("Nice! I've marked this task as done:", SUB_INDENT + tasks[index]);
                 continue;
             }
-            tasks[taskCount++] = new ToDo(command);
-            reply("added: " + command);
+            // Anything that is not a recognised command becomes a todo,
+            // so a deadline has to be spotted before that fallback.
+            Task added;
+            if (command.startsWith(DEADLINE_COMMAND)) {
+                added = parseDeadline(command);
+            } else {
+                added = new ToDo(command);
+            }
+            tasks[taskCount++] = added;
+            replyAdded(added, taskCount);
         }
         reply("Bye. Hope to see you again soon!");
+    }
+
+    /**
+     * Builds a deadline from a {@code deadline <description> /by <time>}
+     * command, splitting it at the {@code /by} keyword.
+     *
+     * @param command the whole line the user typed
+     * @return the deadline the line describes
+     */
+    private static Deadline parseDeadline(String command) {
+        String details = command.substring(DEADLINE_COMMAND.length());
+        int separator = details.indexOf(BY_SEPARATOR);
+        String description = details.substring(0, separator);
+        String by = details.substring(separator + BY_SEPARATOR.length());
+        return new Deadline(description, by);
+    }
+
+    /**
+     * Confirms that a task has been stored, showing the task itself so the
+     * user can see how it was understood, and how many tasks they now have.
+     *
+     * @param task the task that was just added
+     * @param count how many tasks are stored now that it has been added
+     */
+    private static void replyAdded(Task task, int count) {
+        reply("Got it. I've added this task:",
+                SUB_INDENT + task,
+                "Now you have " + count + " tasks in the list.");
     }
 
     /**
