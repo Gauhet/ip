@@ -1,5 +1,5 @@
 /**
- * A mistake in what the user typed, such as an unrecognised command or one
+ * A mistake in what the user typed, such as an unrecognized command or one
  * missing part of its input. The message is shown to the user word for word.
  *
  * <p>Checked, so the compiler insists each one is caught and answered. Bugs

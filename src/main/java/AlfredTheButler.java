@@ -80,10 +80,10 @@ public class AlfredTheButler {
         greet();
         while (isRunning) {
             // Trimmed so that a stray space around a command does not stop it
-            // being recognised.
+            // being recognized.
             String line = scanner.nextLine().trim();
             try {
-                // Worth its own message: saying the command was not recognised
+                // Worth its own message: saying the command was not recognized
                 // would be misleading when none was typed.
                 if (line.isEmpty()) {
                     throw new AlfredException("You'll have to give me something to work with, sir.");
