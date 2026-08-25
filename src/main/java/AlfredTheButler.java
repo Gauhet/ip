@@ -1,48 +1,64 @@
 import java.util.Scanner;
 
 /**
- * Alfred the Butler: a personal chatbot.
- * At this stage it only greets the user and then says goodbye.
+ * Alfred the Butler: a personal chatbot that echoes each command
+ * it is given until the user types {@code bye}.
  */
 public class AlfredTheButler {
-    /**
-     * Runs the chatbot: prints the banner and greeting, then the farewell.
-     *
-     * @param args command line arguments (unused)
-     */
+    /** Horizontal rule that opens and closes every message block. */
+    private static final String DIVIDER = "    " + "_".repeat(60);
+
+    /** Indent for message text, one space deeper than the divider. */
+    private static final String INDENT = "     ";
+
+    /** Name the chatbot introduces itself by. */
+    private static final String NAME = "AlfredTheButler";
+
+    /** ASCII-art logo shown once at startup. */
+    private static final String BANNER =
+            "            _     _      _____  ____   _____  ____\n"
+            + "           / \\   | |    |  ___||  _ \\ | ____||  _ \\\n"
+            + "          / _ \\  | |    | |_   | |_) ||  _|  | | | |\n"
+            + "         / ___ \\ | |___ |  _|  |  _ < | |___ | |_| |\n"
+            + "        /_/   \\_\\|_____||_|    |_| \\_\\|_____||____/\n"
+            + "                    P E N N Y W O R T H\n"
+            + "\n"
+            + "      Butler to the Wayne family  --  At your service";
+
+    /** Greets the user, then echoes each command until {@code bye} is entered. */
     public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        String line = "    ____________________________________________________________";
-        String name = "AlfredTheButler";
+        Scanner scanner = new Scanner(System.in);
 
-        String banner =
-                "            _     _      _____  ____   _____  ____\n"
-                + "           / \\   | |    |  ___||  _ \\ | ____||  _ \\\n"
-                + "          / _ \\  | |    | |_   | |_) ||  _|  | | | |\n"
-                + "         / ___ \\ | |___ |  _|  |  _ < | |___ | |_| |\n"
-                + "        /_/   \\_\\|_____||_|    |_| \\_\\|_____||____/\n"
-                + "                    P E N N Y W O R T H\n"
-                + "\n"
-                + "      Butler to the Wayne family  --  At your service";
-
-        System.out.println(line);
-        System.out.println(banner);
-        System.out.println("    Hello! I'm " + name);
-        System.out.println("    What can I do for you?");
-        System.out.println(line);
-        System.out.println("");
+        greet();
         while (true) {
-            String user = sc.nextLine();
-            System.out.println(line);
-            if (user.equals("bye")) {
+            String command = scanner.nextLine();
+            if (command.equals("bye")) {
                 break;
             }
-            System.out.println("     " + user);
-            System.out.println(line);
-            System.out.println("");
+            reply(command);
         }
-        System.out.println("     Bye. Hope to see you again soon!");
-        System.out.println(line);
-        System.out.println("");
+        reply("Bye. Hope to see you again soon!");
+    }
+
+    /** Prints the banner and the welcome message. */
+    private static void greet() {
+        System.out.println(DIVIDER);
+        System.out.println(BANNER);
+        System.out.println(INDENT + "Hello! I'm " + NAME);
+        System.out.println(INDENT + "What can I do for you?");
+        System.out.println(DIVIDER);
+        System.out.println();
+    }
+
+    /**
+     * Prints a message inside a divider block, followed by a blank line.
+     *
+     * @param message the text to display
+     */
+    private static void reply(String message) {
+        System.out.println(DIVIDER);
+        System.out.println(INDENT + message);
+        System.out.println(DIVIDER);
+        System.out.println();
     }
 }
