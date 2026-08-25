@@ -28,6 +28,8 @@ public class AlfredTheButler {
     /** Greets the user, then echoes each command until {@code bye} is entered. */
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
+        String[] list = new String[100];
+        int i = 0;
 
         greet();
         while (true) {
@@ -35,7 +37,12 @@ public class AlfredTheButler {
             if (command.equals("bye")) {
                 break;
             }
-            reply(command);
+            if (command.equals("list")) {
+                printList(list, i);
+                continue;
+            }
+            list[i++] = command;
+            reply("added: " + command);
         }
         reply("Bye. Hope to see you again soon!");
     }
@@ -60,5 +67,13 @@ public class AlfredTheButler {
         System.out.println(INDENT + message);
         System.out.println(DIVIDER);
         System.out.println();
+    }
+
+    private static void printList(String[] list, int len) {
+        System.out.println(DIVIDER);
+        for (int i = 0; i < len; i++) {
+            System.out.println(INDENT + (i+1) + ". " + list[i]);
+        }
+        System.out.println(DIVIDER);
     }
 }
