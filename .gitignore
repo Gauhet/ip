@@ -20,3 +20,6 @@ _temp/
 text-ui-test/EXPECTED-UNIX.TXT
 src/main/*.class
 src/main/java/*.class
+
+# Claude Code local settings
+.claude/settings.local.json

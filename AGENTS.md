@@ -28,6 +28,18 @@ Unless the user says otherwise, assume that you are assisting a student working 
 
 Ensure that Java 25 is used when running the application or build tasks. On macOS, use `sdk use java 25.0.3.fx-zulu` to switch to Java 25 if needed.
 
+## Testing the text UI
+
+After every change to the code under `src/main/java`, and before reporting that change as done:
+
+1. **Update `test/ui-test-plan.md` if needed.** Add a test case for a new command or behavior, and update the expected output of any existing case whose output the change alters. A change that only reorganizes internals without altering what the program prints needs no update to the plan; in that case say so explicitly, rather than skipping the step silently.
+2. **Invoke the `test-ui` skill** to run the whole plan against the rebuilt program.
+3. **Report the result.** On success, show the console session. On failure, show the failing case with its expected and actual output. Do not describe a code change as complete or working while a case is failing.
+
+Do these two steps in that order. Running the tests first and then editing the plan to match whatever the program happened to print makes the tests agree with bugs instead of catching them. Similarly, when a case fails, fix the program or correct the expected output deliberately, after deciding which of the two is actually wrong; never edit the plan just to make the test pass.
+
+Expected output belongs in the plan only after it has been produced by an actual run and read line by line to confirm it is correct. See `.claude/skills/test-ui/SKILL.md` for how cases are written, run, and compared.
+
 ## Git
 
 Use lightweight tags unless the user requests an annotated tag.
