@@ -179,6 +179,18 @@ When asked to add a case:
    it is both faster and more accurate.
 3. Re-run the whole plan to confirm nothing else broke.
 
+## When the output changes on purpose
+
+Some changes alter output that many cases share — renaming the chatbot, editing
+the banner, fixing the "1 tasks" wording. The greeting is repeated in full in
+every expected block, so such a change invalidates all of them at once.
+
+Regenerate those blocks by running each case and pasting in the real output.
+Do not hand-edit them: retyping the same banner six times is how one block ends
+up with a wrong space that then looks like a genuine test failure. Read the
+regenerated output before pasting it, to confirm the change is the one intended
+and nothing else moved.
+
 ## Notes
 
 * Java 25 is required (`java -version` to check).
