@@ -73,14 +73,14 @@ bye
 
 ## TC2: Add todos and list them
 
-**Aim:** A plain line is stored as a todo and confirmed with a running count,
-and `list` shows the stored tasks numbered from 1 in the order they were added.
+**Aim:** `todo` stores a task and confirms it with a running count, and `list`
+shows the stored tasks numbered from 1 in the order they were added.
 
 **Input:**
 
 ```
-read book
-buy milk
+todo read book
+todo buy milk
 list
 bye
 ```
@@ -135,8 +135,8 @@ each command).
 **Input:**
 
 ```
-read book
-buy milk
+todo read book
+todo buy milk
 mark 2
 list
 unmark 2
@@ -305,7 +305,7 @@ by number regardless of type.
 **Input:**
 
 ```
-borrow book
+todo borrow book
 deadline return book /by Sunday
 event project meeting /from Mon 2pm /to 4pm
 mark 2
@@ -465,13 +465,128 @@ bye now
 
 ---
 
+## TC9: Add todos with the `todo` keyword
+
+**Aim:** `todo <description>` stores a todo described by the words after the
+keyword, not by the whole line, and it is displayed and numbered exactly like a
+todo added any other way.
+
+The keyword is now the only way to add a todo; a bare description is refused,
+which TC10 covers. This case overlaps with TC2 on purpose: TC2 is about the
+running count and the numbering, this one about the keyword and how much of the
+line becomes the description.
+
+**Input:**
+
+```
+todo read book
+todo return the Batmobile
+list
+bye
+```
+
+**Expected output:**
+
+```
+    ____________________________________________________________
+            _     _      _____  ____   _____  ____
+           / \   | |    |  ___||  _ \ | ____||  _ \
+          / _ \  | |    | |_   | |_) ||  _|  | | | |
+         / ___ \ | |___ |  _|  |  _ < | |___ | |_| |
+        /_/   \_\|_____||_|    |_| \_\|_____||____/
+                    P E N N Y W O R T H
+
+      Butler to the Wayne family  --  At your service
+     Hello! I'm AlfredTheButler
+     What can I do for you?
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Got it. I've added this task:
+       [T][ ] read book
+     Now you have 1 tasks in the list.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Got it. I've added this task:
+       [T][ ] return the Batmobile
+     Now you have 2 tasks in the list.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Here are the tasks in your list:
+     1.[T][ ] read book
+     2.[T][ ] return the Batmobile
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Bye. Hope to see you again soon!
+    ____________________________________________________________
+```
+
+---
+
+## TC10: Unrecognised commands are refused
+
+**Aim:** A word that is not a command draws an error quoting that word back,
+rather than being stored as a task. Covers both a mistyped command (`lst`) and
+a bare description of the kind that used to become a todo (`borrow book`).
+
+The closing `list` is the point of the case: it shows an empty list, proving
+the two refused lines stored nothing rather than being quietly accepted.
+
+**Input:**
+
+```
+lst
+borrow book
+list
+bye
+```
+
+**Expected output:**
+
+```
+    ____________________________________________________________
+            _     _      _____  ____   _____  ____
+           / \   | |    |  ___||  _ \ | ____||  _ \
+          / _ \  | |    | |_   | |_) ||  _|  | | | |
+         / ___ \ | |___ |  _|  |  _ < | |___ | |_| |
+        /_/   \_\|_____||_|    |_| \_\|_____||____/
+                    P E N N Y W O R T H
+
+      Butler to the Wayne family  --  At your service
+     Hello! I'm AlfredTheButler
+     What can I do for you?
+    ____________________________________________________________
+
+    ____________________________________________________________
+     I'm afraid I don't know 'lst', sir.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     I'm afraid I don't know 'borrow', sir.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Here are the tasks in your list:
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Bye. Hope to see you again soon!
+    ____________________________________________________________
+```
+
+---
+
 ## Known gaps (not yet covered)
 
 These are behaviours the program does not handle yet, so there is nothing stable
 to assert. Add cases here as the features are implemented.
 
-* Invalid input still crashes the program instead of printing an error message.
-  Each of these was tried by hand against the current code:
+* Invalid input is still unhandled, so it crashes or is quietly accepted rather
+  than drawing an error message. Each of these was tried by hand against the
+  current code:
 
   | Input | What happens today |
   | --- | --- |
@@ -480,17 +595,17 @@ to assert. Add cases here as the features are implemented.
   | `mark 0` | `ArrayIndexOutOfBoundsException` (index -1) |
   | `deadline foo` | `StringIndexOutOfBoundsException` (no `/by`) |
   | `event foo /from Mon` | `StringIndexOutOfBoundsException` (no `/to`) |
+  | `todo` | silently adds a task with a blank description |
 
   Blank input used to belong on this list, quietly adding `[T][ ]` with nothing
   after it. It is now refused with a message, and TC7 covers it.
 
   The rest are not test cases yet because a stack trace is not correct behaviour
-  to assert, and the line numbers in it change on every edit. Write the cases as
-  each one is handled, using the new error message as expected output.
+  to assert, and the line numbers in it change on every edit. The `todo` row is
+  the quiet one that does not crash, so it will not announce itself. Write the
+  cases as each is handled, using the new error message as expected output.
 * Two crashes that are not caused by invalid input: adding a 101st task
   overruns the fixed-size array, and input that ends without `bye` leaves the
   program reading from a stream that has ended.
-* There is no `todo` keyword yet, so `todo borrow book` is stored as a task
-  literally described "todo borrow book".
 * The 100-task limit and the wording "Now you have 1 tasks in the list."
   (singular/plural) are known rough edges.

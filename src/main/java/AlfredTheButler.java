@@ -37,6 +37,9 @@ public class AlfredTheButler {
     /** Command that shows every stored task. */
     private static final String LIST_COMMAND = "list";
 
+    /** Command that adds a task with no date attached. */
+    private static final String TODO_COMMAND = "todo";
+
     /** Command that marks a task as done. */
     private static final String MARK_COMMAND = "mark";
 
@@ -60,8 +63,9 @@ public class AlfredTheButler {
 
     /**
      * Greets the user, then handles one command per line until {@code bye}:
-     * {@code list}, {@code mark <number>} and {@code unmark <number>}, or
-     * otherwise stores the line as a task and confirms it.
+     * {@code list}, {@code mark <number>}, {@code unmark <number>}, and the
+     * three that add a task, {@code todo}, {@code deadline} and {@code event}.
+     * Any other word is refused rather than guessed at.
      *
      * <p>Commands run inside a {@code try} so that a mistake in what was typed
      * becomes an ordinary reply and the loop carries on. Catching in one place
@@ -90,6 +94,10 @@ public class AlfredTheButler {
                 String keyword = parts[0];
                 String arguments = parts.length > 1 ? parts[1].trim() : "";
 
+                // Left null by the commands that do not add anything, which is
+                // what tells the code below there is nothing to store.
+                Task added = null;
+
                 // An arrow switch, so no arm can fall through into the next by
                 // accident, and so `break` keeps its usual meaning in the loop.
                 switch (keyword) {
@@ -105,23 +113,20 @@ public class AlfredTheButler {
                     tasks[index].markDone();
                     reply("Nice! I've marked this task as done:", SUB_INDENT + tasks[index]);
                 }
-                case DEADLINE_COMMAND -> {
-                    Task added = parseDeadline(arguments);
+                case TODO_COMMAND -> added = new ToDo(arguments);
+                case DEADLINE_COMMAND -> added = parseDeadline(arguments);
+                case EVENT_COMMAND -> added = parseEvent(arguments);
+                // Only the keyword is quoted back. Repeating the whole line
+                // would bury the one word that was not understood.
+                default -> throw new AlfredException(
+                        "I'm afraid I don't know '" + keyword + "', sir.");
+                }
+
+                // Storing and confirming is the same for every kind of task, so
+                // it is done once here rather than repeated in each arm above.
+                if (added != null) {
                     tasks[taskCount++] = added;
                     replyAdded(added, taskCount);
-                }
-                case EVENT_COMMAND -> {
-                    Task added = parseEvent(arguments);
-                    tasks[taskCount++] = added;
-                    replyAdded(added, taskCount);
-                }
-                // Anything unrecognised is still stored as a todo, described by
-                // the whole line rather than by its arguments alone.
-                default -> {
-                    Task added = new ToDo(line);
-                    tasks[taskCount++] = added;
-                    replyAdded(added, taskCount);
-                }
                 }
             } catch (AlfredException e) {
                 reply(e.getMessage());
