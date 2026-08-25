@@ -38,7 +38,7 @@ public class AlfredTheButler {
     private static final String UNMARK_COMMAND = "unmark ";
 
     /**
-     * Greets the user, then stores each command as a task and confirms it,
+     * Greets the user, then stores each command as a todo and confirms it,
      * listing the stored tasks on {@code list} and changing whether one is
      * done on {@code mark <number>} and {@code unmark <number>},
      * until {@code bye} is entered.
@@ -72,7 +72,7 @@ public class AlfredTheButler {
                 reply("Nice! I've marked this task as done:", SUB_INDENT + tasks[index]);
                 continue;
             }
-            tasks[taskCount++] = new Task(command);
+            tasks[taskCount++] = new ToDo(command);
             reply("added: " + command);
         }
         reply("Bye. Hope to see you again soon!");
