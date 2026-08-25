@@ -1,4 +1,5 @@
 import java.util.Scanner;
+
 /**
  * Alfred the Butler: a personal chatbot.
  * At this stage it only greets the user and then says goodbye.
@@ -10,7 +11,7 @@ public class AlfredTheButler {
      * @param args command line arguments (unused)
      */
     public static void main(String[] args) {
-        Scanner sc=new Scanner(System.in);
+        Scanner sc = new Scanner(System.in);
         String line = "    ____________________________________________________________";
         String name = "AlfredTheButler";
 
@@ -29,16 +30,19 @@ public class AlfredTheButler {
         System.out.println("    Hello! I'm " + name);
         System.out.println("    What can I do for you?");
         System.out.println(line);
-        while(true) {
+        System.out.println("");
+        while (true) {
             String user = sc.nextLine();
             System.out.println(line);
-            if(user.equals("bye")) {
+            if (user.equals("bye")) {
                 break;
             }
-            System.out.println("    "+user);
+            System.out.println("     " + user);
             System.out.println(line);
+            System.out.println("");
         }
-        System.out.println("    Bye. Hope to see you again soon!");
+        System.out.println("     Bye. Hope to see you again soon!");
         System.out.println(line);
+        System.out.println("");
     }
 }
