@@ -30,36 +30,12 @@ public class AlfredTheButler {
             + "\n"
             + "      Butler to the Wayne family  --  At your service";
 
-    /** Command that ends the conversation. */
-    private static final String BYE_COMMAND = "bye";
-
-    /** Command that shows every stored task. */
-    private static final String LIST_COMMAND = "list";
-
-    /** Command that adds a task with no date attached. */
-    private static final String TODO_COMMAND = "todo";
-
-    /** Command that marks a task as done. */
-    private static final String MARK_COMMAND = "mark";
-
-    /** Command that marks a task as not done. */
-    private static final String UNMARK_COMMAND = "unmark";
-
-    /** Command that removes a task from the list. */
-    private static final String DELETE_COMMAND = "delete";
-
-    /** Command that adds a deadline. */
-    private static final String DEADLINE_COMMAND = "deadline";
-
     /**
      * Keyword that separates a deadline's description from its due time. The
      * surrounding spaces are not part of it, so that a missing description can
      * be told apart from a missing keyword rather than looking the same.
      */
     private static final String BY_SEPARATOR = "/by";
-
-    /** Command that adds an event. */
-    private static final String EVENT_COMMAND = "event";
 
     /** Keyword that separates an event's description from its start time. */
     private static final String FROM_SEPARATOR = "/from";
@@ -106,33 +82,31 @@ public class AlfredTheButler {
 
                 // An arrow switch, so no arm can fall through into the next by
                 // accident, and so `break` keeps its usual meaning in the loop.
-                switch (keyword) {
-                case BYE_COMMAND -> isRunning = false;
-                case LIST_COMMAND -> printList(tasks);
-                case UNMARK_COMMAND -> {
+                // No default arm is needed: an unknown keyword has already been
+                // refused by fromKeyword, so every value reaching here is listed.
+                switch (Command.fromKeyword(keyword)) {
+                case BYE -> isRunning = false;
+                case LIST -> printList(tasks);
+                case UNMARK -> {
                     int index = parseTaskIndex(arguments, tasks.size());
                     tasks.get(index).unmarkDone();
                     reply("OK, I've marked this task as not done yet:", SUB_INDENT + tasks.get(index));
                 }
-                case MARK_COMMAND -> {
+                case MARK -> {
                     int index = parseTaskIndex(arguments, tasks.size());
                     tasks.get(index).markDone();
                     reply("Nice! I've marked this task as done:", SUB_INDENT + tasks.get(index));
                 }
-                case DELETE_COMMAND -> {
+                case DELETE -> {
                     int index = parseTaskIndex(arguments, tasks.size());
                     Task removed = tasks.remove(index);
                     reply("Noted. I've removed this task:",
                             SUB_INDENT + removed,
                             "Now you have " + tasks.size() + " tasks in the list.");
                 }
-                case TODO_COMMAND -> added = parseToDo(arguments);
-                case DEADLINE_COMMAND -> added = parseDeadline(arguments);
-                case EVENT_COMMAND -> added = parseEvent(arguments);
-                // Only the keyword is quoted back. Repeating the whole line
-                // would bury the one word that was not understood.
-                default -> throw new AlfredException(
-                        "I'm afraid I don't know '" + keyword + "', sir.");
+                case TODO -> added = parseToDo(arguments);
+                case DEADLINE -> added = parseDeadline(arguments);
+                case EVENT -> added = parseEvent(arguments);
                 }
 
                 // Storing and confirming is the same for every kind of task, so
