@@ -369,9 +369,24 @@ bye
 These are behaviours the program does not handle yet, so there is nothing stable
 to assert. Add cases here as the features are implemented.
 
-* Invalid input: unknown commands, `mark` with a non-number or an out-of-range
-  number, `deadline`/`event` missing their `/by`, `/from` or `/to` keywords.
-  Today these crash with an exception rather than printing an error message.
+* Invalid input crashes the program instead of printing an error message. Each
+  of these was tried by hand against the current code:
+
+  | Input | What happens today |
+  | --- | --- |
+  | `mark abc` | `NumberFormatException` |
+  | `mark 99` | `NullPointerException` (empty slot in the array) |
+  | `mark 0` | `ArrayIndexOutOfBoundsException` (index -1) |
+  | `deadline foo` | `StringIndexOutOfBoundsException` (no `/by`) |
+  | `event foo /from Mon` | `StringIndexOutOfBoundsException` (no `/to`) |
+  | *(empty line)* | silently adds a task with a blank description |
+
+  The last one is the quiet one: it does not crash, so it will not show up as
+  an obvious bug, but the list ends up holding `[T][ ]` with nothing after it.
+
+  These are not test cases yet because a stack trace is not correct behaviour to
+  assert, and the line numbers in it change on every edit. Write the cases when
+  error handling is added, using the new error messages as expected output.
 * There is no `todo` keyword yet, so `todo borrow book` is stored as a task
   literally described "todo borrow book".
 * The 100-task limit and the wording "Now you have 1 tasks in the list."
