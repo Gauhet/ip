@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * A task the user has asked Alfred to remember, together with whether it has
  * been completed. Each kind of task is a subclass that puts its own type box,
@@ -29,22 +32,31 @@ public abstract class Task {
     }
 
     /**
-     * Returns the fields this task shares with every other kind, as the middle
-     * of a save-file line, for example {@code 1 | read book}. The status is
-     * written as a digit rather than a box, because the file is read by the
-     * program rather than by a person.
+     * Returns the fields this task shares with every other kind, in the order
+     * they are saved: the status, then the description. The status is a digit
+     * rather than a box, because the file is read by the program rather than by
+     * a person.
      *
-     * <p>Each subclass puts its own type letter in front of this and adds any
-     * fields of its own after it, the same way {@link #toString()} is built up.
+     * <p>Each subclass puts its own type letter at the front and adds any fields
+     * of its own at the end, the same way {@link #toString()} is built up.
      *
-     * @return the save-file form of this task, without a type letter
+     * <p>The fields are returned separately rather than already joined into a
+     * line, so that only {@link Storage} knows what separates them and how a
+     * field containing that separator is escaped. Were the joining done here, it
+     * would have to be kept in step with the code that splits the line back up,
+     * in another file.
+     *
+     * @return a mutable list holding this task's shared fields
      */
-    public String toFileFormat() {
+    public List<String> toFileFields() {
+        List<String> fields = new ArrayList<>();
         if (isDone) {
-            return "1 | " + name;
+            fields.add("1");
         } else {
-            return "0 | " + name;
+            fields.add("0");
         }
+        fields.add(name);
+        return fields;
     }
 
     /**

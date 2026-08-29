@@ -3,8 +3,10 @@ import java.util.List;
 import java.util.Scanner;
 
 /**
- * Alfred the Butler: a personal chatbot that echoes each command
- * it is given until the user types {@code bye}.
+ * Alfred the Butler: a personal chatbot that keeps a list of tasks, taking one
+ * command per line until the user says {@code bye} or the input runs out. The
+ * list is saved to disk after every change and read back at startup, so it
+ * outlives a single run.
  */
 public class AlfredTheButler {
     /** Horizontal rule that opens and closes every message block. */
@@ -44,11 +46,11 @@ public class AlfredTheButler {
     private static final String TO_SEPARATOR = "/to";
 
     /**
-     * Greets the user, then handles one command per line until {@code bye}:
-     * {@code list}, {@code mark <number>}, {@code unmark <number>},
-     * {@code delete <number>}, and the three that add a task, {@code todo},
-     * {@code deadline}, and {@code event}. Any other word is refused rather
-     * than guessed at.
+     * Greets the user, then handles one command per line until {@code bye} or
+     * the end of the input: {@code list}, {@code mark <number>},
+     * {@code unmark <number>}, {@code delete <number>}, and the three that add
+     * a task, {@code todo}, {@code deadline}, and {@code event}. Any other word
+     * is refused rather than guessed at.
      *
      * <p>Commands run inside a {@code try} so that a mistake in what was typed
      * becomes an ordinary reply and the loop carries on. Catching in one place
@@ -69,16 +71,31 @@ public class AlfredTheButler {
         // cannot rely on the loop's catch. A file that cannot be read leaves
         // the empty list above in place rather than stopping the program.
         try {
-            tasks = storage.load();
+            Storage.LoadResult loaded = storage.load();
+            tasks = loaded.tasks();
             // Said only when there is something to say. On a first run there is
             // no file yet, and announcing that nothing came back would be noise.
             if (!tasks.isEmpty()) {
-                reply("I've brought back " + tasks.size() + " tasks from last time, sir.");
+                reply("I've brought back " + describeCount(tasks.size(), "task") + " from last time, sir.");
+            }
+            // Warned about separately, and even when nothing else was restored,
+            // because the damaged lines are dropped from the file as soon as the
+            // list next changes.
+            if (loaded.skippedLines() > 0) {
+                reply("I could not make sense of " + describeCount(loaded.skippedLines(), "line")
+                                + " in your saved tasks, sir.",
+                        "I have left them out, and they will be gone once the list changes.");
             }
         } catch (AlfredException e) {
             reply(e.getMessage());
         }
         while (isRunning) {
+            // End of input is treated as `bye`, so that a piped or redirected
+            // session that simply runs out of lines finishes the same way a
+            // typed one does instead of failing to read a line that is not there.
+            if (!scanner.hasNextLine()) {
+                break;
+            }
             // Trimmed so that a stray space around a command does not stop it
             // being recognized.
             String line = scanner.nextLine().trim();
@@ -127,7 +144,7 @@ public class AlfredTheButler {
                     isListChanged = true;
                     reply("Noted. I've removed this task:",
                             SUB_INDENT + removed,
-                            "Now you have " + tasks.size() + " tasks in the list.");
+                            "Now you have " + describeCount(tasks.size(), "task") + " in the list.");
                 }
                 case TODO -> added = parseToDo(arguments);
                 case DEADLINE -> added = parseDeadline(arguments);
@@ -149,9 +166,33 @@ public class AlfredTheButler {
                 }
             } catch (AlfredException e) {
                 reply(e.getMessage());
+            } catch (RuntimeException e) {
+                // A safety net, not a substitute for handling: everything the
+                // user can get wrong is refused above with a message of its own.
+                // This one catches the mistakes in this program, so that a bug
+                // in one command costs that command rather than the session and
+                // the tasks typed since the last save. The class and message are
+                // shown because a fault that cannot be named cannot be reported.
+                reply("Something went wrong on my end, sir: " + e,
+                        "Your tasks are unharmed. Do carry on.");
             }
         }
         reply("Bye. Hope to see you again soon!");
+    }
+
+    /**
+     * Returns a count with its noun, made plural unless there is exactly one of
+     * them, for example {@code 1 task} or {@code 2 tasks}.
+     *
+     * @param count how many there are
+     * @param noun the singular form of what is being counted
+     * @return the count and the noun, ready to drop into a sentence
+     */
+    private static String describeCount(int count, String noun) {
+        if (count == 1) {
+            return count + " " + noun;
+        }
+        return count + " " + noun + "s";
     }
 
     /**
@@ -224,12 +265,12 @@ public class AlfredTheButler {
      * user can see how it was understood.
      *
      * @param task the task that was just added
-     * @param count how many tasks are stored now that it has been added
+     * @param taskCount how many tasks are stored now that it has been added
      */
-    private static void replyAdded(Task task, int count) {
+    private static void replyAdded(Task task, int taskCount) {
         reply("Got it. I've added this task:",
                 SUB_INDENT + task,
-                "Now you have " + count + " tasks in the list.");
+                "Now you have " + describeCount(taskCount, "task") + " in the list.");
     }
 
     /**

@@ -1,3 +1,5 @@
+import java.util.List;
+
 /**
  * A task that spans a stretch of time, for example
  * {@code [E][ ] project meeting (from: Mon 2pm to: 4pm)}.
@@ -32,8 +34,12 @@ public class Event extends Task {
      * them apart again.
      */
     @Override
-    public String toFileFormat() {
-        return "E | " + super.toFileFormat() + " | " + from + " | " + to;
+    public List<String> toFileFields() {
+        List<String> fields = super.toFileFields();
+        fields.add(0, "E");
+        fields.add(from);
+        fields.add(to);
+        return fields;
     }
 
     @Override

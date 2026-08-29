@@ -11,29 +11,28 @@ reports the console session.
 ## The contract with the test plan
 
 `test/ui-test-plan.md` holds every test case. Each case is a `## TC<n>: <title>`
-heading, a prose **Aim**, then either two or three fenced code blocks.
+heading, a prose **Aim**, then fenced code blocks, each introduced by a bold
+label naming what it is. The label decides what the block means, so blocks are
+never counted or identified by position.
 
-A **one-run case** has two blocks, in this order:
+Every case has an **Expected output** block — the entire console output of the
+case, from the greeting banner to the last farewell message — and one of:
 
-1. **Input** — the lines typed into the program, one command per line, last line
-   `bye`.
-1. **Expected output** — the entire console output of that run, from the
-   greeting banner to the farewell message.
+* **Input**, for a one-run case: the lines typed into the program, one command
+  per line.
+* **First input** and **Second input**, for a two-run case: two runs, the second
+  started after the first has exited, against the save file the first left
+  behind. Its expected output holds both runs end to end, so the second greeting
+  appears in the middle of the block.
 
-A **two-run case** has three blocks, and exists to test what survives a restart:
+Any case may also carry a **Save file** block, whose contents become
+`data/alfred.txt` before the case runs. That is how a case tests what the
+program does with a file it did not write.
 
-1. **First input** — the lines typed into the first run.
-1. **Second input** — the lines typed into a second run, started after the first
-   has exited, against the save file the first run left behind.
-1. **Expected output** — the console output of **both** runs, one after the
-   other, so the second greeting appears in the middle of the block.
-
-The number of blocks is what tells the two apart, so a case must have exactly
-two or exactly three.
-
-Each case starts from a **fresh program and an empty save file**, so cases never
-share task state. Within a two-run case the save file is *not* cleared between
-the two runs — carrying it over is the whole point of the case.
+Each case starts from a **fresh program**, and from an empty save file unless it
+supplied one, so cases never share task state. Within a two-run case the save
+file is *not* cleared between the two runs — carrying it over is the whole point
+of the case.
 
 Read the plan's own "Rules for writing a test case" section before adding cases.
 
@@ -60,34 +59,52 @@ report the wrong result.
 
 ### 2. Extract the cases from the plan
 
-Pull each case's two fenced blocks straight out of the Markdown, rather than
+Pull each case's fenced blocks straight out of the Markdown, rather than
 retyping them. Copying by hand risks changing a space and testing the wrong
-thing:
+thing.
+
+Each block is routed by the **bold label above it**, not by its position, so
+that a case can leave a block out or add one without shifting the rest:
 
 ```bash
 awk -v out="$WORK" '
-  /^## TC/ { tc++; fence = 0; next }
+  /^## TC/ { tc++; kind = ""; next }
   tc == 0  { next }
-  /^```/   { fence++; infence = (fence % 2 == 1); blk = int((fence + 1) / 2); next }
-  infence  { print > (out "/tc" tc ".b" blk) }
+  !infence && /^\*\*[A-Za-z ]+:\*\*/ {
+      kind = $0
+      sub(/^\*\*/, "", kind); sub(/:\*\*.*$/, "", kind)
+      gsub(/ /, "-", kind); kind = tolower(kind)
+      next
+  }
+  /^```/ { infence = !infence; if (infence) file = out "/tc" tc "." kind; next }
+  infence { print > file }
 ' test/ui-test-plan.md
 ```
 
-Every opening fence starts the next block, so a case's blocks land in
-`tc<n>.b1`, `tc<n>.b2`, and — for a two-run case only — `tc<n>.b3`. Which block
-is which follows from how many there are:
+That gives one file per labeled block:
+
+| Label in the plan | File | Meaning |
+| --- | --- | --- |
+| `**Input:**` | `tc<n>.input` | the only run's input |
+| `**First input:**` | `tc<n>.first-input` | first run of a two-run case |
+| `**Second input:**` | `tc<n>.second-input` | second run of a two-run case |
+| `**Save file:**` | `tc<n>.save-file` | seeds `data/alfred.txt` before the run |
+| `**Expected output:**` | `tc<n>.expected-output` | what every run printed, end to end |
+
+`**Aim:**` is a label too, but no fence follows it, so it routes nothing.
 
 ```bash
-if [ -f "$WORK/tc$n.b3" ]; then   # two-run case
-  inputs="$WORK/tc$n.b1 $WORK/tc$n.b2"; expected="$WORK/tc$n.b3"
-else                              # one-run case
-  inputs="$WORK/tc$n.b1";          expected="$WORK/tc$n.b2"
+if [ -f "$WORK/tc$n.first-input" ]; then
+  inputs="$WORK/tc$n.first-input $WORK/tc$n.second-input"
+else
+  inputs="$WORK/tc$n.input"
 fi
+expected="$WORK/tc$n.expected-output"
 ```
 
-Before running anything, check that every case produced a `b1` and a `b2`, and
-that no case produced a `b4`. A case with any other number of blocks does not
-follow the required shape, and the plan should be fixed first.
+Before running anything, check that every case produced an `expected-output` and
+at least one input. A case that did not is mislabeled, and the plan should be
+fixed first.
 
 ### 3. Run the cases, in the order they appear in the plan
 
@@ -95,16 +112,26 @@ Run them in a loop that **stops at the first failure** and prints a per-case
 pass/fail line, so the failing case is always identifiable. Never run them in a
 way that swallows individual results or keeps going after a failure.
 
-1. **Clear the save file**, so the case starts with an empty task list:
+1. **Clear the save file**, so the case starts with an empty task list — or
+   seed it, if the case supplied a `**Save file:**` block:
 
    ```bash
-   rm -f data/alfred.txt
+   rm -rf data/alfred.txt
+   if [ -f "$WORK/tc$n.save-file" ]; then
+     mkdir -p data && cp "$WORK/tc$n.save-file" data/alfred.txt
+   fi
    ```
 
    This matters as much as compiling. The program reads `data/alfred.txt` at
-   startup, so without this the tasks from one case reappear in the next, and
-   every case after the first compares against the wrong list. Clear it once
-   per **case**, never between the two runs of a two-run case.
+   startup, so without it the tasks from one case reappear in the next, and
+   every case after the first compares against the wrong list. Do this once per
+   **case**, never between the two runs of a two-run case.
+
+   A `**Save file:**` block is how a case tests what the program does with a
+   file it did not write — a hand-edited or damaged one. It is the only way to
+   reach that code, since the program never saves a line it cannot read back.
+   `rm -rf` rather than `rm -f` because an earlier manual test may have left a
+   directory of that name behind.
 1. Run the program once per input block, appending each run's output to the
    same actual-output file so a two-run case is compared as one session:
 
@@ -149,12 +176,14 @@ Putting those together:
 
 ```bash
 for n in $(seq 1 "$CASES"); do
-  if [ -f "$WORK/tc$n.b3" ]; then
-    inputs="$WORK/tc$n.b1 $WORK/tc$n.b2"; expected="$WORK/tc$n.b3"
+  if [ -f "$WORK/tc$n.first-input" ]; then
+    inputs="$WORK/tc$n.first-input $WORK/tc$n.second-input"
   else
-    inputs="$WORK/tc$n.b1";              expected="$WORK/tc$n.b2"
+    inputs="$WORK/tc$n.input"
   fi
-  rm -f data/alfred.txt
+  expected="$WORK/tc$n.expected-output"
+  rm -rf data/alfred.txt
+  [ -f "$WORK/tc$n.save-file" ] && { mkdir -p data; cp "$WORK/tc$n.save-file" data/alfred.txt; }
   : > "$WORK/tc$n.actual"
   r=0
   for in in $inputs; do
@@ -220,7 +249,7 @@ transcript() {   # $1 = actual output file, $2 = input file
     }
   ' "$1"
 }
-transcript "$WORK/tc1.r1.actual" "$WORK/tc1.b1"
+transcript "$WORK/tc1.r1.actual" "$WORK/tc1.input"
 ```
 
 `STARTUP_MSG` matches the wording the program uses today. If those messages are
@@ -232,9 +261,9 @@ file, and show the two one after the other with a line saying the program was
 restarted in between:
 
 ```bash
-transcript "$WORK/tc1.r1.actual" "$WORK/tc1.b1"
+transcript "$WORK/tc1.r1.actual" "$WORK/tc1.first-input"
 echo "--- program restarted, same save file ---"
-transcript "$WORK/tc1.r2.actual" "$WORK/tc1.b2"
+transcript "$WORK/tc1.r2.actual" "$WORK/tc1.second-input"
 ```
 
 Do **not** run the combined output against the two input files concatenated.

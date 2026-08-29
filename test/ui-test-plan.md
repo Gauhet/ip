@@ -25,15 +25,16 @@ between its two runs.
 
 ## Rules for writing a test case
 
-* A one-run case has two fenced blocks, in this order: **Input**, then
-  **Expected output**. A two-run case has three: **First input**, **Second
-  input**, then **Expected output**. The number of blocks is what tells the
-  runner which kind it is, so a case must have exactly two or exactly three.
-  The aim is the prose line above them.
-* The last input line must be one that exits, which in practice means `bye`.
-  Without it the program would keep reading from a stream that has ended and
-  crash instead of exiting cleanly. Extra words after the keyword are ignored,
-  so `bye now` also exits; only TC8 relies on that, to prove it.
+* Every fenced block is introduced by a bold label saying what it is, and the
+  label is what the runner goes by, not the order. A one-run case has
+  **Input** and **Expected output**; a two-run case has **First input**,
+  **Second input**, and **Expected output**. The aim is the prose above them.
+* A case may add a **Save file** block, whose contents become `data/alfred.txt`
+  before the case runs. That is the only way to test what the program does with
+  a file it did not write, since it never saves a line it cannot read back.
+* The last input line is normally `bye`, but does not have to be: input that
+  simply runs out is treated the same way, which TC16 proves. Extra words after
+  the keyword are ignored, so `bye now` also exits; only TC8 relies on that.
 * `Expected output` is the **entire** console output of the run, starting with
   the greeting banner and ending with the farewell message.
 * Comparison is line-by-line and exact, except that trailing whitespace,
@@ -115,7 +116,7 @@ bye
     ____________________________________________________________
      Got it. I've added this task:
        [T][ ] read book
-     Now you have 1 tasks in the list.
+     Now you have 1 task in the list.
     ____________________________________________________________
 
     ____________________________________________________________
@@ -174,7 +175,7 @@ bye
     ____________________________________________________________
      Got it. I've added this task:
        [T][ ] read book
-     Now you have 1 tasks in the list.
+     Now you have 1 task in the list.
     ____________________________________________________________
 
     ____________________________________________________________
@@ -244,7 +245,7 @@ bye
     ____________________________________________________________
      Got it. I've added this task:
        [D][ ] return book (by: Sunday)
-     Now you have 1 tasks in the list.
+     Now you have 1 task in the list.
     ____________________________________________________________
 
     ____________________________________________________________
@@ -292,7 +293,7 @@ bye
     ____________________________________________________________
      Got it. I've added this task:
        [E][ ] project meeting (from: Mon 2pm to: 4pm)
-     Now you have 1 tasks in the list.
+     Now you have 1 task in the list.
     ____________________________________________________________
 
     ____________________________________________________________
@@ -343,7 +344,7 @@ bye
     ____________________________________________________________
      Got it. I've added this task:
        [T][ ] borrow book
-     Now you have 1 tasks in the list.
+     Now you have 1 task in the list.
     ____________________________________________________________
 
     ____________________________________________________________
@@ -515,7 +516,7 @@ bye
     ____________________________________________________________
      Got it. I've added this task:
        [T][ ] read book
-     Now you have 1 tasks in the list.
+     Now you have 1 task in the list.
     ____________________________________________________________
 
     ____________________________________________________________
@@ -729,7 +730,7 @@ bye
     ____________________________________________________________
      Got it. I've added this task:
        [T][ ] read book
-     Now you have 1 tasks in the list.
+     Now you have 1 task in the list.
     ____________________________________________________________
 
     ____________________________________________________________
@@ -822,7 +823,7 @@ bye
     ____________________________________________________________
      Got it. I've added this task:
        [T][ ] read book
-     Now you have 1 tasks in the list.
+     Now you have 1 task in the list.
     ____________________________________________________________
 
     ____________________________________________________________
@@ -859,7 +860,7 @@ bye
     ____________________________________________________________
      Noted. I've removed this task:
        [T][ ] read book
-     Now you have 1 tasks in the list.
+     Now you have 1 task in the list.
     ____________________________________________________________
 
     ____________________________________________________________
@@ -928,7 +929,7 @@ bye
     ____________________________________________________________
      Got it. I've added this task:
        [T][ ] read book
-     Now you have 1 tasks in the list.
+     Now you have 1 task in the list.
     ____________________________________________________________
 
     ____________________________________________________________
@@ -1028,7 +1029,7 @@ bye
     ____________________________________________________________
      Got it. I've added this task:
        [T][ ] read book
-     Now you have 1 tasks in the list.
+     Now you have 1 task in the list.
     ____________________________________________________________
 
     ____________________________________________________________
@@ -1065,29 +1066,238 @@ bye
 
 ---
 
+## TC16: Input that runs out is treated as `bye`
+
+**Aim:** Input that ends without an exit command finishes the session cleanly,
+with the same farewell as `bye`, instead of failing to read a line that is not
+there.
+
+The input deliberately has no `bye`. Before this was handled, the program threw
+`NoSuchElementException` and printed a stack trace after the last command, which
+is what a redirected or piped session hits every time it reaches the end of its
+file.
+
+**Input:**
+
+```
+todo read book
+list
+```
+
+**Expected output:**
+
+```
+    ____________________________________________________________
+            _     _      _____  ____   _____  ____
+           / \   | |    |  ___||  _ \ | ____||  _ \
+          / _ \  | |    | |_   | |_) ||  _|  | | | |
+         / ___ \ | |___ |  _|  |  _ < | |___ | |_| |
+        /_/   \_\|_____||_|    |_| \_\|_____||____/
+                    P E N N Y W O R T H
+
+      Butler to the Wayne family  --  At your service
+     Hello! I'm AlfredTheButler
+     What can I do for you?
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Got it. I've added this task:
+       [T][ ] read book
+     Now you have 1 task in the list.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Here are the tasks in your list:
+     1.[T][ ] read book
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Bye. Hope to see you again soon!
+    ____________________________________________________________
+```
+
+---
+
+## TC17: A description containing the field separator survives a restart
+
+**Aim:** A description holding the ` | ` that separates fields in the save file
+comes back whole, rather than being cut short at the first one. The same holds
+for a time field.
+
+This is the case that would silently lose data: before the separator was
+escaped, `todo a | b` saved as three fields and came back as just `a`, with no
+error to show anything had gone wrong. The deadline covers a separator in both
+the description and the `/by` time at once.
+
+**First input:**
+
+```
+todo a | b
+deadline pipe | desc /by Sun | day
+bye
+```
+
+**Second input:**
+
+```
+list
+bye
+```
+
+**Expected output:**
+
+```
+    ____________________________________________________________
+            _     _      _____  ____   _____  ____
+           / \   | |    |  ___||  _ \ | ____||  _ \
+          / _ \  | |    | |_   | |_) ||  _|  | | | |
+         / ___ \ | |___ |  _|  |  _ < | |___ | |_| |
+        /_/   \_\|_____||_|    |_| \_\|_____||____/
+                    P E N N Y W O R T H
+
+      Butler to the Wayne family  --  At your service
+     Hello! I'm AlfredTheButler
+     What can I do for you?
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Got it. I've added this task:
+       [T][ ] a | b
+     Now you have 1 task in the list.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Got it. I've added this task:
+       [D][ ] pipe | desc (by: Sun | day)
+     Now you have 2 tasks in the list.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Bye. Hope to see you again soon!
+    ____________________________________________________________
+
+    ____________________________________________________________
+            _     _      _____  ____   _____  ____
+           / \   | |    |  ___||  _ \ | ____||  _ \
+          / _ \  | |    | |_   | |_) ||  _|  | | | |
+         / ___ \ | |___ |  _|  |  _ < | |___ | |_| |
+        /_/   \_\|_____||_|    |_| \_\|_____||____/
+                    P E N N Y W O R T H
+
+      Butler to the Wayne family  --  At your service
+     Hello! I'm AlfredTheButler
+     What can I do for you?
+    ____________________________________________________________
+
+    ____________________________________________________________
+     I've brought back 2 tasks from last time, sir.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Here are the tasks in your list:
+     1.[T][ ] a | b
+     2.[D][ ] pipe | desc (by: Sun | day)
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Bye. Hope to see you again soon!
+    ____________________________________________________________
+```
+
+---
+
+## TC18: Damaged lines are skipped, not fatal
+
+**Aim:** A save file with bad lines in it still gives up its good ones. Each
+readable task is restored, the unreadable lines are counted and reported, and
+the user is told the lines will be lost, since nothing keeps a copy of them.
+
+The seeded file covers every way a line can be wrong: an unknown type letter,
+too few fields, a missing time field, and a status that is neither 0 nor 1. A
+good task sits at each end, so a bad line in the middle cannot be shown to stop
+the ones after it from loading.
+
+**Save file:**
+
+```
+T | 1 | read book
+X | 0 | unknown type
+T | 0
+D | 0 | no by field
+T | 2 | bad status
+E | 0 | good event | Mon 2pm | 4pm
+```
+
+**Input:**
+
+```
+list
+bye
+```
+
+**Expected output:**
+
+```
+    ____________________________________________________________
+            _     _      _____  ____   _____  ____
+           / \   | |    |  ___||  _ \ | ____||  _ \
+          / _ \  | |    | |_   | |_) ||  _|  | | | |
+         / ___ \ | |___ |  _|  |  _ < | |___ | |_| |
+        /_/   \_\|_____||_|    |_| \_\|_____||____/
+                    P E N N Y W O R T H
+
+      Butler to the Wayne family  --  At your service
+     Hello! I'm AlfredTheButler
+     What can I do for you?
+    ____________________________________________________________
+
+    ____________________________________________________________
+     I've brought back 2 tasks from last time, sir.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     I could not make sense of 4 lines in your saved tasks, sir.
+     I have left them out, and they will be gone once the list changes.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Here are the tasks in your list:
+     1.[T][X] read book
+     2.[E][ ] good event (from: Mon 2pm to: 4pm)
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Bye. Hope to see you again soon!
+    ____________________________________________________________
+```
+
+---
+
 ## Known gaps (not yet covered)
 
 No invalid command crashes the program any more. Blank input, an unknown
 keyword, a missing description or separator, and a bad task number are all
 refused with a message, covered by TC7, TC10, TC11, and TC12.
 
-What is left are the program's own limits rather than mistakes in what was
-typed. There is nothing stable to assert about them yet, so add cases here as
-each is handled.
+A damaged save file no longer costs the whole list, a description containing the
+field separator survives being saved, input that runs out ends the session
+cleanly, and counts read as "1 task" rather than "1 tasks". Those are covered by
+TC18, TC17, TC16, and the counts throughout.
+
+What is left are limits of the tests rather than of the program.
 
 * The contents of `data/alfred.txt` are still not read by any case directly.
-  TC14 and TC15 now check the file indirectly, by restarting the program and
-  looking at what comes back, which catches a wrong or missing line. A test that
-  asserts the exact bytes of the file is still not something this plan can
-  express.
-* A save file that cannot be parsed is not covered. One bad line currently makes
-  the program give up on the whole file and start empty, and the next change
-  then overwrites it, so the rest of the tasks are lost. Handling each line on
-  its own is the fix; add a case for it then, since there is nothing worth
-  pinning down about the current behavior.
-* Input that ends without `bye` leaves the program reading from a stream that
-  has ended.
-* "Now you have 1 tasks in the list." does not change for the singular, and
-  "I've brought back 1 tasks from last time, sir." has the same problem. This
-  one is only cosmetic, so it is the odd entry here: nothing crashes and no
-  case is blocked by it.
+  TC14, TC15, and TC17 check the file indirectly, by restarting the program and
+  looking at what comes back, which catches a wrong or missing line. Asserting
+  the exact bytes of the file is not something this plan can express.
+* A save file that cannot be opened at all — one whose permissions deny reading,
+  or whose name has been taken by a folder — is handled and reported, but no
+  case covers it. A **Save file** block can only put text in the file; it cannot
+  make the file unreadable. A failing save is untestable for the same reason.
+  Both were checked by hand.
+* Damaged lines are reported and skipped, but nothing keeps a copy of them, so
+  they are gone from the file as soon as the list next changes. TC18 asserts the
+  warning that says so, which is the whole of the mitigation. Copying the file
+  aside before the first overwrite would close this properly.
+* The safety net that catches an unexpected fault inside a command is not
+  covered, since reaching it needs a bug to exist.

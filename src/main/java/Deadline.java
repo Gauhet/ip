@@ -1,3 +1,5 @@
+import java.util.List;
+
 /**
  * A task that has to be finished by a stated time, for example
  * {@code [D][ ] return book (by: Sunday)}.
@@ -21,8 +23,11 @@ public class Deadline extends Task {
     }
 
     @Override
-    public String toFileFormat() {
-        return "D | " + super.toFileFormat() + " | " + by;
+    public List<String> toFileFields() {
+        List<String> fields = super.toFileFields();
+        fields.add(0, "D");
+        fields.add(by);
+        return fields;
     }
 
     @Override

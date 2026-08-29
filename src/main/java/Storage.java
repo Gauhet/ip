@@ -18,8 +18,13 @@ import java.util.List;
  * <p>The first field is the type letter, the second is 1 for a task that is
  * done and 0 for one that is not, and the third is the description. Any fields
  * after that belong to the type: the due time of a deadline, or the start and
- * end of an event. Each task writes its own line, in
- * {@link Task#toFileFormat()}.
+ * end of an event. Each task says what its fields are, in
+ * {@link Task#toFileFields()}; joining them into a line and splitting them back
+ * out is done here, so that the two halves cannot drift apart.
+ *
+ * <p>A description may itself contain the separator, as in {@code todo a | b}.
+ * Such a character is escaped on the way out and restored on the way in, so
+ * that any text the user can type survives the round trip.
  *
  * <p>The file is written after every change and read once at startup, so the
  * list a run begins with is the list the previous run ended with.
@@ -30,6 +35,35 @@ public class Storage {
      * started from. Hard-coded because nothing yet asks for a second save file.
      */
     private static final Path FILE = Path.of("data", "alfred.txt");
+
+    /** What goes between two fields of a line, with a space on each side. */
+    private static final String SEPARATOR = " | ";
+
+    /** The character the separator is built from, and which therefore has to be escaped. */
+    private static final char SEPARATOR_CHAR = '|';
+
+    /** Marks the character after it as part of a field rather than as a separator. */
+    private static final char ESCAPE_CHAR = '\\';
+
+    /** How many fields a line has, by type letter, counting the type letter itself. */
+    private static final int TODO_FIELDS = 3;
+
+    private static final int DEADLINE_FIELDS = 4;
+
+    private static final int EVENT_FIELDS = 5;
+
+    /**
+     * What one call to {@link Storage#load()} found: the tasks it could read,
+     * and how many lines it had to give up on.
+     *
+     * <p>The two travel together so that the count cannot be read without the
+     * tasks it belongs to, which is what a field on {@code Storage} would
+     * allow.
+     *
+     * @param tasks the tasks that were read, in the order they were saved
+     * @param skippedLines how many lines could not be understood
+     */
+    public record LoadResult(List<Task> tasks, int skippedLines) { }
 
     /**
      * Writes the whole task list to the save file, replacing whatever it held
@@ -46,7 +80,7 @@ public class Storage {
     public void save(List<Task> tasks) throws AlfredException {
         List<String> lines = new ArrayList<>();
         for (Task task : tasks) {
-            lines.add(task.toFileFormat());
+            lines.add(joinFields(task.toFileFields()));
         }
         try {
             Files.createDirectories(FILE.getParent());
@@ -55,7 +89,7 @@ public class Storage {
             // Reported the same way as a mistyped command, so that a disk
             // problem becomes a reply the user can read rather than a stack
             // trace that ends the session.
-            throw new AlfredException("I could not save your tasks, sir: " + e.getMessage());
+            throw new AlfredException("I could not save your tasks, sir: " + describe(e));
         }
     }
 
@@ -64,55 +98,188 @@ public class Storage {
      *
      * <p>A missing file is not a problem: it is what the first ever run sees,
      * and it means there is nothing to restore rather than that something went
-     * wrong.
+     * wrong. A blank line is not a problem either, and is passed over silently.
      *
-     * @return the saved tasks, or an empty list if nothing has been saved yet
-     * @throws AlfredException if the file exists but cannot be read
+     * <p>A line that cannot be understood is skipped rather than abandoning the
+     * whole file, so that one damaged line costs one task instead of all of
+     * them. The caller is told how many were skipped, because those lines are
+     * gone from the file as soon as the list next changes.
+     *
+     * @return the tasks that could be read, and how many lines were skipped
+     * @throws AlfredException if the file exists but cannot be read at all
      */
-    public List<Task> load() throws AlfredException {
+    public LoadResult load() throws AlfredException {
         List<Task> tasks = new ArrayList<>();
         if (!Files.exists(FILE)) {
-            return tasks;
+            return new LoadResult(tasks, 0);
         }
+
+        List<String> lines;
         try {
-            for (String line : Files.readAllLines(FILE)) {
-                tasks.add(parseTask(line));
-            }
-        } catch (IOException | RuntimeException e) {
-            // Deliberately minimal: one bad line gives up on the whole file.
-            // RuntimeException is caught alongside IOException because a short
-            // or misspelled line fails inside parseTask rather than on the read.
-            // Handling each line on its own, so that one typo costs one task
-            // instead of all of them, is worth doing but is not done yet.
-            throw new AlfredException("I could not read your saved tasks, sir. Starting with an empty list.");
+            lines = Files.readAllLines(FILE);
+        } catch (IOException e) {
+            // A file that cannot be opened or decoded at all is different from
+            // a file with a bad line in it: there is nothing to salvage.
+            throw new AlfredException("I could not read your saved tasks, sir: " + describe(e));
         }
-        return tasks;
+
+        int skippedLines = 0;
+        for (String line : lines) {
+            if (line.isBlank()) {
+                continue;
+            }
+            try {
+                tasks.add(parseTask(line));
+            } catch (AlfredException e) {
+                skippedLines++;
+            }
+        }
+        return new LoadResult(tasks, skippedLines);
+    }
+
+    /**
+     * Describes a file problem in a way that says what went wrong.
+     *
+     * <p>The message of a file exception is often only the path, which the user
+     * can already see, so the kind of failure is named as well. That kind is
+     * carried by the class: {@code AccessDeniedException} and
+     * {@code NoSuchFileException} both report the same message and differ in
+     * nothing else.
+     *
+     * @param e the problem that came back from the file system
+     * @return a short description naming the kind of failure and the path
+     */
+    private static String describe(IOException e) {
+        String kind = e.getClass().getSimpleName();
+        if (e.getMessage() == null) {
+            return kind;
+        }
+        return kind + " on " + e.getMessage();
+    }
+
+    /**
+     * Joins a task's fields into one line, escaping any separator character
+     * inside a field so that splitting the line again cannot mistake it for a
+     * separator.
+     *
+     * @param fields the task's fields, in the order they are saved
+     * @return the line to write to the file
+     */
+    private static String joinFields(List<String> fields) {
+        List<String> escaped = new ArrayList<>();
+        for (String field : fields) {
+            escaped.add(escape(field));
+        }
+        return String.join(SEPARATOR, escaped);
+    }
+
+    /**
+     * Marks the characters in a field that would otherwise be read as a
+     * separator. The escape character is escaped first; doing it second would
+     * escape the marks added for the separators as well.
+     *
+     * @param field one field of a line, as the user typed it
+     * @return the field as it is written to the file
+     */
+    private static String escape(String field) {
+        return field.replace(String.valueOf(ESCAPE_CHAR), "" + ESCAPE_CHAR + ESCAPE_CHAR)
+                .replace(String.valueOf(SEPARATOR_CHAR), "" + ESCAPE_CHAR + SEPARATOR_CHAR);
+    }
+
+    /**
+     * Splits a line into its fields and undoes the escaping in one pass.
+     *
+     * <p>Scanning character by character rather than splitting on the separator
+     * is what lets an escaped separator be told apart from a real one. A
+     * regular expression could do it too, but it would have to look backwards
+     * for an escape character, and would then be wrong about a field that ends
+     * with an escaped escape character.
+     *
+     * @param line one line of the save file
+     * @return the fields of that line, in order, with the escaping removed
+     */
+    private static List<String> splitFields(String line) {
+        List<String> fields = new ArrayList<>();
+        StringBuilder field = new StringBuilder();
+        for (int i = 0; i < line.length(); i++) {
+            char current = line.charAt(i);
+            if (current == ESCAPE_CHAR && i + 1 < line.length()) {
+                // The character after the mark is part of the field whatever it
+                // is, which is what makes an escaped separator harmless.
+                field.append(line.charAt(i + 1));
+                i++;
+            } else if (current == SEPARATOR_CHAR) {
+                fields.add(field.toString().trim());
+                field.setLength(0);
+            } else {
+                field.append(current);
+            }
+        }
+        fields.add(field.toString().trim());
+        return fields;
     }
 
     /**
      * Builds the task that one line of the save file describes.
      *
-     * <p>The line is assumed to be well formed, which is what makes this short.
-     * A line that is not throws, and {@link #load()} turns that into the one
-     * message it reports.
+     * <p>Every part of the line is checked, because the file can be edited by
+     * hand and a wrong line should cost only itself. A line with the wrong
+     * number of fields, an unknown type letter, a status that is neither 0 nor
+     * 1, or an empty description is refused rather than turned into a task that
+     * misrepresents what was saved.
      *
      * @param line a single line of the save file
      * @return the task that line describes
+     * @throws AlfredException if the line is not a task this program wrote
      */
-    private static Task parseTask(String line) {
-        // Split on the separator with its spaces, so that the spaces are not
-        // left on the ends of the fields.
-        String[] fields = line.split(" \\| ");
-        Task task = switch (fields[0]) {
-        case "T" -> new ToDo(fields[2]);
-        case "D" -> new Deadline(fields[2], fields[3]);
-        case "E" -> new Event(fields[2], fields[3], fields[4]);
-        default -> throw new IllegalArgumentException("Unknown task type: " + fields[0]);
+    private static Task parseTask(String line) throws AlfredException {
+        List<String> fields = splitFields(line);
+        String type = fields.get(0);
+        int expectedFields = switch (type) {
+        case "T" -> TODO_FIELDS;
+        case "D" -> DEADLINE_FIELDS;
+        case "E" -> EVENT_FIELDS;
+        default -> throw new AlfredException("Unknown task type: " + type);
         };
-        // A task is built not done, so only a saved 1 needs acting on.
-        if (fields[1].equals("1")) {
+        if (fields.size() != expectedFields) {
+            throw new AlfredException("A " + type + " line needs " + expectedFields + " fields");
+        }
+
+        String description = fields.get(2);
+        if (description.isEmpty()) {
+            throw new AlfredException("A task needs a description");
+        }
+        Task task = switch (type) {
+        case "T" -> new ToDo(description);
+        case "D" -> new Deadline(description, requireNonEmpty(fields.get(3)));
+        case "E" -> new Event(description, requireNonEmpty(fields.get(3)), requireNonEmpty(fields.get(4)));
+        default -> throw new AlfredException("Unknown task type: " + type);
+        };
+
+        // Checked rather than compared against "1" alone, so that a status of
+        // anything else is treated as damage instead of quietly meaning "not
+        // done".
+        String status = fields.get(1);
+        if (status.equals("1")) {
             task.markDone();
+        } else if (!status.equals("0")) {
+            throw new AlfredException("A status must be 0 or 1, not " + status);
         }
         return task;
+    }
+
+    /**
+     * Returns a time field, refusing it if it is empty. A deadline or event
+     * saved without one could not have been created by this program.
+     *
+     * @param field the field to check
+     * @return the field, unchanged
+     * @throws AlfredException if the field is empty
+     */
+    private static String requireNonEmpty(String field) throws AlfredException {
+        if (field.isEmpty()) {
+            throw new AlfredException("A time field cannot be empty");
+        }
+        return field;
     }
 }
