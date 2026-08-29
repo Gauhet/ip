@@ -5,10 +5,7 @@ import java.util.List;
  * {@code [D][ ] return book (by: Sunday)}.
  */
 public class Deadline extends Task {
-    /**
-     * When the task is due, kept as the words the user typed rather than as a
-     * parsed date, since nothing yet needs to compare or sort by dates.
-     */
+    /** When the task is due, kept as the words the user typed rather than as a parsed date. */
     private final String by;
 
     /**

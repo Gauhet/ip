@@ -5,10 +5,7 @@ import java.util.List;
  * {@code [E][ ] project meeting (from: Mon 2pm to: 4pm)}.
  */
 public class Event extends Task {
-    /**
-     * When the event starts and ends, kept as the words the user typed rather
-     * than as parsed dates, since nothing yet needs to compare or sort by dates.
-     */
+    /** When the event starts and ends, kept as the words the user typed rather than as parsed dates. */
     private final String from;
 
     private final String to;
