@@ -1,3 +1,5 @@
+import java.util.List;
+
 /**
  * A task with no date attached to it, for example {@code [T][ ] borrow book}.
  */
@@ -10,6 +12,13 @@ public class ToDo extends Task {
      */
     public ToDo(String description) {
         super(description);
+    }
+
+    @Override
+    public List<String> toFileFields() {
+        List<String> fields = super.toFileFields();
+        fields.add(0, "T");
+        return fields;
     }
 
     @Override

@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * A task the user has asked Alfred to remember, together with whether it has
  * been completed. Each kind of task is a subclass that puts its own type box,
@@ -26,6 +29,34 @@ public abstract class Task {
     /** Marks this task as not completed. */
     public void unmarkDone() {
         isDone = false;
+    }
+
+    /**
+     * Returns the fields this task shares with every other kind, in the order
+     * they are saved: the status, then the description. The status is a digit
+     * rather than a box, because the file is read by the program rather than by
+     * a person.
+     *
+     * <p>Each subclass puts its own type letter at the front and adds any fields
+     * of its own at the end, the same way {@link #toString()} is built up.
+     *
+     * <p>The fields are returned separately rather than already joined into a
+     * line, so that only {@link Storage} knows what separates them and how a
+     * field containing that separator is escaped. Were the joining done here, it
+     * would have to be kept in step with the code that splits the line back up,
+     * in another file.
+     *
+     * @return a mutable list holding this task's shared fields
+     */
+    public List<String> toFileFields() {
+        List<String> fields = new ArrayList<>();
+        if (isDone) {
+            fields.add("1");
+        } else {
+            fields.add("0");
+        }
+        fields.add(name);
+        return fields;
     }
 
     /**

@@ -1,12 +1,11 @@
+import java.util.List;
+
 /**
  * A task that spans a stretch of time, for example
  * {@code [E][ ] project meeting (from: Mon 2pm to: 4pm)}.
  */
 public class Event extends Task {
-    /**
-     * When the event starts and ends, kept as the words the user typed rather
-     * than as parsed dates, since nothing yet needs to compare or sort by dates.
-     */
+    /** When the event starts and ends, kept as the words the user typed rather than as parsed dates. */
     private final String from;
 
     private final String to;
@@ -22,6 +21,22 @@ public class Event extends Task {
         super(description);
         this.from = from;
         this.to = to;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>The start and the end each get their own field, rather than being run
+     * together into one, so that reading the line back does not have to split
+     * them apart again.
+     */
+    @Override
+    public List<String> toFileFields() {
+        List<String> fields = super.toFileFields();
+        fields.add(0, "E");
+        fields.add(from);
+        fields.add(to);
+        return fields;
     }
 
     @Override

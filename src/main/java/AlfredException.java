@@ -1,9 +1,10 @@
 /**
- * A mistake in what the user typed, such as an unrecognized command or one
- * missing part of its input. The message is shown to the user word for word.
+ * Something the program can tell the user about and carry on from: a mistake in
+ * what they typed, such as an unrecognized command or one missing part of its
+ * input, or a save file that cannot be read, written, or made sense of. The
+ * message is shown to the user word for word.
  *
- * <p>Checked, so the compiler insists each one is caught and answered. Bugs
- * stay unchecked and still crash rather than becoming a polite message.
+ * <p>Checked, so the compiler insists each one is caught and answered.
  */
 public class AlfredException extends Exception {
     /**
