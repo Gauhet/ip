@@ -9,7 +9,8 @@ public enum Command {
     UNMARK("unmark"),
     DELETE("delete"),
     DEADLINE("deadline"),
-    EVENT("event");
+    EVENT("event"),
+    ON("on");
 
     /** The word the user types to invoke this command. */
     private final String keyword;

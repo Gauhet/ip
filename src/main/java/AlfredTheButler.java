@@ -1,3 +1,4 @@
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -47,10 +48,10 @@ public class AlfredTheButler {
 
     /**
      * Greets the user, then handles one command per line until {@code bye} or
-     * the end of the input: {@code list}, {@code mark <number>},
-     * {@code unmark <number>}, {@code delete <number>}, and the three that add
-     * a task, {@code todo}, {@code deadline}, and {@code event}. Any other word
-     * is refused rather than guessed at.
+     * the end of the input: {@code list}, {@code on <date>},
+     * {@code mark <number>}, {@code unmark <number>}, {@code delete <number>},
+     * and the three that add a task, {@code todo}, {@code deadline}, and
+     * {@code event}. Any other word is refused rather than guessed at.
      *
      * <p>Commands run inside a {@code try} so that a mistake in what was typed
      * becomes an ordinary reply and the loop carries on. Catching in one place
@@ -149,6 +150,15 @@ public class AlfredTheButler {
                 case TODO -> added = parseToDo(arguments);
                 case DEADLINE -> added = parseDeadline(arguments);
                 case EVENT -> added = parseEvent(arguments);
+                case ON -> {
+                    // Checked here rather than left to the date reader, which
+                    // would quote back an empty string as the thing it did not
+                    // recognize and say nothing about what was actually wrong.
+                    if (arguments.isEmpty()) {
+                        throw new AlfredException("The on command needs a date, sir.");
+                    }
+                    printTasksOn(tasks, Dates.parse(arguments));
+                }
                 }
 
                 // Storing and confirming is the same for every kind of task, so
@@ -210,43 +220,57 @@ public class AlfredTheButler {
     }
 
     /**
-     * Builds a deadline from the {@code <description> /by <time>} part of a
+     * Builds a deadline from the {@code <description> /by <date>} part of a
      * {@code deadline} command.
+     *
+     * <p>The date is read as a real date rather than kept as the words that
+     * were typed, so that the program knows which day is meant. A date that
+     * cannot be read is refused by {@link Dates} with a message of its
+     * own, which is why nothing here catches it.
      *
      * @param arguments everything the user typed after the keyword
      * @return the deadline the arguments describe
-     * @throws AlfredException if the description or the due time is missing
+     * @throws AlfredException if the description or the due date is missing,
+     *         or the due date cannot be read
      */
     private static Deadline parseDeadline(String arguments) throws AlfredException {
-        String complaint = "A deadline needs a description and a /by time, sir.";
+        String complaint = "A deadline needs a description and a /by date, sir.";
         int separator = arguments.indexOf(BY_SEPARATOR);
         if (separator == -1) {
             throw new AlfredException(complaint);
         }
         String description = arguments.substring(0, separator).trim();
         String by = arguments.substring(separator + BY_SEPARATOR.length()).trim();
+        // Checked for presence before being read, so that a date left out
+        // draws the complaint about the command rather than one about the
+        // format of an empty string.
         if (description.isEmpty() || by.isEmpty()) {
             throw new AlfredException(complaint);
         }
-        return new Deadline(description, by);
+        return new Deadline(description, Dates.parse(by));
     }
 
     /**
      * Builds an event from the {@code <description> /from <start> /to <end>}
      * part of an {@code event} command.
      *
+     * <p>The start and the end are read as real dates, on the same terms as the
+     * due date of a deadline, and the pair is then checked for being in order.
+     *
      * @param arguments everything the user typed after the keyword
      * @return the event the arguments describe
-     * @throws AlfredException if the description, the start, or the end is missing
+     * @throws AlfredException if the description, the start, or the end is
+     *         missing, if either date cannot be read, or if the event ends
+     *         before it starts
      */
     private static Event parseEvent(String arguments) throws AlfredException {
-        String complaint = "An event needs a description, a /from time, and a /to time, sir.";
+        String complaint = "An event needs a description, a /from date, and a /to date, sir.";
         int fromSeparator = arguments.indexOf(FROM_SEPARATOR);
         if (fromSeparator == -1) {
             throw new AlfredException(complaint);
         }
         // Looked for after /from, so that a /to inside the description
-        // is not mistaken for the one that starts the end time.
+        // is not mistaken for the one that starts the end date.
         int toSeparator = arguments.indexOf(TO_SEPARATOR, fromSeparator + FROM_SEPARATOR.length());
         if (toSeparator == -1) {
             throw new AlfredException(complaint);
@@ -257,7 +281,15 @@ public class AlfredTheButler {
         if (description.isEmpty() || from.isEmpty() || to.isEmpty()) {
             throw new AlfredException(complaint);
         }
-        return new Event(description, from, to);
+        LocalDate start = Dates.parse(from);
+        LocalDate end = Dates.parse(to);
+        // Checked once both are real dates, since two dates that cannot be read
+        // cannot be compared. An event of a single day is allowed, so only a
+        // strictly earlier end is refused.
+        if (end.isBefore(start)) {
+            throw new AlfredException("An event cannot end before it starts, sir.");
+        }
+        return new Event(description, start, end);
     }
 
     /**
@@ -325,6 +357,41 @@ public class AlfredTheButler {
         }
         System.out.println(DIVIDER);
         System.out.println();
+    }
+
+    /**
+     * Prints the tasks that fall on one day, in the order they are stored.
+     *
+     * <p>Each task is numbered by its place in the whole list rather than by
+     * its place among the matches. That is what makes the number usable:
+     * {@code mark}, {@code unmark}, and {@code delete} count through the whole
+     * list, so a number shown here acts on the task it is printed beside.
+     * Numbering the matches from 1 would read more tidily and would be a trap,
+     * since {@code mark 2} would then act on some task the user is not looking
+     * at. The numbers can therefore have gaps, which is the visible sign that
+     * they mean something outside this list.
+     *
+     * <p>An empty result gets a sentence of its own rather than a heading with
+     * nothing under it, because "nothing on that day" is the answer to the
+     * question, not an empty container.
+     *
+     * @param tasks every stored task, in the order they are stored
+     * @param date the day being asked about
+     */
+    private static void printTasksOn(List<Task> tasks, LocalDate date) {
+        String when = Dates.format(date);
+        List<String> lines = new ArrayList<>();
+        for (int i = 0; i < tasks.size(); i++) {
+            if (tasks.get(i).occursOn(date)) {
+                lines.add((i + 1) + "." + tasks.get(i));
+            }
+        }
+        if (lines.isEmpty()) {
+            reply("You have nothing on " + when + ", sir.");
+            return;
+        }
+        lines.add(0, "Here is what you have on " + when + ":");
+        reply(lines.toArray(new String[0]));
     }
 
     /**

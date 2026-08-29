@@ -1,3 +1,4 @@
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +20,26 @@ public abstract class Task {
     protected Task(String name) {
         this.name = name;
         this.isDone = false;
+    }
+
+    /**
+     * Tells whether this task falls on the given day.
+     *
+     * <p>A task with no date attached to it falls on no day, which is the
+     * answer given here and inherited by {@link ToDo}. The kinds that carry a
+     * date override it.
+     *
+     * <p>Asking the task rather than testing what kind it is keeps the decision
+     * next to the dates it is made from. A chain of {@code instanceof} checks
+     * in the caller would work too, but it would sit far from those dates and
+     * would have to be found and extended by hand whenever a new kind of task
+     * is added, which is the kind of edit that gets missed.
+     *
+     * @param date the day being asked about
+     * @return true if this task falls on that day
+     */
+    public boolean occursOn(LocalDate date) {
+        return false;
     }
 
     /** Marks this task as completed. */

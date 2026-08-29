@@ -11,14 +11,15 @@ import java.util.List;
  *
  * <pre>
  * T | 1 | read book
- * D | 0 | return book | June 6th
- * E | 0 | project meeting | Mon 2pm | 4pm
+ * D | 0 | return book | 2019-10-15
+ * E | 0 | project meeting | 2019-12-02 | 2019-12-03
  * </pre>
  *
  * <p>The first field is the type letter, the second is 1 for a task that is
  * done and 0 for one that is not, and the third is the description. Any fields
- * after that belong to the type: the due time of a deadline, or the start and
- * end of an event. Each task says what its fields are, in
+ * after that belong to the type: the due date of a deadline, or the start and
+ * end of an event, each written as {@code yyyy-mm-dd}. Each task says what its
+ * fields are, in
  * {@link Task#toFileFields()}; joining them into a line and splitting them back
  * out is done here, so that the two halves cannot drift apart.
  *
@@ -122,6 +123,17 @@ public class Storage {
      * whole file, so that one damaged line costs one task instead of all of
      * them. The caller is told how many were skipped, because those lines are
      * gone from the file as soon as the list next changes.
+     *
+     * <p>Skipping works by catching {@link AlfredException}, so everything that
+     * can refuse a line has to raise that one and not an unchecked exception.
+     * A date is the case to watch: {@link Dates#parse(String)} is what makes a
+     * hand-edited date cost the line it sits on, because the exception
+     * {@code java.time} would otherwise throw is unchecked and would escape
+     * this loop with the rest of the file unread.
+     *
+     * <p>The messages those refusals carry are written for someone who typed
+     * the text, and none of them is shown here: a line that cannot be read is
+     * only counted. It is the refusal that matters, not its wording.
      *
      * @return the tasks that could be read, and how many lines were skipped
      * @throws AlfredException if the file exists but cannot be read at all
@@ -243,8 +255,8 @@ public class Storage {
      * <p>Every part of the line is checked, because the file can be edited by
      * hand and a wrong line should cost only itself. A line with the wrong
      * number of fields, an unknown type letter, a status that is neither 0 nor
-     * 1, or an empty description is refused rather than turned into a task that
-     * misrepresents what was saved.
+     * 1, an empty description, or a date field that is not a date is refused
+     * rather than turned into a task that misrepresents what was saved.
      *
      * @param line a single line of the save file
      * @return the task that line describes
@@ -269,8 +281,8 @@ public class Storage {
         }
         Task task = switch (type) {
         case "T" -> new ToDo(description);
-        case "D" -> new Deadline(description, requireNonEmpty(fields.get(3)));
-        case "E" -> new Event(description, requireNonEmpty(fields.get(3)), requireNonEmpty(fields.get(4)));
+        case "D" -> new Deadline(description, Dates.parse(fields.get(3)));
+        case "E" -> new Event(description, Dates.parse(fields.get(3)), Dates.parse(fields.get(4)));
         default -> throw new AlfredException("Unknown task type: " + type);
         };
 
@@ -284,20 +296,5 @@ public class Storage {
             throw new AlfredException("A status must be 0 or 1, not " + status);
         }
         return task;
-    }
-
-    /**
-     * Returns a time field, refusing it if it is empty. A deadline or event
-     * saved without one could not have been created by this program.
-     *
-     * @param field the field to check
-     * @return the field, unchanged
-     * @throws AlfredException if the field is empty
-     */
-    private static String requireNonEmpty(String field) throws AlfredException {
-        if (field.isEmpty()) {
-            throw new AlfredException("A time field cannot be empty");
-        }
-        return field;
     }
 }

@@ -221,13 +221,19 @@ bye
 
 ## TC4: Add a deadline
 
-**Aim:** `deadline <description> /by <time>` splits the line at `/by`, stores a
-deadline, and displays it as `[D]` with its due time in brackets.
+**Aim:** `deadline <description> /by <date>` splits the line at `/by`, reads the
+date as a real date rather than as the words that were typed, stores a deadline,
+and displays it as `[D]` with its due date in brackets.
+
+The date goes in as `2019-10-15`, the `yyyy-mm-dd` form the program reads, and
+comes out as `Oct 15 2019`, the form a reader gets. That the two differ is the
+assertion: text that had merely been carried through would come back exactly as
+it was typed, so a display in the input's own form would prove nothing.
 
 **Input:**
 
 ```
-deadline return book /by Sunday
+deadline return book /by 2019-10-15
 list
 bye
 ```
@@ -250,13 +256,13 @@ bye
 
     ____________________________________________________________
      Got it. I've added this task:
-       [D][ ] return book (by: Sunday)
+       [D][ ] return book (by: Oct 15 2019)
      Now you have 1 task in the list.
     ____________________________________________________________
 
     ____________________________________________________________
      Here are the tasks in your list:
-     1.[D][ ] return book (by: Sunday)
+     1.[D][ ] return book (by: Oct 15 2019)
     ____________________________________________________________
 
     ____________________________________________________________
@@ -269,13 +275,18 @@ bye
 ## TC5: Add an event
 
 **Aim:** `event <description> /from <start> /to <end>` splits the line at both
-keywords, stores an event, and displays it as `[E]` with its start and end
-times.
+keywords, reads both dates, stores an event, and displays it as `[E]` with its
+start and end dates.
+
+The start and the end are different days, so a start wrongly stored in place of
+the end, or the reverse, would show up rather than being hidden by two equal
+values. Both are shown as `MMM dd yyyy`, the same reader's form a deadline
+gets.
 
 **Input:**
 
 ```
-event project meeting /from Mon 2pm /to 4pm
+event project meeting /from 2019-12-02 /to 2019-12-03
 list
 bye
 ```
@@ -298,13 +309,13 @@ bye
 
     ____________________________________________________________
      Got it. I've added this task:
-       [E][ ] project meeting (from: Mon 2pm to: 4pm)
+       [E][ ] project meeting (from: Dec 02 2019 to: Dec 03 2019)
      Now you have 1 task in the list.
     ____________________________________________________________
 
     ____________________________________________________________
      Here are the tasks in your list:
-     1.[E][ ] project meeting (from: Mon 2pm to: 4pm)
+     1.[E][ ] project meeting (from: Dec 02 2019 to: Dec 03 2019)
     ____________________________________________________________
 
     ____________________________________________________________
@@ -324,8 +335,8 @@ by number regardless of type.
 
 ```
 todo borrow book
-deadline return book /by Sunday
-event project meeting /from Mon 2pm /to 4pm
+deadline return book /by 2019-10-15
+event project meeting /from 2019-12-02 /to 2019-12-03
 mark 2
 list
 bye
@@ -355,26 +366,26 @@ bye
 
     ____________________________________________________________
      Got it. I've added this task:
-       [D][ ] return book (by: Sunday)
+       [D][ ] return book (by: Oct 15 2019)
      Now you have 2 tasks in the list.
     ____________________________________________________________
 
     ____________________________________________________________
      Got it. I've added this task:
-       [E][ ] project meeting (from: Mon 2pm to: 4pm)
+       [E][ ] project meeting (from: Dec 02 2019 to: Dec 03 2019)
      Now you have 3 tasks in the list.
     ____________________________________________________________
 
     ____________________________________________________________
      Nice! I've marked this task as done:
-       [D][X] return book (by: Sunday)
+       [D][X] return book (by: Oct 15 2019)
     ____________________________________________________________
 
     ____________________________________________________________
      Here are the tasks in your list:
      1.[T][ ] borrow book
-     2.[D][X] return book (by: Sunday)
-     3.[E][ ] project meeting (from: Mon 2pm to: 4pm)
+     2.[D][X] return book (by: Oct 15 2019)
+     3.[E][ ] project meeting (from: Dec 02 2019 to: Dec 03 2019)
     ____________________________________________________________
 
     ____________________________________________________________
@@ -609,6 +620,10 @@ with nothing after it. `deadline /by Sunday` is the case that needs the
 separator to be matched without its surrounding spaces; matched with them, it
 would look like a missing `/by` rather than a missing description.
 
+`Sunday` is deliberately not a date. The case still expects the message about
+the missing description, which is what shows the parts are checked for presence
+before the date is read, rather than the other way around.
+
 As in TC10, the closing `list` is the assertion that matters: an empty list
 shows none of the six was stored.
 
@@ -646,23 +661,23 @@ bye
     ____________________________________________________________
 
     ____________________________________________________________
-     A deadline needs a description and a /by time, sir.
+     A deadline needs a description and a /by date, sir.
     ____________________________________________________________
 
     ____________________________________________________________
-     A deadline needs a description and a /by time, sir.
+     A deadline needs a description and a /by date, sir.
     ____________________________________________________________
 
     ____________________________________________________________
-     A deadline needs a description and a /by time, sir.
+     A deadline needs a description and a /by date, sir.
     ____________________________________________________________
 
     ____________________________________________________________
-     An event needs a description, a /from time, and a /to time, sir.
+     An event needs a description, a /from date, and a /to date, sir.
     ____________________________________________________________
 
     ____________________________________________________________
-     An event needs a description, a /from time, and a /to time, sir.
+     An event needs a description, a /from date, and a /to date, sir.
     ____________________________________________________________
 
     ____________________________________________________________
@@ -799,8 +814,8 @@ count reaches zero and the list comes back empty rather than breaking.
 
 ```
 todo read book
-deadline return book /by Sunday
-event project meeting /from Mon 2pm /to 4pm
+deadline return book /by 2019-10-15
+event project meeting /from 2019-12-02 /to 2019-12-03
 list
 delete 2
 list
@@ -834,33 +849,33 @@ bye
 
     ____________________________________________________________
      Got it. I've added this task:
-       [D][ ] return book (by: Sunday)
+       [D][ ] return book (by: Oct 15 2019)
      Now you have 2 tasks in the list.
     ____________________________________________________________
 
     ____________________________________________________________
      Got it. I've added this task:
-       [E][ ] project meeting (from: Mon 2pm to: 4pm)
+       [E][ ] project meeting (from: Dec 02 2019 to: Dec 03 2019)
      Now you have 3 tasks in the list.
     ____________________________________________________________
 
     ____________________________________________________________
      Here are the tasks in your list:
      1.[T][ ] read book
-     2.[D][ ] return book (by: Sunday)
-     3.[E][ ] project meeting (from: Mon 2pm to: 4pm)
+     2.[D][ ] return book (by: Oct 15 2019)
+     3.[E][ ] project meeting (from: Dec 02 2019 to: Dec 03 2019)
     ____________________________________________________________
 
     ____________________________________________________________
      Noted. I've removed this task:
-       [D][ ] return book (by: Sunday)
+       [D][ ] return book (by: Oct 15 2019)
      Now you have 2 tasks in the list.
     ____________________________________________________________
 
     ____________________________________________________________
      Here are the tasks in your list:
      1.[T][ ] read book
-     2.[E][ ] project meeting (from: Mon 2pm to: 4pm)
+     2.[E][ ] project meeting (from: Dec 02 2019 to: Dec 03 2019)
     ____________________________________________________________
 
     ____________________________________________________________
@@ -871,7 +886,7 @@ bye
 
     ____________________________________________________________
      Noted. I've removed this task:
-       [E][ ] project meeting (from: Mon 2pm to: 4pm)
+       [E][ ] project meeting (from: Dec 02 2019 to: Dec 03 2019)
      Now you have 0 tasks in the list.
     ____________________________________________________________
 
@@ -889,7 +904,7 @@ bye
 ## TC14: Tasks survive a restart
 
 **Aim:** Tasks saved by one run are read back by the next. All three types come
-back, with their descriptions, their times, their done status, and their
+back, with their descriptions, their dates, their done status, and their
 original order intact, and the count of restored tasks is announced once before
 the first command.
 
@@ -899,12 +914,24 @@ second starts against the file the first left behind and does nothing but
 digit is read as well as written, and the deadline and event prove the fields
 after the description survive the round trip.
 
+Those fields are now dates rather than free text, so this case carries the
+weight of the date handling: the second run rebuilds each one with
+`LocalDate.parse`, and a date written to the file in a form that could not be
+read back would be dropped as a damaged line and show up here as a missing
+task.
+
+It is also what holds the two date formats apart. The file keeps `yyyy-mm-dd`,
+because that is the form that reads back exactly, while the list shows
+`MMM dd yyyy`. Saving what the user is shown would round-trip a month name
+through `LocalDate.parse`, and this case is where that would surface, as three
+tasks that failed to come back.
+
 **First input:**
 
 ```
 todo read book
-deadline return book /by Sunday
-event project meeting /from Mon 2pm /to 4pm
+deadline return book /by 2019-10-15
+event project meeting /from 2019-12-02 /to 2019-12-03
 mark 1
 bye
 ```
@@ -940,13 +967,13 @@ bye
 
     ____________________________________________________________
      Got it. I've added this task:
-       [D][ ] return book (by: Sunday)
+       [D][ ] return book (by: Oct 15 2019)
      Now you have 2 tasks in the list.
     ____________________________________________________________
 
     ____________________________________________________________
      Got it. I've added this task:
-       [E][ ] project meeting (from: Mon 2pm to: 4pm)
+       [E][ ] project meeting (from: Dec 02 2019 to: Dec 03 2019)
      Now you have 3 tasks in the list.
     ____________________________________________________________
 
@@ -979,8 +1006,8 @@ bye
     ____________________________________________________________
      Here are the tasks in your list:
      1.[T][X] read book
-     2.[D][ ] return book (by: Sunday)
-     3.[E][ ] project meeting (from: Mon 2pm to: 4pm)
+     2.[D][ ] return book (by: Oct 15 2019)
+     3.[E][ ] project meeting (from: Dec 02 2019 to: Dec 03 2019)
     ____________________________________________________________
 
     ____________________________________________________________
@@ -1127,19 +1154,23 @@ list
 ## TC17: A description containing the field separator survives a restart
 
 **Aim:** A description holding the ` | ` that separates fields in the save file
-comes back whole, rather than being cut short at the first one. The same holds
-for a time field.
+comes back whole, rather than being cut short at the first one.
 
 This is the case that would silently lose data: before the separator was
 escaped, `todo a | b` saved as three fields and came back as just `a`, with no
-error to show anything had gone wrong. The deadline covers a separator in both
-the description and the `/by` time at once.
+error to show anything had gone wrong. The deadline covers a separator in the
+description of a task that has a field after it, which is where a lost
+separator would misalign the remaining fields rather than only truncating the
+last one.
+
+The `/by` date can no longer hold a separator, since a `yyyy-mm-dd` date has no
+room for one, so the escaping is exercised through the description alone.
 
 **First input:**
 
 ```
 todo a | b
-deadline pipe | desc /by Sun | day
+deadline pipe | desc /by 2019-10-15
 bye
 ```
 
@@ -1174,7 +1205,7 @@ bye
 
     ____________________________________________________________
      Got it. I've added this task:
-       [D][ ] pipe | desc (by: Sun | day)
+       [D][ ] pipe | desc (by: Oct 15 2019)
      Now you have 2 tasks in the list.
     ____________________________________________________________
 
@@ -1202,7 +1233,7 @@ bye
     ____________________________________________________________
      Here are the tasks in your list:
      1.[T][ ] a | b
-     2.[D][ ] pipe | desc (by: Sun | day)
+     2.[D][ ] pipe | desc (by: Oct 15 2019)
     ____________________________________________________________
 
     ____________________________________________________________
@@ -1219,9 +1250,24 @@ readable task is restored, the unreadable lines are counted and reported, and
 the user is told the lines will be lost, since nothing keeps a copy of them.
 
 The seeded file covers every way a line can be wrong: an unknown type letter,
-too few fields, a missing time field, and a status that is neither 0 nor 1. A
-good task sits at each end, so a bad line in the middle cannot be shown to stop
-the ones after it from loading.
+too few fields, a missing date field, a status that is neither 0 nor 1, and a
+date field that is not a date. A good task sits at each end, so a bad line in
+the middle cannot be shown to stop the ones after it from loading.
+
+The good event is seeded as `2019-12-02` and listed as `Dec 02 2019`, which is
+the file's form and the reader's form seen side by side in one case: the block
+below is exactly what is on disk, and the expected output is what a person sees.
+
+The last two bad lines are the ones the dates brought with them, and they are
+wrong in the two different ways a date can be. `Sunday` is not shaped like a
+date at all; `2019-02-30` is shaped like one and names a day that does not
+exist. A hand-edited file is the only way either reaches this code, since the
+program never writes one.
+
+Each has to cost its own line and no more. The exception `LocalDate.parse`
+throws is unchecked, so passed along as it came it would escape the loading loop
+and cost the whole file; `Dates` turns it into the checked one the loop
+watches for.
 
 **Save file:**
 
@@ -1231,7 +1277,9 @@ X | 0 | unknown type
 T | 0
 D | 0 | no by field
 T | 2 | bad status
-E | 0 | good event | Mon 2pm | 4pm
+D | 0 | bad date | Sunday
+D | 0 | impossible day | 2019-02-30
+E | 0 | good event | 2019-12-02 | 2019-12-03
 ```
 
 **Input:**
@@ -1262,14 +1310,462 @@ bye
     ____________________________________________________________
 
     ____________________________________________________________
-     I could not make sense of 4 lines in your saved tasks, sir.
+     I could not make sense of 6 lines in your saved tasks, sir.
      I have left them out, and they will be gone once the list changes.
     ____________________________________________________________
 
     ____________________________________________________________
      Here are the tasks in your list:
      1.[T][X] read book
-     2.[E][ ] good event (from: Mon 2pm to: 4pm)
+     2.[E][ ] good event (from: Dec 02 2019 to: Dec 03 2019)
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Bye. Hope to see you again soon!
+    ____________________________________________________________
+```
+
+---
+
+## TC19: A date that cannot be read is refused with a message
+
+**Aim:** A date the program cannot read draws a message saying what to type,
+the task is not stored, and the session carries on.
+
+A date can be wrong in two ways, and the two get different messages because the
+user can do something different about each:
+
+* **Not shaped like a date.** `Sunday`, `2/12/2019`, and `2019-2-3` are written
+  in the wrong format, so the reply names the right one and shows an example.
+  `2019-2-3` is the case that would slip through a looser check: it is nearly
+  right, and wrong only in that the month and day are not padded to two digits.
+* **Shaped like a date but naming no real day.** `2019-02-30` has the format
+  exactly right, so repeating the format would not help. The reply points at the
+  day and the month instead.
+
+The last input covers a bad `/to`, so the check is shown to apply to an event's
+dates and not only to a deadline's.
+
+Earlier this behavior was the happy path only, and the unchecked exception from
+`LocalDate.parse` fell through to the safety net meant for bugs in the program,
+which replied with the name of a Java class. This case previously asserted that,
+so that it would fail and ask to be rewritten once a real message existed. This
+is that rewrite.
+
+The closing `list` is the assertion that matters: an empty list shows that no
+half-built task was stored on its way to being refused.
+
+**Input:**
+
+```
+deadline return book /by Sunday
+deadline pay rent /by 2/12/2019
+deadline file taxes /by 2019-2-3
+deadline leap /by 2019-02-30
+event party /from 2019-12-02 /to next week
+list
+bye
+```
+
+**Expected output:**
+
+```
+    ____________________________________________________________
+            _     _      _____  ____   _____  ____
+           / \   | |    |  ___||  _ \ | ____||  _ \
+          / _ \  | |    | |_   | |_) ||  _|  | | | |
+         / ___ \ | |___ |  _|  |  _ < | |___ | |_| |
+        /_/   \_\|_____||_|    |_| \_\|_____||____/
+                    P E N N Y W O R T H
+
+      Butler to the Wayne family  --  At your service
+     Hello! I'm AlfredTheButler
+     What can I do for you?
+    ____________________________________________________________
+
+    ____________________________________________________________
+     I don't know 'Sunday' as a date, sir. Do use yyyy-mm-dd, as in 2019-10-15.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     I don't know '2/12/2019' as a date, sir. Do use yyyy-mm-dd, as in 2019-10-15.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     I don't know '2019-2-3' as a date, sir. Do use yyyy-mm-dd, as in 2019-10-15.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     There is no such date as '2019-02-30', sir. Do check the day and the month.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     I don't know 'next week' as a date, sir. Do use yyyy-mm-dd, as in 2019-10-15.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Here are the tasks in your list:
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Bye. Hope to see you again soon!
+    ____________________________________________________________
+```
+
+---
+
+## TC20: Edge-case dates survive a save and a load
+
+**Aim:** A date comes back from the save file as the same day it went in, for
+the dates most likely to expose a mistake in the two formats.
+
+TC14 already restarts the program with a deadline and an event in the list, but
+its dates are ordinary ones. This case picks the three that would catch a format
+error TC14 would miss:
+
+* `2019-01-05` has a single-digit month and a single-digit day. Written with a
+  pattern that does not pad, it would save as `2019-1-5`, which
+  `LocalDate.parse` refuses, and the task would come back as a skipped line.
+* `2020-02-29` is a leap day. It exists only if the year is carried with it, so
+  a format that dropped or altered the year would turn it into an impossible
+  date rather than a merely wrong one.
+* The event runs from `2019-12-31` to `2020-01-01`, crossing a year boundary, so
+  a year taken from the wrong field would show up as a start and end in the same
+  year.
+
+Reading them back is the assertion. The dates the second run prints are produced
+from the file rather than from anything left in memory, so a date that did not
+survive shows up either as a changed day or as a task that is missing entirely.
+
+**First input:**
+
+```
+deadline file taxes /by 2019-01-05
+deadline leap day /by 2020-02-29
+event new year /from 2019-12-31 /to 2020-01-01
+bye
+```
+
+**Second input:**
+
+```
+list
+bye
+```
+
+**Expected output:**
+
+```
+    ____________________________________________________________
+            _     _      _____  ____   _____  ____
+           / \   | |    |  ___||  _ \ | ____||  _ \
+          / _ \  | |    | |_   | |_) ||  _|  | | | |
+         / ___ \ | |___ |  _|  |  _ < | |___ | |_| |
+        /_/   \_\|_____||_|    |_| \_\|_____||____/
+                    P E N N Y W O R T H
+
+      Butler to the Wayne family  --  At your service
+     Hello! I'm AlfredTheButler
+     What can I do for you?
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Got it. I've added this task:
+       [D][ ] file taxes (by: Jan 05 2019)
+     Now you have 1 task in the list.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Got it. I've added this task:
+       [D][ ] leap day (by: Feb 29 2020)
+     Now you have 2 tasks in the list.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Got it. I've added this task:
+       [E][ ] new year (from: Dec 31 2019 to: Jan 01 2020)
+     Now you have 3 tasks in the list.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Bye. Hope to see you again soon!
+    ____________________________________________________________
+
+    ____________________________________________________________
+            _     _      _____  ____   _____  ____
+           / \   | |    |  ___||  _ \ | ____||  _ \
+          / _ \  | |    | |_   | |_) ||  _|  | | | |
+         / ___ \ | |___ |  _|  |  _ < | |___ | |_| |
+        /_/   \_\|_____||_|    |_| \_\|_____||____/
+                    P E N N Y W O R T H
+
+      Butler to the Wayne family  --  At your service
+     Hello! I'm AlfredTheButler
+     What can I do for you?
+    ____________________________________________________________
+
+    ____________________________________________________________
+     I've brought back 3 tasks from last time, sir.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Here are the tasks in your list:
+     1.[D][ ] file taxes (by: Jan 05 2019)
+     2.[D][ ] leap day (by: Feb 29 2020)
+     3.[E][ ] new year (from: Dec 31 2019 to: Jan 01 2020)
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Bye. Hope to see you again soon!
+    ____________________________________________________________
+```
+
+---
+
+## TC21: An event cannot end before it starts
+
+**Aim:** An event whose `/to` date falls before its `/from` date is refused,
+while one that starts and ends on the same day is allowed.
+
+Both dates can be perfectly readable and still describe something that cannot
+happen, so this check is separate from reading them, and runs only once both
+have been read: two dates that cannot be read cannot be compared.
+
+The second input is the boundary. An event lasting a single day has an end that
+is not after its start, so a check written with the comparison the wrong way
+round would refuse it. Storing it is what shows only a strictly earlier end is
+refused.
+
+**Input:**
+
+```
+event backwards /from 2020-01-01 /to 2019-01-01
+event one day /from 2020-01-01 /to 2020-01-01
+list
+bye
+```
+
+**Expected output:**
+
+```
+    ____________________________________________________________
+            _     _      _____  ____   _____  ____
+           / \   | |    |  ___||  _ \ | ____||  _ \
+          / _ \  | |    | |_   | |_) ||  _|  | | | |
+         / ___ \ | |___ |  _|  |  _ < | |___ | |_| |
+        /_/   \_\|_____||_|    |_| \_\|_____||____/
+                    P E N N Y W O R T H
+
+      Butler to the Wayne family  --  At your service
+     Hello! I'm AlfredTheButler
+     What can I do for you?
+    ____________________________________________________________
+
+    ____________________________________________________________
+     An event cannot end before it starts, sir.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Got it. I've added this task:
+       [E][ ] one day (from: Jan 01 2020 to: Jan 01 2020)
+     Now you have 1 task in the list.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Here are the tasks in your list:
+     1.[E][ ] one day (from: Jan 01 2020 to: Jan 01 2020)
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Bye. Hope to see you again soon!
+    ____________________________________________________________
+```
+
+---
+
+## TC22: `on <date>` shows what falls on one day
+
+**Aim:** `on <date>` shows the deadlines due that day and the events running
+over it, leaves out everything else, and numbers what it shows by each task's
+place in the whole list.
+
+The list is built so that each kind of task answers differently:
+
+* The todo has no date, so it never appears.
+* The deadline appears on `2019-12-02` and on no other day.
+* The event runs from `2019-12-01` to `2019-12-03`, so it appears on all three,
+  its first and last days included. The queries walk the day before it, its
+  three days, and the day after, which is what pins both ends: a check written
+  with `isAfter` in place of `!isBefore` would drop the first day, and the
+  mirror mistake would drop the last.
+
+`2019-12-02` is the day both a deadline and an event fall on, so it also shows
+the two kinds listed together.
+
+The numbering is the other half of the case. The event is task 3 of 3, and it
+keeps the number 3 when shown on a day where it is the only match. `mark 3`
+then marks it, which is the point: a number shown by `on` is the number the
+other commands expect. Were the matches renumbered from 1, that `mark 3` would
+have found nothing, or worse, the wrong task. The gap between `2.` and `3.` in
+the `2019-12-02` reply is the visible sign of this.
+
+The last query repeats an earlier one to show the mark took effect on the task
+that was meant.
+
+**Input:**
+
+```
+todo no date
+deadline return book /by 2019-12-02
+event conference /from 2019-12-01 /to 2019-12-03
+on 2019-11-30
+on 2019-12-01
+on 2019-12-02
+on 2019-12-03
+on 2019-12-04
+mark 3
+on 2019-12-01
+bye
+```
+
+**Expected output:**
+
+```
+    ____________________________________________________________
+            _     _      _____  ____   _____  ____
+           / \   | |    |  ___||  _ \ | ____||  _ \
+          / _ \  | |    | |_   | |_) ||  _|  | | | |
+         / ___ \ | |___ |  _|  |  _ < | |___ | |_| |
+        /_/   \_\|_____||_|    |_| \_\|_____||____/
+                    P E N N Y W O R T H
+
+      Butler to the Wayne family  --  At your service
+     Hello! I'm AlfredTheButler
+     What can I do for you?
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Got it. I've added this task:
+       [T][ ] no date
+     Now you have 1 task in the list.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Got it. I've added this task:
+       [D][ ] return book (by: Dec 02 2019)
+     Now you have 2 tasks in the list.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Got it. I've added this task:
+       [E][ ] conference (from: Dec 01 2019 to: Dec 03 2019)
+     Now you have 3 tasks in the list.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     You have nothing on Nov 30 2019, sir.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Here is what you have on Dec 01 2019:
+     3.[E][ ] conference (from: Dec 01 2019 to: Dec 03 2019)
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Here is what you have on Dec 02 2019:
+     2.[D][ ] return book (by: Dec 02 2019)
+     3.[E][ ] conference (from: Dec 01 2019 to: Dec 03 2019)
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Here is what you have on Dec 03 2019:
+     3.[E][ ] conference (from: Dec 01 2019 to: Dec 03 2019)
+    ____________________________________________________________
+
+    ____________________________________________________________
+     You have nothing on Dec 04 2019, sir.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Nice! I've marked this task as done:
+       [E][X] conference (from: Dec 01 2019 to: Dec 03 2019)
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Here is what you have on Dec 01 2019:
+     3.[E][X] conference (from: Dec 01 2019 to: Dec 03 2019)
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Bye. Hope to see you again soon!
+    ____________________________________________________________
+```
+
+---
+
+## TC23: `on` checks the date it is given
+
+**Aim:** `on` refuses a missing date and an unreadable one, each with its own
+message, and changes nothing on the way.
+
+A date left out gets a message about the command rather than one about the
+format, since quoting an empty string back as the thing that was not recognized
+would say nothing useful. A date that is present but unreadable goes through the
+same reader as a deadline's, so it draws the same two messages TC19 covers,
+which is the point: the rules for a date do not depend on the command it was
+typed into.
+
+The closing `list` shows the one real task untouched, so none of the three
+refused commands disturbed the list.
+
+**Input:**
+
+```
+todo read book
+on
+on Sunday
+on 2019-02-30
+list
+bye
+```
+
+**Expected output:**
+
+```
+    ____________________________________________________________
+            _     _      _____  ____   _____  ____
+           / \   | |    |  ___||  _ \ | ____||  _ \
+          / _ \  | |    | |_   | |_) ||  _|  | | | |
+         / ___ \ | |___ |  _|  |  _ < | |___ | |_| |
+        /_/   \_\|_____||_|    |_| \_\|_____||____/
+                    P E N N Y W O R T H
+
+      Butler to the Wayne family  --  At your service
+     Hello! I'm AlfredTheButler
+     What can I do for you?
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Got it. I've added this task:
+       [T][ ] read book
+     Now you have 1 task in the list.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     The on command needs a date, sir.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     I don't know 'Sunday' as a date, sir. Do use yyyy-mm-dd, as in 2019-10-15.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     There is no such date as '2019-02-30', sir. Do check the day and the month.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Here are the tasks in your list:
+     1.[T][ ] read book
     ____________________________________________________________
 
     ____________________________________________________________
@@ -1290,7 +1786,19 @@ field separator survives being saved, input that runs out ends the session
 cleanly, and counts read as "1 task" rather than "1 tasks". Those are covered by
 TC18, TC17, TC16, and the counts throughout.
 
-What is left are limits of the tests rather than of the program.
+A date that cannot be read now has a message of its own, saying either what
+format to use or that the day does not exist, covered by TC19. A date missing
+altogether is covered by TC11, an event that ends before it starts by TC21, and
+an unreadable date in the save file by TC18. Asking what falls on one day is
+covered by TC22, and the ways that question can be malformed by TC23.
+
+One gap is a limit of the program rather than of the tests. Only `yyyy-mm-dd` is
+accepted, so `2/12/2019` is refused rather than understood, and a time of day
+such as `1800` has nowhere to go, since a task holds a `LocalDate` and not a
+`LocalDateTime`. Both are refusals with a clear reason rather than failures, but
+accepting more of what a user might reasonably type is the next thing to add.
+
+The rest are limits of the tests rather than of the program.
 
 * The contents of `data/alfred.txt` are still not read by any case directly.
   TC14, TC15, and TC17 check the file indirectly, by restarting the program and
