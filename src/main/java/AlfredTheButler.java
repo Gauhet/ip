@@ -54,8 +54,9 @@ public class AlfredTheButler {
      * becomes an ordinary reply and the loop carries on. Catching in one place
      * lets each method throw its own message without knowing how it is printed.
      *
-     * <p>Every command that changes the list is followed by a save, so that the
-     * file on disk always matches what the user has just been shown.
+     * <p>The saved tasks are read back before the first command, and every
+     * command that changes the list is followed by a save, so that the file on
+     * disk always matches what the user has just been shown.
      */
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -64,6 +65,19 @@ public class AlfredTheButler {
         boolean isRunning = true;
 
         greet();
+        // Loaded in its own try, because this runs before the loop below and so
+        // cannot rely on the loop's catch. A file that cannot be read leaves
+        // the empty list above in place rather than stopping the program.
+        try {
+            tasks = storage.load();
+            // Said only when there is something to say. On a first run there is
+            // no file yet, and announcing that nothing came back would be noise.
+            if (!tasks.isEmpty()) {
+                reply("I've brought back " + tasks.size() + " tasks from last time, sir.");
+            }
+        } catch (AlfredException e) {
+            reply(e.getMessage());
+        }
         while (isRunning) {
             // Trimmed so that a stray space around a command does not stop it
             // being recognized.

@@ -6,26 +6,30 @@ Manual-style tests for the text UI of `AlfredTheButler`, run automatically by th
 ## How a test case is run
 
 1. All sources in `src/main/java` are compiled to a temporary build directory.
-1. For **each** test case, a **fresh** program is started and the case's `Input`
-   lines are fed to it on standard input, one per line.
+1. For **each** test case, `data/alfred.txt` is deleted, then a **fresh**
+   program is started and the case's `Input` lines are fed to it on standard
+   input, one per line.
 1. The program's whole console output is compared with the case's
    `Expected output`.
 
-Because each case gets its own run, cases are independent: tasks added in one
-case never leak into the next. This is why every case that needs a task list has
-to add the tasks itself.
+The program reads `data/alfred.txt` at startup and rewrites it after every
+change, so deleting it before each case is what keeps cases independent: tasks
+added in one case never leak into the next. This is why every case that needs a
+task list has to add the tasks itself.
 
-Each run now also writes its task list to `data/alfred.txt`, under whatever
-directory the program is started from. That file does not break the independence
-above, because nothing reads it back yet: a run starts with an empty list no
-matter what the previous run left behind. Once loading is implemented, that
-stops being true, and the runner has to clear the file between cases for these
-tests to keep meaning what they say.
+A **two-run case** is the exception, and the only way to test that tasks survive
+a restart. It has three fenced blocks instead of two: two inputs, run one after
+the other against the *same* save file, and one expected output holding both
+runs' console output end to end. The file is cleared before the case, not
+between its two runs.
 
 ## Rules for writing a test case
 
-* Every case has two fenced blocks, in this order: **Input**, then
-  **Expected output**. The aim is the prose line above them.
+* A one-run case has two fenced blocks, in this order: **Input**, then
+  **Expected output**. A two-run case has three: **First input**, **Second
+  input**, then **Expected output**. The number of blocks is what tells the
+  runner which kind it is, so a case must have exactly two or exactly three.
+  The aim is the prose line above them.
 * The last input line must be one that exits, which in practice means `bye`.
   Without it the program would keep reading from a stream that has ended and
   crash instead of exiting cleanly. Extra words after the keyword are ignored,
@@ -875,6 +879,192 @@ bye
 
 ---
 
+## TC14: Tasks survive a restart
+
+**Aim:** Tasks saved by one run are read back by the next. All three types come
+back, with their descriptions, their times, their done status, and their
+original order intact, and the count of restored tasks is announced once before
+the first command.
+
+This is a two-run case: the first run builds and marks a list and exits, the
+second starts against the file the first left behind and does nothing but
+`list`. The task marked in the first run is the one that proves the status
+digit is read as well as written, and the deadline and event prove the fields
+after the description survive the round trip.
+
+**First input:**
+
+```
+todo read book
+deadline return book /by Sunday
+event project meeting /from Mon 2pm /to 4pm
+mark 1
+bye
+```
+
+**Second input:**
+
+```
+list
+bye
+```
+
+**Expected output:**
+
+```
+    ____________________________________________________________
+            _     _      _____  ____   _____  ____
+           / \   | |    |  ___||  _ \ | ____||  _ \
+          / _ \  | |    | |_   | |_) ||  _|  | | | |
+         / ___ \ | |___ |  _|  |  _ < | |___ | |_| |
+        /_/   \_\|_____||_|    |_| \_\|_____||____/
+                    P E N N Y W O R T H
+
+      Butler to the Wayne family  --  At your service
+     Hello! I'm AlfredTheButler
+     What can I do for you?
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Got it. I've added this task:
+       [T][ ] read book
+     Now you have 1 tasks in the list.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Got it. I've added this task:
+       [D][ ] return book (by: Sunday)
+     Now you have 2 tasks in the list.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Got it. I've added this task:
+       [E][ ] project meeting (from: Mon 2pm to: 4pm)
+     Now you have 3 tasks in the list.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Nice! I've marked this task as done:
+       [T][X] read book
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Bye. Hope to see you again soon!
+    ____________________________________________________________
+
+    ____________________________________________________________
+            _     _      _____  ____   _____  ____
+           / \   | |    |  ___||  _ \ | ____||  _ \
+          / _ \  | |    | |_   | |_) ||  _|  | | | |
+         / ___ \ | |___ |  _|  |  _ < | |___ | |_| |
+        /_/   \_\|_____||_|    |_| \_\|_____||____/
+                    P E N N Y W O R T H
+
+      Butler to the Wayne family  --  At your service
+     Hello! I'm AlfredTheButler
+     What can I do for you?
+    ____________________________________________________________
+
+    ____________________________________________________________
+     I've brought back 3 tasks from last time, sir.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Here are the tasks in your list:
+     1.[T][X] read book
+     2.[D][ ] return book (by: Sunday)
+     3.[E][ ] project meeting (from: Mon 2pm to: 4pm)
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Bye. Hope to see you again soon!
+    ____________________________________________________________
+```
+
+---
+
+## TC15: An emptied list brings nothing back
+
+**Aim:** A run that ends with no tasks leaves nothing for the next run to
+restore. The next run says nothing about loading and starts with an empty list,
+rather than announcing zero tasks or bringing back the deleted one.
+
+The first run adds a task and deletes it again, so the save file is emptied
+rather than never written. That is the case that would break if deleting the
+last task left the file untouched, or if the greeting announced a count
+unconditionally.
+
+**First input:**
+
+```
+todo read book
+delete 1
+bye
+```
+
+**Second input:**
+
+```
+list
+bye
+```
+
+**Expected output:**
+
+```
+    ____________________________________________________________
+            _     _      _____  ____   _____  ____
+           / \   | |    |  ___||  _ \ | ____||  _ \
+          / _ \  | |    | |_   | |_) ||  _|  | | | |
+         / ___ \ | |___ |  _|  |  _ < | |___ | |_| |
+        /_/   \_\|_____||_|    |_| \_\|_____||____/
+                    P E N N Y W O R T H
+
+      Butler to the Wayne family  --  At your service
+     Hello! I'm AlfredTheButler
+     What can I do for you?
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Got it. I've added this task:
+       [T][ ] read book
+     Now you have 1 tasks in the list.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Noted. I've removed this task:
+       [T][ ] read book
+     Now you have 0 tasks in the list.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Bye. Hope to see you again soon!
+    ____________________________________________________________
+
+    ____________________________________________________________
+            _     _      _____  ____   _____  ____
+           / \   | |    |  ___||  _ \ | ____||  _ \
+          / _ \  | |    | |_   | |_) ||  _|  | | | |
+         / ___ \ | |___ |  _|  |  _ < | |___ | |_| |
+        /_/   \_\|_____||_|    |_| \_\|_____||____/
+                    P E N N Y W O R T H
+
+      Butler to the Wayne family  --  At your service
+     Hello! I'm AlfredTheButler
+     What can I do for you?
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Here are the tasks in your list:
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Bye. Hope to see you again soon!
+    ____________________________________________________________
+```
+
+---
+
 ## Known gaps (not yet covered)
 
 No invalid command crashes the program any more. Blank input, an unknown
@@ -885,15 +1075,19 @@ What is left are the program's own limits rather than mistakes in what was
 typed. There is nothing stable to assert about them yet, so add cases here as
 each is handled.
 
-* The contents of `data/alfred.txt` are not checked. These cases compare console
-  output, and saving prints nothing when it succeeds, so a save that wrote the
-  wrong line, or wrote nothing at all, would still pass every case here.
-  Checking it needs a test that reads the file, which this plan has no way to
+* The contents of `data/alfred.txt` are still not read by any case directly.
+  TC14 and TC15 now check the file indirectly, by restarting the program and
+  looking at what comes back, which catches a wrong or missing line. A test that
+  asserts the exact bytes of the file is still not something this plan can
   express.
-* Tasks are saved but never loaded, so they do not come back when the program is
-  started again. Add a case for that once loading is implemented.
+* A save file that cannot be parsed is not covered. One bad line currently makes
+  the program give up on the whole file and start empty, and the next change
+  then overwrites it, so the rest of the tasks are lost. Handling each line on
+  its own is the fix; add a case for it then, since there is nothing worth
+  pinning down about the current behavior.
 * Input that ends without `bye` leaves the program reading from a stream that
   has ended.
-* "Now you have 1 tasks in the list." does not change for the singular. This
+* "Now you have 1 tasks in the list." does not change for the singular, and
+  "I've brought back 1 tasks from last time, sir." has the same problem. This
   one is only cosmetic, so it is the odd entry here: nothing crashes and no
   case is blocked by it.
