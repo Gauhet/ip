@@ -50,26 +50,36 @@ n=${#subject}
 [ "$n" -gt 50 ] && [ "$n" -le 72 ] && echo "WARN subject is $n chars (aim for 50)"
 
 case "$subject" in
-  [A-Z]*) ;;
-  *) echo "FAIL subject does not start with a capital letter" ;;
-esac
-case "$subject" in
   *.) echo "FAIL subject ends with a period" ;;
 esac
 
-# Imperative mood, checked after any optional "scope: " prefix
+# Everything after an optional "scope: " prefix. The guide's own examples show
+# that prefix in lower case, so the capitalization and mood rules both apply to
+# this part rather than to the whole line.
 verb=$(printf '%s' "$subject" | sed -E 's/^[^:]{1,30}: *//')
+case "$verb" in
+  [A-Z]*) ;;
+  *) echo "FAIL subject does not start with a capital letter: '$verb'" ;;
+esac
 printf '%s' "$verb" |
   grep -qiE '^(add|fix|updat|remov|chang|creat|implement|refactor|delet|mov|renam|us|writ|test)(ed|ing)\b' &&
   echo "FAIL subject is not in the imperative mood: '$verb'"
 
 awk 'NR == 2 && $0 != "" { print "FAIL no blank line between subject and body" }
-     NR >= 3 && length > 72 { print "FAIL body line "NR" is "length" chars (wrap at 72)" }' "$MSG"
+     NR >= 3 && length > 72 { print "FAIL body line "NR" is "length" chars (wrap at 72)" }
+     NR >= 3 && tolower($0) ~ /(^|[^a-z])(currently|originally)([^a-z]|$)/ {
+       print "WARN body line "NR" uses a term the guide asks you to avoid" }' "$MSG"
 ```
 
 The imperative check is a heuristic over the verbs that come up most often. It
 catches `Added` and `Adding` but not `Wrote`, so read the subject yourself as
 well rather than treating a silent run as proof.
+
+The last check is a warning rather than a failure, because the fix is usually
+to rewrite the sentence in the present tense rather than to delete a word. Read
+any near-miss the same way: "has so far been" hedges exactly as "currently"
+does, and the pattern cannot see it. It looks at the body alone, so that a
+subject naming those terms does not match itself.
 
 ### 3. Check the branch name
 
