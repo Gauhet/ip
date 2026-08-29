@@ -6,9 +6,9 @@ Manual-style tests for the text UI of `AlfredTheButler`, run automatically by th
 ## How a test case is run
 
 1. All sources in `src/main/java` are compiled to a temporary build directory.
-2. For **each** test case, a **fresh** program is started and the case's `Input`
+1. For **each** test case, a **fresh** program is started and the case's `Input`
    lines are fed to it on standard input, one per line.
-3. The program's whole console output is compared with the case's
+1. The program's whole console output is compared with the case's
    `Expected output`.
 
 Because each case gets its own run, cases are independent: tasks added in one
@@ -17,7 +17,7 @@ to add the tasks itself.
 
 ## Rules for writing a test case
 
-* Every case has three fenced blocks, in this order: **Input**, then
+* Every case has two fenced blocks, in this order: **Input**, then
   **Expected output**. The aim is the prose line above them.
 * The last input line must be one that exits, which in practice means `bye`.
   Without it the program would keep reading from a stream that has ended and
@@ -526,7 +526,7 @@ bye
 
 ---
 
-## TC10: Unrecognised commands are refused
+## TC10: Unrecognized commands are refused
 
 **Aim:** A word that is not a command draws an error quoting that word back,
 rather than being stored as a task. Covers both a mistyped command (`lst`) and
@@ -581,7 +581,7 @@ bye
 
 ## TC11: Task commands with missing parts are refused
 
-**Aim:** `todo`, `deadline` and `event` each check that every part they need is
+**Aim:** `todo`, `deadline`, and `event` each check that every part they need is
 present, and refuse the command with one message naming all of those parts
 rather than crashing or storing a half-built task.
 
@@ -640,11 +640,11 @@ bye
     ____________________________________________________________
 
     ____________________________________________________________
-     An event needs a description, a /from time and a /to time, sir.
+     An event needs a description, a /from time, and a /to time, sir.
     ____________________________________________________________
 
     ____________________________________________________________
-     An event needs a description, a /from time and a /to time, sir.
+     An event needs a description, a /from time, and a /to time, sir.
     ____________________________________________________________
 
     ____________________________________________________________
@@ -660,7 +660,7 @@ bye
 
 ## TC12: Bad task numbers are refused
 
-**Aim:** `mark`, `unmark` and `delete` check the number they are given before
+**Aim:** `mark`, `unmark`, and `delete` check the number they are given before
 using it. Anything that is not a number, and any number that does not name a
 task in the list, draws a message rather than a crash.
 
@@ -872,7 +872,7 @@ bye
 
 No invalid command crashes the program any more. Blank input, an unknown
 keyword, a missing description or separator, and a bad task number are all
-refused with a message, covered by TC7, TC10, TC11 and TC12.
+refused with a message, covered by TC7, TC10, TC11, and TC12.
 
 What is left are the program's own limits rather than mistakes in what was
 typed. There is nothing stable to assert about them yet, so add cases here as

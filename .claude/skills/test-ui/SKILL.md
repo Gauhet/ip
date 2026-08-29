@@ -15,7 +15,7 @@ heading, a prose **Aim**, then two fenced code blocks in this order:
 
 1. **Input** — the lines typed into the program, one command per line, last line
    `bye`.
-2. **Expected output** — the entire console output of that run, from the
+1. **Expected output** — the entire console output of that run, from the
    greeting banner to the farewell message.
 
 Each case runs in its own fresh program, so cases never share task state.
@@ -80,7 +80,7 @@ way that swallows individual results or keeps going after a failure.
    Give the run a short timeout (10s is plenty). If it times out, treat it as a
    failure: it usually means the input did not end with `bye`, so the program is
    still waiting for a command that will never come.
-3. Normalise both files and diff them. Normalising strips carriage returns,
+1. Normalize both files and diff them. Normalizing strips carriage returns,
    trailing whitespace, and blank lines at the end of the file — differences
    that come from the platform, not from the program:
 
@@ -98,7 +98,7 @@ way that swallows individual results or keeps going after a failure.
    ```
 
    `diff` exits 0 when the files match. Any other exit status is a failure.
-3. If the case passed, move on to the next one. If it failed, go to
+1. If the case passed, move on to the next one. If it failed, go to
    "Reporting a failure" below and stop.
 
 Putting those together:
@@ -172,12 +172,12 @@ When asked to add a case:
 
 1. Append a new `## TC<n>` section to `test/ui-test-plan.md` with its aim and
    Input block.
-2. Get the expected output by **running** the program with that input, then
+1. Get the expected output by **running** the program with that input, then
    paste the real output into the Expected output block — after checking line by
    line that the output is actually correct. Writing expected output by hand is
    how typos in indentation end up baked into the plan; running it and reviewing
    it is both faster and more accurate.
-3. Re-run the whole plan to confirm nothing else broke.
+1. Re-run the whole plan to confirm nothing else broke.
 
 ## When the output changes on purpose
 

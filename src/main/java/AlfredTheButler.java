@@ -47,7 +47,7 @@ public class AlfredTheButler {
      * Greets the user, then handles one command per line until {@code bye}:
      * {@code list}, {@code mark <number>}, {@code unmark <number>},
      * {@code delete <number>}, and the three that add a task, {@code todo},
-     * {@code deadline} and {@code event}. Any other word is refused rather
+     * {@code deadline}, and {@code event}. Any other word is refused rather
      * than guessed at.
      *
      * <p>Commands run inside a {@code try} so that a mistake in what was typed
@@ -167,7 +167,7 @@ public class AlfredTheButler {
      * @throws AlfredException if the description, the start or the end is missing
      */
     private static Event parseEvent(String arguments) throws AlfredException {
-        String complaint = "An event needs a description, a /from time and a /to time, sir.";
+        String complaint = "An event needs a description, a /from time, and a /to time, sir.";
         int fromSeparator = arguments.indexOf(FROM_SEPARATOR);
         if (fromSeparator == -1) {
             throw new AlfredException(complaint);
