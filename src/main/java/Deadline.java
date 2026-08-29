@@ -40,12 +40,22 @@ public class Deadline extends Task {
     /**
      * {@inheritDoc}
      *
+     * <p>A deadline falls on the single day it is due.
+     */
+    @Override
+    public boolean occursOn(LocalDate date) {
+        return by.equals(date);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
      * <p>The due date is shown in the reader's form, not the one it was typed
      * or saved in, which is what having stored a real date rather than the
      * user's words makes possible.
      */
     @Override
     public String toString() {
-        return "[D]" + super.toString() + " (by: " + DISPLAY_DATE_FORMAT.format(by) + ")";
+        return "[D]" + super.toString() + " (by: " + Dates.format(by) + ")";
     }
 }

@@ -1266,7 +1266,7 @@ program never writes one.
 
 Each has to cost its own line and no more. The exception `LocalDate.parse`
 throws is unchecked, so passed along as it came it would escape the loading loop
-and cost the whole file; `DateParser` turns it into the checked one the loop
+and cost the whole file; `Dates` turns it into the checked one the loop
 watches for.
 
 **Save file:**
@@ -1583,6 +1583,198 @@ bye
 
 ---
 
+## TC22: `on <date>` shows what falls on one day
+
+**Aim:** `on <date>` shows the deadlines due that day and the events running
+over it, leaves out everything else, and numbers what it shows by each task's
+place in the whole list.
+
+The list is built so that each kind of task answers differently:
+
+* The todo has no date, so it never appears.
+* The deadline appears on `2019-12-02` and on no other day.
+* The event runs from `2019-12-01` to `2019-12-03`, so it appears on all three,
+  its first and last days included. The queries walk the day before it, its
+  three days, and the day after, which is what pins both ends: a check written
+  with `isAfter` in place of `!isBefore` would drop the first day, and the
+  mirror mistake would drop the last.
+
+`2019-12-02` is the day both a deadline and an event fall on, so it also shows
+the two kinds listed together.
+
+The numbering is the other half of the case. The event is task 3 of 3, and it
+keeps the number 3 when shown on a day where it is the only match. `mark 3`
+then marks it, which is the point: a number shown by `on` is the number the
+other commands expect. Were the matches renumbered from 1, that `mark 3` would
+have found nothing, or worse, the wrong task. The gap between `2.` and `3.` in
+the `2019-12-02` reply is the visible sign of this.
+
+The last query repeats an earlier one to show the mark took effect on the task
+that was meant.
+
+**Input:**
+
+```
+todo no date
+deadline return book /by 2019-12-02
+event conference /from 2019-12-01 /to 2019-12-03
+on 2019-11-30
+on 2019-12-01
+on 2019-12-02
+on 2019-12-03
+on 2019-12-04
+mark 3
+on 2019-12-01
+bye
+```
+
+**Expected output:**
+
+```
+    ____________________________________________________________
+            _     _      _____  ____   _____  ____
+           / \   | |    |  ___||  _ \ | ____||  _ \
+          / _ \  | |    | |_   | |_) ||  _|  | | | |
+         / ___ \ | |___ |  _|  |  _ < | |___ | |_| |
+        /_/   \_\|_____||_|    |_| \_\|_____||____/
+                    P E N N Y W O R T H
+
+      Butler to the Wayne family  --  At your service
+     Hello! I'm AlfredTheButler
+     What can I do for you?
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Got it. I've added this task:
+       [T][ ] no date
+     Now you have 1 task in the list.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Got it. I've added this task:
+       [D][ ] return book (by: Dec 02 2019)
+     Now you have 2 tasks in the list.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Got it. I've added this task:
+       [E][ ] conference (from: Dec 01 2019 to: Dec 03 2019)
+     Now you have 3 tasks in the list.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     You have nothing on Nov 30 2019, sir.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Here is what you have on Dec 01 2019:
+     3.[E][ ] conference (from: Dec 01 2019 to: Dec 03 2019)
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Here is what you have on Dec 02 2019:
+     2.[D][ ] return book (by: Dec 02 2019)
+     3.[E][ ] conference (from: Dec 01 2019 to: Dec 03 2019)
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Here is what you have on Dec 03 2019:
+     3.[E][ ] conference (from: Dec 01 2019 to: Dec 03 2019)
+    ____________________________________________________________
+
+    ____________________________________________________________
+     You have nothing on Dec 04 2019, sir.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Nice! I've marked this task as done:
+       [E][X] conference (from: Dec 01 2019 to: Dec 03 2019)
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Here is what you have on Dec 01 2019:
+     3.[E][X] conference (from: Dec 01 2019 to: Dec 03 2019)
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Bye. Hope to see you again soon!
+    ____________________________________________________________
+```
+
+---
+
+## TC23: `on` checks the date it is given
+
+**Aim:** `on` refuses a missing date and an unreadable one, each with its own
+message, and changes nothing on the way.
+
+A date left out gets a message about the command rather than one about the
+format, since quoting an empty string back as the thing that was not recognized
+would say nothing useful. A date that is present but unreadable goes through the
+same reader as a deadline's, so it draws the same two messages TC19 covers,
+which is the point: the rules for a date do not depend on the command it was
+typed into.
+
+The closing `list` shows the one real task untouched, so none of the three
+refused commands disturbed the list.
+
+**Input:**
+
+```
+todo read book
+on
+on Sunday
+on 2019-02-30
+list
+bye
+```
+
+**Expected output:**
+
+```
+    ____________________________________________________________
+            _     _      _____  ____   _____  ____
+           / \   | |    |  ___||  _ \ | ____||  _ \
+          / _ \  | |    | |_   | |_) ||  _|  | | | |
+         / ___ \ | |___ |  _|  |  _ < | |___ | |_| |
+        /_/   \_\|_____||_|    |_| \_\|_____||____/
+                    P E N N Y W O R T H
+
+      Butler to the Wayne family  --  At your service
+     Hello! I'm AlfredTheButler
+     What can I do for you?
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Got it. I've added this task:
+       [T][ ] read book
+     Now you have 1 task in the list.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     The on command needs a date, sir.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     I don't know 'Sunday' as a date, sir. Do use yyyy-mm-dd, as in 2019-10-15.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     There is no such date as '2019-02-30', sir. Do check the day and the month.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Here are the tasks in your list:
+     1.[T][ ] read book
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Bye. Hope to see you again soon!
+    ____________________________________________________________
+```
+
+---
+
 ## Known gaps (not yet covered)
 
 No invalid command crashes the program any more. Blank input, an unknown
@@ -1597,7 +1789,8 @@ TC18, TC17, TC16, and the counts throughout.
 A date that cannot be read now has a message of its own, saying either what
 format to use or that the day does not exist, covered by TC19. A date missing
 altogether is covered by TC11, an event that ends before it starts by TC21, and
-an unreadable date in the save file by TC18.
+an unreadable date in the save file by TC18. Asking what falls on one day is
+covered by TC22, and the ways that question can be malformed by TC23.
 
 One gap is a limit of the program rather than of the tests. Only `yyyy-mm-dd` is
 accepted, so `2/12/2019` is refused rather than understood, and a time of day

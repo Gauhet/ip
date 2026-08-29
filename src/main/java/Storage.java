@@ -294,13 +294,13 @@ public class Storage {
      * deadline or event saved without one could not have been created by this
      * program.
      *
-     * <p>{@link DateParser} refuses a bad date with an {@link AlfredException},
+     * <p>{@link Dates} refuses a bad date with an {@link AlfredException},
      * which is the exception {@link #load()} watches for when it decides to
      * skip a line. That is what keeps a hand-edited date costing the line it is
      * on rather than the whole file: an unchecked exception would escape the
      * loading loop instead.
      *
-     * <p>The message {@code DateParser} builds is addressed to someone who
+     * <p>The message {@code Dates} builds is addressed to someone who
      * typed the date, and is not shown for a file, since a line that cannot be
      * read is only counted. It is the refusal that matters here, not its
      * wording.
@@ -310,6 +310,6 @@ public class Storage {
      * @throws AlfredException if the field is not a date this program wrote
      */
     private static LocalDate parseDate(String field) throws AlfredException {
-        return DateParser.parse(field);
+        return Dates.parse(field);
     }
 }

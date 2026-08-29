@@ -47,13 +47,26 @@ public class Event extends Task {
     /**
      * {@inheritDoc}
      *
+     * <p>An event falls on every day it spans, its first and its last included,
+     * so that asking about a day in the middle of a long event finds it. Both
+     * ends count because an event that runs from Monday to Wednesday is one the
+     * user has on Monday.
+     */
+    @Override
+    public boolean occursOn(LocalDate date) {
+        return !date.isBefore(from) && !date.isAfter(to);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
      * <p>Both dates are shown in the reader's form, on the same terms as the
      * due date of a deadline.
      */
     @Override
     public String toString() {
         return "[E]" + super.toString()
-                + " (from: " + DISPLAY_DATE_FORMAT.format(from)
-                + " to: " + DISPLAY_DATE_FORMAT.format(to) + ")";
+                + " (from: " + Dates.format(from)
+                + " to: " + Dates.format(to) + ")";
     }
 }
