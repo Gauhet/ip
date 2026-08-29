@@ -3,7 +3,7 @@ import java.util.List;
 
 /**
  * A task that spans a stretch of days, for example
- * {@code [E][ ] project meeting (from: 2019-12-02 to: 2019-12-03)}.
+ * {@code [E][ ] project meeting (from: Dec 02 2019 to: Dec 03 2019)}.
  */
 public class Event extends Task {
     /**
@@ -44,8 +44,16 @@ public class Event extends Task {
         return fields;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>Both dates are shown in the reader's form, on the same terms as the
+     * due date of a deadline.
+     */
     @Override
     public String toString() {
-        return "[E]" + super.toString() + " (from: " + from + " to: " + to + ")";
+        return "[E]" + super.toString()
+                + " (from: " + DISPLAY_DATE_FORMAT.format(from)
+                + " to: " + DISPLAY_DATE_FORMAT.format(to) + ")";
     }
 }

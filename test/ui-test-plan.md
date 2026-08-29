@@ -225,10 +225,10 @@ bye
 date as a real date rather than as the words that were typed, stores a deadline,
 and displays it as `[D]` with its due date in brackets.
 
-The date is given as `2019-10-15`, the `yyyy-mm-dd` form the program
-understands. It is displayed in that same form for now, so this case cannot tell
-a parsed date apart from the text that was typed; TC14 is what shows the date is
-really a date, by saving it and reading it back.
+The date goes in as `2019-10-15`, the `yyyy-mm-dd` form the program reads, and
+comes out as `Oct 15 2019`, the form a reader gets. That the two differ is the
+assertion: text that had merely been carried through would come back exactly as
+it was typed, so a display in the input's own form would prove nothing.
 
 **Input:**
 
@@ -256,13 +256,13 @@ bye
 
     ____________________________________________________________
      Got it. I've added this task:
-       [D][ ] return book (by: 2019-10-15)
+       [D][ ] return book (by: Oct 15 2019)
      Now you have 1 task in the list.
     ____________________________________________________________
 
     ____________________________________________________________
      Here are the tasks in your list:
-     1.[D][ ] return book (by: 2019-10-15)
+     1.[D][ ] return book (by: Oct 15 2019)
     ____________________________________________________________
 
     ____________________________________________________________
@@ -280,7 +280,8 @@ start and end dates.
 
 The start and the end are different days, so a start wrongly stored in place of
 the end, or the reverse, would show up rather than being hidden by two equal
-values.
+values. Both are shown as `MMM dd yyyy`, the same reader's form a deadline
+gets.
 
 **Input:**
 
@@ -308,13 +309,13 @@ bye
 
     ____________________________________________________________
      Got it. I've added this task:
-       [E][ ] project meeting (from: 2019-12-02 to: 2019-12-03)
+       [E][ ] project meeting (from: Dec 02 2019 to: Dec 03 2019)
      Now you have 1 task in the list.
     ____________________________________________________________
 
     ____________________________________________________________
      Here are the tasks in your list:
-     1.[E][ ] project meeting (from: 2019-12-02 to: 2019-12-03)
+     1.[E][ ] project meeting (from: Dec 02 2019 to: Dec 03 2019)
     ____________________________________________________________
 
     ____________________________________________________________
@@ -365,26 +366,26 @@ bye
 
     ____________________________________________________________
      Got it. I've added this task:
-       [D][ ] return book (by: 2019-10-15)
+       [D][ ] return book (by: Oct 15 2019)
      Now you have 2 tasks in the list.
     ____________________________________________________________
 
     ____________________________________________________________
      Got it. I've added this task:
-       [E][ ] project meeting (from: 2019-12-02 to: 2019-12-03)
+       [E][ ] project meeting (from: Dec 02 2019 to: Dec 03 2019)
      Now you have 3 tasks in the list.
     ____________________________________________________________
 
     ____________________________________________________________
      Nice! I've marked this task as done:
-       [D][X] return book (by: 2019-10-15)
+       [D][X] return book (by: Oct 15 2019)
     ____________________________________________________________
 
     ____________________________________________________________
      Here are the tasks in your list:
      1.[T][ ] borrow book
-     2.[D][X] return book (by: 2019-10-15)
-     3.[E][ ] project meeting (from: 2019-12-02 to: 2019-12-03)
+     2.[D][X] return book (by: Oct 15 2019)
+     3.[E][ ] project meeting (from: Dec 02 2019 to: Dec 03 2019)
     ____________________________________________________________
 
     ____________________________________________________________
@@ -848,33 +849,33 @@ bye
 
     ____________________________________________________________
      Got it. I've added this task:
-       [D][ ] return book (by: 2019-10-15)
+       [D][ ] return book (by: Oct 15 2019)
      Now you have 2 tasks in the list.
     ____________________________________________________________
 
     ____________________________________________________________
      Got it. I've added this task:
-       [E][ ] project meeting (from: 2019-12-02 to: 2019-12-03)
+       [E][ ] project meeting (from: Dec 02 2019 to: Dec 03 2019)
      Now you have 3 tasks in the list.
     ____________________________________________________________
 
     ____________________________________________________________
      Here are the tasks in your list:
      1.[T][ ] read book
-     2.[D][ ] return book (by: 2019-10-15)
-     3.[E][ ] project meeting (from: 2019-12-02 to: 2019-12-03)
+     2.[D][ ] return book (by: Oct 15 2019)
+     3.[E][ ] project meeting (from: Dec 02 2019 to: Dec 03 2019)
     ____________________________________________________________
 
     ____________________________________________________________
      Noted. I've removed this task:
-       [D][ ] return book (by: 2019-10-15)
+       [D][ ] return book (by: Oct 15 2019)
      Now you have 2 tasks in the list.
     ____________________________________________________________
 
     ____________________________________________________________
      Here are the tasks in your list:
      1.[T][ ] read book
-     2.[E][ ] project meeting (from: 2019-12-02 to: 2019-12-03)
+     2.[E][ ] project meeting (from: Dec 02 2019 to: Dec 03 2019)
     ____________________________________________________________
 
     ____________________________________________________________
@@ -885,7 +886,7 @@ bye
 
     ____________________________________________________________
      Noted. I've removed this task:
-       [E][ ] project meeting (from: 2019-12-02 to: 2019-12-03)
+       [E][ ] project meeting (from: Dec 02 2019 to: Dec 03 2019)
      Now you have 0 tasks in the list.
     ____________________________________________________________
 
@@ -918,6 +919,12 @@ weight of the date handling: the second run rebuilds each one with
 `LocalDate.parse`, and a date written to the file in a form that could not be
 read back would be dropped as a damaged line and show up here as a missing
 task.
+
+It is also what holds the two date formats apart. The file keeps `yyyy-mm-dd`,
+because that is the form that reads back exactly, while the list shows
+`MMM dd yyyy`. Saving what the user is shown would round-trip a month name
+through `LocalDate.parse`, and this case is where that would surface, as three
+tasks that failed to come back.
 
 **First input:**
 
@@ -960,13 +967,13 @@ bye
 
     ____________________________________________________________
      Got it. I've added this task:
-       [D][ ] return book (by: 2019-10-15)
+       [D][ ] return book (by: Oct 15 2019)
      Now you have 2 tasks in the list.
     ____________________________________________________________
 
     ____________________________________________________________
      Got it. I've added this task:
-       [E][ ] project meeting (from: 2019-12-02 to: 2019-12-03)
+       [E][ ] project meeting (from: Dec 02 2019 to: Dec 03 2019)
      Now you have 3 tasks in the list.
     ____________________________________________________________
 
@@ -999,8 +1006,8 @@ bye
     ____________________________________________________________
      Here are the tasks in your list:
      1.[T][X] read book
-     2.[D][ ] return book (by: 2019-10-15)
-     3.[E][ ] project meeting (from: 2019-12-02 to: 2019-12-03)
+     2.[D][ ] return book (by: Oct 15 2019)
+     3.[E][ ] project meeting (from: Dec 02 2019 to: Dec 03 2019)
     ____________________________________________________________
 
     ____________________________________________________________
@@ -1198,7 +1205,7 @@ bye
 
     ____________________________________________________________
      Got it. I've added this task:
-       [D][ ] pipe | desc (by: 2019-10-15)
+       [D][ ] pipe | desc (by: Oct 15 2019)
      Now you have 2 tasks in the list.
     ____________________________________________________________
 
@@ -1226,7 +1233,7 @@ bye
     ____________________________________________________________
      Here are the tasks in your list:
      1.[T][ ] a | b
-     2.[D][ ] pipe | desc (by: 2019-10-15)
+     2.[D][ ] pipe | desc (by: Oct 15 2019)
     ____________________________________________________________
 
     ____________________________________________________________
@@ -1246,6 +1253,10 @@ The seeded file covers every way a line can be wrong: an unknown type letter,
 too few fields, a missing date field, a status that is neither 0 nor 1, and a
 date field that is not a date. A good task sits at each end, so a bad line in
 the middle cannot be shown to stop the ones after it from loading.
+
+The good event is seeded as `2019-12-02` and listed as `Dec 02 2019`, which is
+the file's form and the reader's form seen side by side in one case: the block
+below is exactly what is on disk, and the expected output is what a person sees.
 
 The `D | 0 | bad date | Sunday` line is the one the dates brought with them. A
 hand-edited file is the only way a date the program cannot read reaches this
@@ -1300,7 +1311,7 @@ bye
     ____________________________________________________________
      Here are the tasks in your list:
      1.[T][X] read book
-     2.[E][ ] good event (from: 2019-12-02 to: 2019-12-03)
+     2.[E][ ] good event (from: Dec 02 2019 to: Dec 03 2019)
     ____________________________________________________________
 
     ____________________________________________________________

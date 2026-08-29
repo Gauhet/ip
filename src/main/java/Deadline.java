@@ -3,7 +3,7 @@ import java.util.List;
 
 /**
  * A task that has to be finished by a stated date, for example
- * {@code [D][ ] return book (by: 2019-10-15)}.
+ * {@code [D][ ] return book (by: Oct 15 2019)}.
  */
 public class Deadline extends Task {
     /** The day the task is due. A real date, so that it can later be compared or reformatted. */
@@ -37,8 +37,15 @@ public class Deadline extends Task {
         return fields;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>The due date is shown in the reader's form, not the one it was typed
+     * or saved in, which is what having stored a real date rather than the
+     * user's words makes possible.
+     */
     @Override
     public String toString() {
-        return "[D]" + super.toString() + " (by: " + by + ")";
+        return "[D]" + super.toString() + " (by: " + DISPLAY_DATE_FORMAT.format(by) + ")";
     }
 }
