@@ -2,7 +2,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -290,25 +289,27 @@ public class Storage {
     }
 
     /**
-     * Reads a date field of a saved line. An empty field fails here too, since
-     * nothing is not a date; a deadline or event saved without one could not
-     * have been created by this program.
+     * Reads a date field of a saved line, by the same rules as a date the user
+     * types. An empty field fails here too, since nothing is not a date; a
+     * deadline or event saved without one could not have been created by this
+     * program.
      *
-     * <p>The failure is turned into an {@link AlfredException} rather than left
-     * as the unchecked one {@code java.time} throws, because that is the
-     * exception {@link #load()} watches for when it decides to skip a line. Left
-     * unchecked, one hand-edited date would escape the loop and cost the whole
-     * file instead of the single line it belongs to.
+     * <p>{@link DateParser} refuses a bad date with an {@link AlfredException},
+     * which is the exception {@link #load()} watches for when it decides to
+     * skip a line. That is what keeps a hand-edited date costing the line it is
+     * on rather than the whole file: an unchecked exception would escape the
+     * loading loop instead.
+     *
+     * <p>The message {@code DateParser} builds is addressed to someone who
+     * typed the date, and is not shown for a file, since a line that cannot be
+     * read is only counted. It is the refusal that matters here, not its
+     * wording.
      *
      * @param field the field to read
      * @return the date the field names
-     * @throws AlfredException if the field is not a {@code yyyy-mm-dd} date
+     * @throws AlfredException if the field is not a date this program wrote
      */
     private static LocalDate parseDate(String field) throws AlfredException {
-        try {
-            return LocalDate.parse(field);
-        } catch (DateTimeParseException e) {
-            throw new AlfredException("A date field must read yyyy-mm-dd, not " + field);
-        }
+        return DateParser.parse(field);
     }
 }

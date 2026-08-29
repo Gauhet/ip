@@ -661,23 +661,23 @@ bye
     ____________________________________________________________
 
     ____________________________________________________________
-     A deadline needs a description and a /by time, sir.
+     A deadline needs a description and a /by date, sir.
     ____________________________________________________________
 
     ____________________________________________________________
-     A deadline needs a description and a /by time, sir.
+     A deadline needs a description and a /by date, sir.
     ____________________________________________________________
 
     ____________________________________________________________
-     A deadline needs a description and a /by time, sir.
+     A deadline needs a description and a /by date, sir.
     ____________________________________________________________
 
     ____________________________________________________________
-     An event needs a description, a /from time, and a /to time, sir.
+     An event needs a description, a /from date, and a /to date, sir.
     ____________________________________________________________
 
     ____________________________________________________________
-     An event needs a description, a /from time, and a /to time, sir.
+     An event needs a description, a /from date, and a /to date, sir.
     ____________________________________________________________
 
     ____________________________________________________________
@@ -1258,11 +1258,16 @@ The good event is seeded as `2019-12-02` and listed as `Dec 02 2019`, which is
 the file's form and the reader's form seen side by side in one case: the block
 below is exactly what is on disk, and the expected output is what a person sees.
 
-The `D | 0 | bad date | Sunday` line is the one the dates brought with them. A
-hand-edited file is the only way a date the program cannot read reaches this
-code, since the program never writes one. It has to cost that line alone: the
-exception `LocalDate.parse` throws is unchecked, so left as it came it would
-escape the loading loop and cost the whole file.
+The last two bad lines are the ones the dates brought with them, and they are
+wrong in the two different ways a date can be. `Sunday` is not shaped like a
+date at all; `2019-02-30` is shaped like one and names a day that does not
+exist. A hand-edited file is the only way either reaches this code, since the
+program never writes one.
+
+Each has to cost its own line and no more. The exception `LocalDate.parse`
+throws is unchecked, so passed along as it came it would escape the loading loop
+and cost the whole file; `DateParser` turns it into the checked one the loop
+watches for.
 
 **Save file:**
 
@@ -1273,6 +1278,7 @@ T | 0
 D | 0 | no by field
 T | 2 | bad status
 D | 0 | bad date | Sunday
+D | 0 | impossible day | 2019-02-30
 E | 0 | good event | 2019-12-02 | 2019-12-03
 ```
 
@@ -1304,7 +1310,7 @@ bye
     ____________________________________________________________
 
     ____________________________________________________________
-     I could not make sense of 5 lines in your saved tasks, sir.
+     I could not make sense of 6 lines in your saved tasks, sir.
      I have left them out, and they will be gone once the list changes.
     ____________________________________________________________
 
@@ -1321,30 +1327,41 @@ bye
 
 ---
 
-## TC19: A time that is not a date is not stored
+## TC19: A date that cannot be read is refused with a message
 
-**Aim:** `deadline` and `event` accept only the `yyyy-mm-dd` form so far.
-Anything else is not stored, and the session carries on rather than ending.
+**Aim:** A date the program cannot read draws a message saying what to type,
+the task is not stored, and the session carries on.
 
-This case records a rough edge rather than a finished behavior. Reading the
-date is deliberately the happy path only: there is no check of its own, so a
-word like `Sunday` reaches `LocalDate.parse` and the unchecked exception it
-throws falls through to the safety net meant for bugs in the program. That is
-why the message names a Java class instead of saying what the user should type.
+A date can be wrong in two ways, and the two get different messages because the
+user can do something different about each:
 
-The message is worth pinning down all the same. It is the behavior the program
-has today, and a case that asserts it is what will fail — and so ask to be
-rewritten — on the day a message of its own is added, which is the point at
-which the expected output here should become something a reader would want to
-see.
+* **Not shaped like a date.** `Sunday`, `2/12/2019`, and `2019-2-3` are written
+  in the wrong format, so the reply names the right one and shows an example.
+  `2019-2-3` is the case that would slip through a looser check: it is nearly
+  right, and wrong only in that the month and day are not padded to two digits.
+* **Shaped like a date but naming no real day.** `2019-02-30` has the format
+  exactly right, so repeating the format would not help. The reply points at the
+  day and the month instead.
 
-The closing `list` is the assertion that matters: an empty list shows that
-neither half-built task was stored on its way to being refused.
+The last input covers a bad `/to`, so the check is shown to apply to an event's
+dates and not only to a deadline's.
+
+Earlier this behavior was the happy path only, and the unchecked exception from
+`LocalDate.parse` fell through to the safety net meant for bugs in the program,
+which replied with the name of a Java class. This case previously asserted that,
+so that it would fail and ask to be rewritten once a real message existed. This
+is that rewrite.
+
+The closing `list` is the assertion that matters: an empty list shows that no
+half-built task was stored on its way to being refused.
 
 **Input:**
 
 ```
 deadline return book /by Sunday
+deadline pay rent /by 2/12/2019
+deadline file taxes /by 2019-2-3
+deadline leap /by 2019-02-30
 event party /from 2019-12-02 /to next week
 list
 bye
@@ -1367,13 +1384,23 @@ bye
     ____________________________________________________________
 
     ____________________________________________________________
-     Something went wrong on my end, sir: java.time.format.DateTimeParseException: Text 'Sunday' could not be parsed at index 0
-     Your tasks are unharmed. Do carry on.
+     I don't know 'Sunday' as a date, sir. Do use yyyy-mm-dd, as in 2019-10-15.
     ____________________________________________________________
 
     ____________________________________________________________
-     Something went wrong on my end, sir: java.time.format.DateTimeParseException: Text 'next week' could not be parsed at index 0
-     Your tasks are unharmed. Do carry on.
+     I don't know '2/12/2019' as a date, sir. Do use yyyy-mm-dd, as in 2019-10-15.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     I don't know '2019-2-3' as a date, sir. Do use yyyy-mm-dd, as in 2019-10-15.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     There is no such date as '2019-02-30', sir. Do check the day and the month.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     I don't know 'next week' as a date, sir. Do use yyyy-mm-dd, as in 2019-10-15.
     ____________________________________________________________
 
     ____________________________________________________________
@@ -1495,6 +1522,67 @@ bye
 
 ---
 
+## TC21: An event cannot end before it starts
+
+**Aim:** An event whose `/to` date falls before its `/from` date is refused,
+while one that starts and ends on the same day is allowed.
+
+Both dates can be perfectly readable and still describe something that cannot
+happen, so this check is separate from reading them, and runs only once both
+have been read: two dates that cannot be read cannot be compared.
+
+The second input is the boundary. An event lasting a single day has an end that
+is not after its start, so a check written with the comparison the wrong way
+round would refuse it. Storing it is what shows only a strictly earlier end is
+refused.
+
+**Input:**
+
+```
+event backwards /from 2020-01-01 /to 2019-01-01
+event one day /from 2020-01-01 /to 2020-01-01
+list
+bye
+```
+
+**Expected output:**
+
+```
+    ____________________________________________________________
+            _     _      _____  ____   _____  ____
+           / \   | |    |  ___||  _ \ | ____||  _ \
+          / _ \  | |    | |_   | |_) ||  _|  | | | |
+         / ___ \ | |___ |  _|  |  _ < | |___ | |_| |
+        /_/   \_\|_____||_|    |_| \_\|_____||____/
+                    P E N N Y W O R T H
+
+      Butler to the Wayne family  --  At your service
+     Hello! I'm AlfredTheButler
+     What can I do for you?
+    ____________________________________________________________
+
+    ____________________________________________________________
+     An event cannot end before it starts, sir.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Got it. I've added this task:
+       [E][ ] one day (from: Jan 01 2020 to: Jan 01 2020)
+     Now you have 1 task in the list.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Here are the tasks in your list:
+     1.[E][ ] one day (from: Jan 01 2020 to: Jan 01 2020)
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Bye. Hope to see you again soon!
+    ____________________________________________________________
+```
+
+---
+
 ## Known gaps (not yet covered)
 
 No invalid command crashes the program any more. Blank input, an unknown
@@ -1506,11 +1594,16 @@ field separator survives being saved, input that runs out ends the session
 cleanly, and counts read as "1 task" rather than "1 tasks". Those are covered by
 TC18, TC17, TC16, and the counts throughout.
 
-One gap is a limit of the program rather than of the tests. A `/by`, `/from`,
-or `/to` that is not a `yyyy-mm-dd` date has no message of its own, and falls
-through to the safety net meant for bugs, as TC19 records. Only the one form is
-understood, so `2/12/2019 1800` and `Sunday` are refused alike. A message of its
-own, and more input formats, are the next things to add.
+A date that cannot be read now has a message of its own, saying either what
+format to use or that the day does not exist, covered by TC19. A date missing
+altogether is covered by TC11, an event that ends before it starts by TC21, and
+an unreadable date in the save file by TC18.
+
+One gap is a limit of the program rather than of the tests. Only `yyyy-mm-dd` is
+accepted, so `2/12/2019` is refused rather than understood, and a time of day
+such as `1800` has nowhere to go, since a task holds a `LocalDate` and not a
+`LocalDateTime`. Both are refusals with a clear reason rather than failures, but
+accepting more of what a user might reasonably type is the next thing to add.
 
 The rest are limits of the tests rather than of the program.
 

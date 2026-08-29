@@ -215,26 +215,30 @@ public class AlfredTheButler {
      * {@code deadline} command.
      *
      * <p>The date is read as a real date rather than kept as the words that
-     * were typed, so that the program knows which day is meant. Only the
-     * {@code yyyy-mm-dd} form is understood so far; anything else is not yet
-     * refused with a message of its own.
+     * were typed, so that the program knows which day is meant. A date that
+     * cannot be read is refused by {@link DateParser} with a message of its
+     * own, which is why nothing here catches it.
      *
      * @param arguments everything the user typed after the keyword
      * @return the deadline the arguments describe
-     * @throws AlfredException if the description or the due date is missing
+     * @throws AlfredException if the description or the due date is missing,
+     *         or the due date cannot be read
      */
     private static Deadline parseDeadline(String arguments) throws AlfredException {
-        String complaint = "A deadline needs a description and a /by time, sir.";
+        String complaint = "A deadline needs a description and a /by date, sir.";
         int separator = arguments.indexOf(BY_SEPARATOR);
         if (separator == -1) {
             throw new AlfredException(complaint);
         }
         String description = arguments.substring(0, separator).trim();
         String by = arguments.substring(separator + BY_SEPARATOR.length()).trim();
+        // Checked for presence before being read, so that a date left out
+        // draws the complaint about the command rather than one about the
+        // format of an empty string.
         if (description.isEmpty() || by.isEmpty()) {
             throw new AlfredException(complaint);
         }
-        return new Deadline(description, LocalDate.parse(by));
+        return new Deadline(description, DateParser.parse(by));
     }
 
     /**
@@ -242,20 +246,22 @@ public class AlfredTheButler {
      * part of an {@code event} command.
      *
      * <p>The start and the end are read as real dates, on the same terms as the
-     * due date of a deadline.
+     * due date of a deadline, and the pair is then checked for being in order.
      *
      * @param arguments everything the user typed after the keyword
      * @return the event the arguments describe
-     * @throws AlfredException if the description, the start, or the end is missing
+     * @throws AlfredException if the description, the start, or the end is
+     *         missing, if either date cannot be read, or if the event ends
+     *         before it starts
      */
     private static Event parseEvent(String arguments) throws AlfredException {
-        String complaint = "An event needs a description, a /from time, and a /to time, sir.";
+        String complaint = "An event needs a description, a /from date, and a /to date, sir.";
         int fromSeparator = arguments.indexOf(FROM_SEPARATOR);
         if (fromSeparator == -1) {
             throw new AlfredException(complaint);
         }
         // Looked for after /from, so that a /to inside the description
-        // is not mistaken for the one that starts the end time.
+        // is not mistaken for the one that starts the end date.
         int toSeparator = arguments.indexOf(TO_SEPARATOR, fromSeparator + FROM_SEPARATOR.length());
         if (toSeparator == -1) {
             throw new AlfredException(complaint);
@@ -266,7 +272,15 @@ public class AlfredTheButler {
         if (description.isEmpty() || from.isEmpty() || to.isEmpty()) {
             throw new AlfredException(complaint);
         }
-        return new Event(description, LocalDate.parse(from), LocalDate.parse(to));
+        LocalDate start = DateParser.parse(from);
+        LocalDate end = DateParser.parse(to);
+        // Checked once both are real dates, since two dates that cannot be read
+        // cannot be compared. An event of a single day is allowed, so only a
+        // strictly earlier end is refused.
+        if (end.isBefore(start)) {
+            throw new AlfredException("An event cannot end before it starts, sir.");
+        }
+        return new Event(description, start, end);
     }
 
     /**
