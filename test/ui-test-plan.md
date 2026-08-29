@@ -6,7 +6,7 @@ Manual-style tests for the text UI of `AlfredTheButler`, run automatically by th
 ## How a test case is run
 
 1. All sources in `src/main/java` are compiled to a temporary build directory.
-1. For **each** test case, `data/alfred.txt` is deleted, then a **fresh**
+1. For **each** test case, the whole `data` folder is deleted, then a **fresh**
    program is started and the case's `Input` lines are fed to it on standard
    input, one per line.
 1. The program's whole console output is compared with the case's
@@ -16,6 +16,12 @@ The program reads `data/alfred.txt` at startup and rewrites it after every
 change, so deleting it before each case is what keeps cases independent: tasks
 added in one case never leak into the next. This is why every case that needs a
 task list has to add the tasks itself.
+
+The **folder** is deleted, not just the file, which means every case that does
+not seed a save file starts from exactly what a fresh copy of this project on
+another computer looks like: no save file, and no folder to hold one. The
+program has to create both on demand, so that path is exercised by every such
+case rather than needing one of its own.
 
 A **two-run case** is the exception, and the only way to test that tasks survive
 a restart. It has three fenced blocks instead of two: two inputs, run one after

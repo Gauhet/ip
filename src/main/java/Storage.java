@@ -31,10 +31,26 @@ import java.util.List;
  */
 public class Storage {
     /**
-     * Where the tasks are kept, relative to the directory the program is
-     * started from. Hard-coded because nothing yet asks for a second save file.
+     * The folder the save file lives in. Created when it is not there, which is
+     * what the first run on a new computer finds.
      */
-    private static final Path FILE = Path.of("data", "alfred.txt");
+    private static final Path FOLDER = Path.of("data");
+
+    /**
+     * Where the tasks are kept. Hard-coded because nothing yet asks for a second
+     * save file.
+     *
+     * <p>The path is relative, so it is read against whatever directory the
+     * program is started from rather than against one particular computer's
+     * layout. It is also built a segment at a time rather than written as
+     * {@code "data/alfred.txt"}, so that the separator between them is the one
+     * the operating system in use expects.
+     *
+     * <p>Naming the folder separately, rather than asking the file for its
+     * parent, is what makes {@link #save(java.util.List)} safe: a path with no
+     * folder in it has no parent, and creating that would fail.
+     */
+    private static final Path FILE = FOLDER.resolve("alfred.txt");
 
     /** What goes between two fields of a line, with a space on each side. */
     private static final String SEPARATOR = " | ";
@@ -83,7 +99,9 @@ public class Storage {
             lines.add(joinFields(task.toFileFields()));
         }
         try {
-            Files.createDirectories(FILE.getParent());
+            // Creates the folder if it is missing and does nothing if it is
+            // already there, so the first run needs no special case.
+            Files.createDirectories(FOLDER);
             Files.write(FILE, lines);
         } catch (IOException e) {
             // Reported the same way as a mistyped command, so that a disk

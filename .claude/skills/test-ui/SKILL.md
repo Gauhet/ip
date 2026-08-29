@@ -112,11 +112,11 @@ Run them in a loop that **stops at the first failure** and prints a per-case
 pass/fail line, so the failing case is always identifiable. Never run them in a
 way that swallows individual results or keeps going after a failure.
 
-1. **Clear the save file**, so the case starts with an empty task list — or
-   seed it, if the case supplied a `**Save file:**` block:
+1. **Remove the whole `data` folder**, so the case starts with an empty task
+   list — or seed the file, if the case supplied a `**Save file:**` block:
 
    ```bash
-   rm -rf data/alfred.txt
+   rm -rf data
    if [ -f "$WORK/tc$n.save-file" ]; then
      mkdir -p data && cp "$WORK/tc$n.save-file" data/alfred.txt
    fi
@@ -126,6 +126,11 @@ way that swallows individual results or keeps going after a failure.
    startup, so without it the tasks from one case reappear in the next, and
    every case after the first compares against the wrong list. Do this once per
    **case**, never between the two runs of a two-run case.
+
+   The **folder** goes, not just the file, so that every unseeded case starts
+   from what a fresh copy of the project on someone else's computer looks like:
+   no save file and no folder to put one in. That path is required to work, and
+   deleting only the file would leave it untested.
 
    A `**Save file:**` block is how a case tests what the program does with a
    file it did not write — a hand-edited or damaged one. It is the only way to
@@ -182,7 +187,7 @@ for n in $(seq 1 "$CASES"); do
     inputs="$WORK/tc$n.input"
   fi
   expected="$WORK/tc$n.expected-output"
-  rm -rf data/alfred.txt
+  rm -rf data
   [ -f "$WORK/tc$n.save-file" ] && { mkdir -p data; cp "$WORK/tc$n.save-file" data/alfred.txt; }
   : > "$WORK/tc$n.actual"
   r=0
@@ -316,8 +321,8 @@ and nothing else moved.
 
 * Java 25 is required (`java -version` to check).
 * Class files go to a scratch directory, never into the repository.
-* `data/alfred.txt` is the one repository path this skill writes to, because the
-  program writes there and the file has to be cleared between cases. It is
-  ignored by Git, so a run leaves the working tree clean. Whatever the last case
-  saved is left behind afterwards.
+* `data/` is the one repository path this skill writes to and deletes, because
+  the program writes there and it has to be cleared between cases. It is ignored
+  by Git, so a run leaves the working tree clean. Whatever the last case saved is
+  left behind afterwards.
 * This skill only reads and runs; it never edits `src/main/java`.
