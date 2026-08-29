@@ -53,10 +53,14 @@ public class AlfredTheButler {
      * <p>Commands run inside a {@code try} so that a mistake in what was typed
      * becomes an ordinary reply and the loop carries on. Catching in one place
      * lets each method throw its own message without knowing how it is printed.
+     *
+     * <p>Every command that changes the list is followed by a save, so that the
+     * file on disk always matches what the user has just been shown.
      */
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         List<Task> tasks = new ArrayList<>();
+        Storage storage = new Storage();
         boolean isRunning = true;
 
         greet();
@@ -80,6 +84,10 @@ public class AlfredTheButler {
                 // what tells the code below there is nothing to store.
                 Task added = null;
 
+                // Set by every command that changes the list, so that the save
+                // below happens once, in one place, rather than in each arm.
+                boolean isListChanged = false;
+
                 // An arrow switch, so no arm can fall through into the next by
                 // accident, and so `break` keeps its usual meaning in the loop.
                 // No default arm is needed: an unknown keyword has already been
@@ -90,16 +98,19 @@ public class AlfredTheButler {
                 case UNMARK -> {
                     int index = parseTaskIndex(arguments, tasks.size());
                     tasks.get(index).unmarkDone();
+                    isListChanged = true;
                     reply("OK, I've marked this task as not done yet:", SUB_INDENT + tasks.get(index));
                 }
                 case MARK -> {
                     int index = parseTaskIndex(arguments, tasks.size());
                     tasks.get(index).markDone();
+                    isListChanged = true;
                     reply("Nice! I've marked this task as done:", SUB_INDENT + tasks.get(index));
                 }
                 case DELETE -> {
                     int index = parseTaskIndex(arguments, tasks.size());
                     Task removed = tasks.remove(index);
+                    isListChanged = true;
                     reply("Noted. I've removed this task:",
                             SUB_INDENT + removed,
                             "Now you have " + tasks.size() + " tasks in the list.");
@@ -113,7 +124,14 @@ public class AlfredTheButler {
                 // it is done once here rather than repeated in each arm above.
                 if (added != null) {
                     tasks.add(added);
+                    isListChanged = true;
                     replyAdded(added, tasks.size());
+                }
+
+                // Saved after the reply, so that a command the user has been
+                // told succeeded is on disk before the next one is read.
+                if (isListChanged) {
+                    storage.save(tasks);
                 }
             } catch (AlfredException e) {
                 reply(e.getMessage());
@@ -164,7 +182,7 @@ public class AlfredTheButler {
      *
      * @param arguments everything the user typed after the keyword
      * @return the event the arguments describe
-     * @throws AlfredException if the description, the start or the end is missing
+     * @throws AlfredException if the description, the start, or the end is missing
      */
     private static Event parseEvent(String arguments) throws AlfredException {
         String complaint = "An event needs a description, a /from time, and a /to time, sir.";

@@ -24,6 +24,18 @@ public class Event extends Task {
         this.to = to;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>The start and the end each get their own field, rather than being run
+     * together into one, so that reading the line back does not have to split
+     * them apart again.
+     */
+    @Override
+    public String toFileFormat() {
+        return "E | " + super.toFileFormat() + " | " + from + " | " + to;
+    }
+
     @Override
     public String toString() {
         return "[E]" + super.toString() + " (from: " + from + " to: " + to + ")";

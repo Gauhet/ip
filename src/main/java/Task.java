@@ -29,6 +29,25 @@ public abstract class Task {
     }
 
     /**
+     * Returns the fields this task shares with every other kind, as the middle
+     * of a save-file line, for example {@code 1 | read book}. The status is
+     * written as a digit rather than a box, because the file is read by the
+     * program rather than by a person.
+     *
+     * <p>Each subclass puts its own type letter in front of this and adds any
+     * fields of its own after it, the same way {@link #toString()} is built up.
+     *
+     * @return the save-file form of this task, without a type letter
+     */
+    public String toFileFormat() {
+        if (isDone) {
+            return "1 | " + name;
+        } else {
+            return "0 | " + name;
+        }
+    }
+
+    /**
      * Returns the status box and description, for example {@code [X] read book}.
      *
      * @return the display form of this task, without any type box

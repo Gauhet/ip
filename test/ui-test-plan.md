@@ -15,6 +15,13 @@ Because each case gets its own run, cases are independent: tasks added in one
 case never leak into the next. This is why every case that needs a task list has
 to add the tasks itself.
 
+Each run now also writes its task list to `data/alfred.txt`, under whatever
+directory the program is started from. That file does not break the independence
+above, because nothing reads it back yet: a run starts with an empty list no
+matter what the previous run left behind. Once loading is implemented, that
+stops being true, and the runner has to clear the file between cases for these
+tests to keep meaning what they say.
+
 ## Rules for writing a test case
 
 * Every case has two fenced blocks, in this order: **Input**, then
@@ -878,6 +885,13 @@ What is left are the program's own limits rather than mistakes in what was
 typed. There is nothing stable to assert about them yet, so add cases here as
 each is handled.
 
+* The contents of `data/alfred.txt` are not checked. These cases compare console
+  output, and saving prints nothing when it succeeds, so a save that wrote the
+  wrong line, or wrote nothing at all, would still pass every case here.
+  Checking it needs a test that reads the file, which this plan has no way to
+  express.
+* Tasks are saved but never loaded, so they do not come back when the program is
+  started again. Add a case for that once loading is implemented.
 * Input that ends without `bye` leaves the program reading from a stream that
   has ended.
 * "Now you have 1 tasks in the list." does not change for the singular. This
