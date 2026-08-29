@@ -1,3 +1,4 @@
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -210,12 +211,17 @@ public class AlfredTheButler {
     }
 
     /**
-     * Builds a deadline from the {@code <description> /by <time>} part of a
+     * Builds a deadline from the {@code <description> /by <date>} part of a
      * {@code deadline} command.
+     *
+     * <p>The date is read as a real date rather than kept as the words that
+     * were typed, so that the program knows which day is meant. Only the
+     * {@code yyyy-mm-dd} form is understood so far; anything else is not yet
+     * refused with a message of its own.
      *
      * @param arguments everything the user typed after the keyword
      * @return the deadline the arguments describe
-     * @throws AlfredException if the description or the due time is missing
+     * @throws AlfredException if the description or the due date is missing
      */
     private static Deadline parseDeadline(String arguments) throws AlfredException {
         String complaint = "A deadline needs a description and a /by time, sir.";
@@ -228,12 +234,15 @@ public class AlfredTheButler {
         if (description.isEmpty() || by.isEmpty()) {
             throw new AlfredException(complaint);
         }
-        return new Deadline(description, by);
+        return new Deadline(description, LocalDate.parse(by));
     }
 
     /**
      * Builds an event from the {@code <description> /from <start> /to <end>}
      * part of an {@code event} command.
+     *
+     * <p>The start and the end are read as real dates, on the same terms as the
+     * due date of a deadline.
      *
      * @param arguments everything the user typed after the keyword
      * @return the event the arguments describe
@@ -257,7 +266,7 @@ public class AlfredTheButler {
         if (description.isEmpty() || from.isEmpty() || to.isEmpty()) {
             throw new AlfredException(complaint);
         }
-        return new Event(description, from, to);
+        return new Event(description, LocalDate.parse(from), LocalDate.parse(to));
     }
 
     /**

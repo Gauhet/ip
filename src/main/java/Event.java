@@ -1,23 +1,27 @@
+import java.time.LocalDate;
 import java.util.List;
 
 /**
- * A task that spans a stretch of time, for example
- * {@code [E][ ] project meeting (from: Mon 2pm to: 4pm)}.
+ * A task that spans a stretch of days, for example
+ * {@code [E][ ] project meeting (from: 2019-12-02 to: 2019-12-03)}.
  */
 public class Event extends Task {
-    /** When the event starts and ends, kept as the words the user typed rather than as parsed dates. */
-    private final String from;
+    /**
+     * The days the event starts and ends on. Real dates, so that they can
+     * later be compared or reformatted.
+     */
+    private final LocalDate from;
 
-    private final String to;
+    private final LocalDate to;
 
     /**
      * Creates an event that starts out not done.
      *
      * @param description what the event is
-     * @param from when it starts, in the user's own words
-     * @param to when it ends, in the user's own words
+     * @param from the day it starts
+     * @param to the day it ends
      */
-    public Event(String description, String from, String to) {
+    public Event(String description, LocalDate from, LocalDate to) {
         super(description);
         this.from = from;
         this.to = to;
@@ -28,14 +32,15 @@ public class Event extends Task {
      *
      * <p>The start and the end each get their own field, rather than being run
      * together into one, so that reading the line back does not have to split
-     * them apart again.
+     * them apart again. Each is written in the {@code yyyy-mm-dd} form that
+     * {@link LocalDate#parse(CharSequence)} reads back.
      */
     @Override
     public List<String> toFileFields() {
         List<String> fields = super.toFileFields();
         fields.add(0, "E");
-        fields.add(from);
-        fields.add(to);
+        fields.add(from.toString());
+        fields.add(to.toString());
         return fields;
     }
 

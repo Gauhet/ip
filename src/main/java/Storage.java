@@ -1,6 +1,8 @@
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,14 +13,15 @@ import java.util.List;
  *
  * <pre>
  * T | 1 | read book
- * D | 0 | return book | June 6th
- * E | 0 | project meeting | Mon 2pm | 4pm
+ * D | 0 | return book | 2019-10-15
+ * E | 0 | project meeting | 2019-12-02 | 2019-12-03
  * </pre>
  *
  * <p>The first field is the type letter, the second is 1 for a task that is
  * done and 0 for one that is not, and the third is the description. Any fields
- * after that belong to the type: the due time of a deadline, or the start and
- * end of an event. Each task says what its fields are, in
+ * after that belong to the type: the due date of a deadline, or the start and
+ * end of an event, each written as {@code yyyy-mm-dd}. Each task says what its
+ * fields are, in
  * {@link Task#toFileFields()}; joining them into a line and splitting them back
  * out is done here, so that the two halves cannot drift apart.
  *
@@ -243,8 +246,8 @@ public class Storage {
      * <p>Every part of the line is checked, because the file can be edited by
      * hand and a wrong line should cost only itself. A line with the wrong
      * number of fields, an unknown type letter, a status that is neither 0 nor
-     * 1, or an empty description is refused rather than turned into a task that
-     * misrepresents what was saved.
+     * 1, an empty description, or a date field that is not a date is refused
+     * rather than turned into a task that misrepresents what was saved.
      *
      * @param line a single line of the save file
      * @return the task that line describes
@@ -269,8 +272,8 @@ public class Storage {
         }
         Task task = switch (type) {
         case "T" -> new ToDo(description);
-        case "D" -> new Deadline(description, requireNonEmpty(fields.get(3)));
-        case "E" -> new Event(description, requireNonEmpty(fields.get(3)), requireNonEmpty(fields.get(4)));
+        case "D" -> new Deadline(description, parseDate(fields.get(3)));
+        case "E" -> new Event(description, parseDate(fields.get(3)), parseDate(fields.get(4)));
         default -> throw new AlfredException("Unknown task type: " + type);
         };
 
@@ -287,17 +290,25 @@ public class Storage {
     }
 
     /**
-     * Returns a time field, refusing it if it is empty. A deadline or event
-     * saved without one could not have been created by this program.
+     * Reads a date field of a saved line. An empty field fails here too, since
+     * nothing is not a date; a deadline or event saved without one could not
+     * have been created by this program.
      *
-     * @param field the field to check
-     * @return the field, unchanged
-     * @throws AlfredException if the field is empty
+     * <p>The failure is turned into an {@link AlfredException} rather than left
+     * as the unchecked one {@code java.time} throws, because that is the
+     * exception {@link #load()} watches for when it decides to skip a line. Left
+     * unchecked, one hand-edited date would escape the loop and cost the whole
+     * file instead of the single line it belongs to.
+     *
+     * @param field the field to read
+     * @return the date the field names
+     * @throws AlfredException if the field is not a {@code yyyy-mm-dd} date
      */
-    private static String requireNonEmpty(String field) throws AlfredException {
-        if (field.isEmpty()) {
-            throw new AlfredException("A time field cannot be empty");
+    private static LocalDate parseDate(String field) throws AlfredException {
+        try {
+            return LocalDate.parse(field);
+        } catch (DateTimeParseException e) {
+            throw new AlfredException("A date field must read yyyy-mm-dd, not " + field);
         }
-        return field;
     }
 }
