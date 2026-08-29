@@ -1,7 +1,6 @@
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -124,6 +123,17 @@ public class Storage {
      * whole file, so that one damaged line costs one task instead of all of
      * them. The caller is told how many were skipped, because those lines are
      * gone from the file as soon as the list next changes.
+     *
+     * <p>Skipping works by catching {@link AlfredException}, so everything that
+     * can refuse a line has to raise that one and not an unchecked exception.
+     * A date is the case to watch: {@link Dates#parse(String)} is what makes a
+     * hand-edited date cost the line it sits on, because the exception
+     * {@code java.time} would otherwise throw is unchecked and would escape
+     * this loop with the rest of the file unread.
+     *
+     * <p>The messages those refusals carry are written for someone who typed
+     * the text, and none of them is shown here: a line that cannot be read is
+     * only counted. It is the refusal that matters, not its wording.
      *
      * @return the tasks that could be read, and how many lines were skipped
      * @throws AlfredException if the file exists but cannot be read at all
@@ -271,8 +281,8 @@ public class Storage {
         }
         Task task = switch (type) {
         case "T" -> new ToDo(description);
-        case "D" -> new Deadline(description, parseDate(fields.get(3)));
-        case "E" -> new Event(description, parseDate(fields.get(3)), parseDate(fields.get(4)));
+        case "D" -> new Deadline(description, Dates.parse(fields.get(3)));
+        case "E" -> new Event(description, Dates.parse(fields.get(3)), Dates.parse(fields.get(4)));
         default -> throw new AlfredException("Unknown task type: " + type);
         };
 
@@ -286,30 +296,5 @@ public class Storage {
             throw new AlfredException("A status must be 0 or 1, not " + status);
         }
         return task;
-    }
-
-    /**
-     * Reads a date field of a saved line, by the same rules as a date the user
-     * types. An empty field fails here too, since nothing is not a date; a
-     * deadline or event saved without one could not have been created by this
-     * program.
-     *
-     * <p>{@link Dates} refuses a bad date with an {@link AlfredException},
-     * which is the exception {@link #load()} watches for when it decides to
-     * skip a line. That is what keeps a hand-edited date costing the line it is
-     * on rather than the whole file: an unchecked exception would escape the
-     * loading loop instead.
-     *
-     * <p>The message {@code Dates} builds is addressed to someone who
-     * typed the date, and is not shown for a file, since a line that cannot be
-     * read is only counted. It is the refusal that matters here, not its
-     * wording.
-     *
-     * @param field the field to read
-     * @return the date the field names
-     * @throws AlfredException if the field is not a date this program wrote
-     */
-    private static LocalDate parseDate(String field) throws AlfredException {
-        return Dates.parse(field);
     }
 }
