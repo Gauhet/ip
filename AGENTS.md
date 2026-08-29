@@ -24,24 +24,44 @@ Unless the user says otherwise, assume that you are assisting a student working 
 
 # Project-specific requirements
 
-## Java version:
+## Java version
 
 Ensure that Java 25 is used when running the application or build tasks. On macOS, use `sdk use java 25.0.3.fx-zulu` to switch to Java 25 if needed.
+
+## Checking style
+
+This project follows three style guides:
+
+* [se-edu Java conventions (intermediate)](https://se-education.org/guides/conventions/java/intermediate.html), for everything under `src/main/java`.
+* [se-edu Markdown conventions](https://se-education.org/guides/conventions/markdown.html), for every `.md` file.
+* [Google developer documentation style guide](https://developers.google.com/style), for all prose a reader sees: Markdown files, Javadoc, comments, and the messages the program prints.
+
+After writing or editing any `.java` or `.md` file, and before reporting that change as done, **invoke the `style-check` skill**. If it is not available — most often because it was added or edited during the current session and has not been picked up yet — read `.claude/skills/style-check/SKILL.md` and follow its steps directly instead. Never skip the check because the skill did not load.
+
+The skill fetches the three guides from their URLs on every run rather than working from an embedded copy, so it follows the guides as they stand rather than as they stood when it was written. If a guide cannot be fetched, it reports that the check did not run. Treat that as an unfinished check, not as a pass.
+
+Run the style check **before** the text UI tests below. A style fix can change what the program prints, and the tests have to run against the code as it will be left, not as it was midway through.
 
 ## Testing the text UI
 
 After every change to the code under `src/main/java`, and before reporting that change as done:
 
 1. **Update `test/ui-test-plan.md` if needed.** Add a test case for a new command or behavior, and update the expected output of any existing case whose output the change alters. A change that only reorganizes internals without altering what the program prints needs no update to the plan; in that case say so explicitly, rather than skipping the step silently.
-2. **Run the `test-ui` tests** over the whole plan against the rebuilt program. Invoke the `test-ui` skill. If it is not available — most often because it was added or edited during the current session and has not been picked up yet — read `.claude/skills/test-ui/SKILL.md` and follow its steps directly instead; it is a plain Markdown procedure of shell commands, so it runs the same way with or without a skill mechanism. Never skip the tests because the skill did not load.
-3. **Report the result.** On success, show the console session. On failure, show the failing case with its expected and actual output. Do not describe a code change as complete or working while a case is failing.
+1. **Run the `test-ui` tests** over the whole plan against the rebuilt program. Invoke the `test-ui` skill. If it is not available — most often because it was added or edited during the current session and has not been picked up yet — read `.claude/skills/test-ui/SKILL.md` and follow its steps directly instead; it is a plain Markdown procedure of shell commands, so it runs the same way with or without a skill mechanism. Never skip the tests because the skill did not load.
+1. **Report the result.** On success, show the console session. On failure, show the failing case with its expected and actual output. Do not describe a code change as complete or working while a case is failing.
 
-Do these two steps in that order. Running the tests first and then editing the plan to match whatever the program happened to print makes the tests agree with bugs instead of catching them. Similarly, when a case fails, fix the program or correct the expected output deliberately, after deciding which of the two is actually wrong; never edit the plan just to make the test pass.
+Do these three steps in that order. Running the tests first and then editing the plan to match whatever the program happened to print makes the tests agree with bugs instead of catching them. Similarly, when a case fails, fix the program or correct the expected output deliberately, after deciding which of the two is actually wrong; never edit the plan just to make the test pass.
 
 Expected output belongs in the plan only after it has been produced by an actual run and read line by line to confirm it is correct. See `.claude/skills/test-ui/SKILL.md` for how cases are written, run, and compared.
 
 ## Git
 
+This project follows the [se-edu Git conventions](https://se-education.org/guides/conventions/git.html) for commit messages and branch names.
+
+Before proposing a commit message, and before creating any commit, **invoke the `commit-check` skill**. If it is not available — most often because it was added or edited during the current session and has not been picked up yet — read `.claude/skills/commit-check/SKILL.md` and follow its steps directly instead. Never skip the check because the skill did not load.
+
+The skill fetches the conventions from their URL on every run rather than working from an embedded copy. If the guide cannot be fetched, it reports that the check did not run. Treat that as an unfinished check, not as a pass.
+
 Use lightweight tags unless the user requests an annotated tag.
-When proposing or creating a commit message, include enough detail to explain the rationale for the change.
+When proposing or creating a commit message, include enough detail to explain the rationale for the change. Weigh this against the size of the change: a small, self-explanatory commit does not need a body.
 Do not commit or push unless explicitly asked.
