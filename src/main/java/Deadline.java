@@ -6,7 +6,7 @@ import java.util.List;
  * {@code [D][ ] return book (by: Oct 15 2019)}.
  */
 public class Deadline extends Task {
-    /** The day the task is due. A real date, so that it can later be compared or reformatted. */
+    /** The day the task is due. A real date, so that it can be compared and reformatted. */
     private final LocalDate by;
 
     /**

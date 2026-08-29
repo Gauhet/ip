@@ -7,8 +7,8 @@ import java.util.List;
  */
 public class Event extends Task {
     /**
-     * The days the event starts and ends on. Real dates, so that they can
-     * later be compared or reformatted.
+     * The days the event starts and ends on. Real dates, so that they can be
+     * compared and reformatted.
      */
     private final LocalDate from;
 
