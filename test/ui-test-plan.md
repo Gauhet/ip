@@ -1387,6 +1387,114 @@ bye
 
 ---
 
+## TC20: Edge-case dates survive a save and a load
+
+**Aim:** A date comes back from the save file as the same day it went in, for
+the dates most likely to expose a mistake in the two formats.
+
+TC14 already restarts the program with a deadline and an event in the list, but
+its dates are ordinary ones. This case picks the three that would catch a format
+error TC14 would miss:
+
+* `2019-01-05` has a single-digit month and a single-digit day. Written with a
+  pattern that does not pad, it would save as `2019-1-5`, which
+  `LocalDate.parse` refuses, and the task would come back as a skipped line.
+* `2020-02-29` is a leap day. It exists only if the year is carried with it, so
+  a format that dropped or altered the year would turn it into an impossible
+  date rather than a merely wrong one.
+* The event runs from `2019-12-31` to `2020-01-01`, crossing a year boundary, so
+  a year taken from the wrong field would show up as a start and end in the same
+  year.
+
+Reading them back is the assertion. The dates the second run prints are produced
+from the file rather than from anything left in memory, so a date that did not
+survive shows up either as a changed day or as a task that is missing entirely.
+
+**First input:**
+
+```
+deadline file taxes /by 2019-01-05
+deadline leap day /by 2020-02-29
+event new year /from 2019-12-31 /to 2020-01-01
+bye
+```
+
+**Second input:**
+
+```
+list
+bye
+```
+
+**Expected output:**
+
+```
+    ____________________________________________________________
+            _     _      _____  ____   _____  ____
+           / \   | |    |  ___||  _ \ | ____||  _ \
+          / _ \  | |    | |_   | |_) ||  _|  | | | |
+         / ___ \ | |___ |  _|  |  _ < | |___ | |_| |
+        /_/   \_\|_____||_|    |_| \_\|_____||____/
+                    P E N N Y W O R T H
+
+      Butler to the Wayne family  --  At your service
+     Hello! I'm AlfredTheButler
+     What can I do for you?
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Got it. I've added this task:
+       [D][ ] file taxes (by: Jan 05 2019)
+     Now you have 1 task in the list.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Got it. I've added this task:
+       [D][ ] leap day (by: Feb 29 2020)
+     Now you have 2 tasks in the list.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Got it. I've added this task:
+       [E][ ] new year (from: Dec 31 2019 to: Jan 01 2020)
+     Now you have 3 tasks in the list.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Bye. Hope to see you again soon!
+    ____________________________________________________________
+
+    ____________________________________________________________
+            _     _      _____  ____   _____  ____
+           / \   | |    |  ___||  _ \ | ____||  _ \
+          / _ \  | |    | |_   | |_) ||  _|  | | | |
+         / ___ \ | |___ |  _|  |  _ < | |___ | |_| |
+        /_/   \_\|_____||_|    |_| \_\|_____||____/
+                    P E N N Y W O R T H
+
+      Butler to the Wayne family  --  At your service
+     Hello! I'm AlfredTheButler
+     What can I do for you?
+    ____________________________________________________________
+
+    ____________________________________________________________
+     I've brought back 3 tasks from last time, sir.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Here are the tasks in your list:
+     1.[D][ ] file taxes (by: Jan 05 2019)
+     2.[D][ ] leap day (by: Feb 29 2020)
+     3.[E][ ] new year (from: Dec 31 2019 to: Jan 01 2020)
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Bye. Hope to see you again soon!
+    ____________________________________________________________
+```
+
+---
+
 ## Known gaps (not yet covered)
 
 No invalid command crashes the program any more. Blank input, an unknown
