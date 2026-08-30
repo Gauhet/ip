@@ -172,28 +172,23 @@ public class Parser {
      * Converts a task number typed by the user into a list index, since the
      * user numbers tasks from 1 but the list is indexed from 0.
      *
+     * <p>Only whether the text is a number is settled here. Whether it names a
+     * task is {@link TaskList}'s to answer, because that depends on how many
+     * tasks there are, and asking the parser to know that would mean handing it
+     * the list to read a piece of text.
+     *
      * @param arguments everything typed after {@code mark}, {@code unmark}
      *        or {@code delete}
-     * @param taskCount how many tasks are stored
-     * @return the index of the task the user meant
-     * @throws AlfredException if the arguments are not a number, or name a
-     *         task that is not in the list
+     * @return the index the number points at, which may be outside the list
+     * @throws AlfredException if the arguments are not a number
      */
-    public static int parseTaskIndex(String arguments, int taskCount) throws AlfredException {
-        int number;
+    public static int parseTaskIndex(String arguments) throws AlfredException {
         try {
-            number = Integer.parseInt(arguments);
-        } catch (NumberFormatException e) {
             // Also covers a missing number, since parsing an empty string
             // fails the same way.
+            return Integer.parseInt(arguments) - 1;
+        } catch (NumberFormatException e) {
             throw new AlfredException("That is not a task number, sir.");
         }
-        int index = number - 1;
-        // Checked here because the list would answer an out-of-range index
-        // with an exception, where a mistyped number deserves a reply.
-        if (index < 0 || index >= taskCount) {
-            throw new AlfredException("There is no such task, sir.");
-        }
-        return index;
     }
 }

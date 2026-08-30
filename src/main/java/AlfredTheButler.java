@@ -96,17 +96,17 @@ public class AlfredTheButler {
                 case BYE -> isRunning = false;
                 case LIST -> ui.showList(tasks);
                 case UNMARK -> {
-                    int index = Parser.parseTaskIndex(arguments, tasks.size());
+                    int index = Parser.parseTaskIndex(arguments);
                     isListChanged = true;
                     ui.showUnmarked(tasks.unmarkDone(index));
                 }
                 case MARK -> {
-                    int index = Parser.parseTaskIndex(arguments, tasks.size());
+                    int index = Parser.parseTaskIndex(arguments);
                     isListChanged = true;
                     ui.showMarked(tasks.markDone(index));
                 }
                 case DELETE -> {
-                    int index = Parser.parseTaskIndex(arguments, tasks.size());
+                    int index = Parser.parseTaskIndex(arguments);
                     Task removed = tasks.delete(index);
                     isListChanged = true;
                     ui.showRemoved(removed, tasks.size());
