@@ -1,8 +1,15 @@
+package alfred;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+
+import alfred.task.Deadline;
+import alfred.task.Event;
+import alfred.task.Task;
+import alfred.task.ToDo;
 
 /**
  * Keeps the task list on the hard disk, so that tasks outlive a single run of
@@ -58,7 +65,7 @@ public class Storage {
      * @param tasks the tasks that were read, in the order they were saved
      * @param skippedLines how many lines could not be understood
      */
-    public record LoadResult(List<Task> tasks, int skippedLines) { }
+    record LoadResult(List<Task> tasks, int skippedLines) { }
 
     /** Where the tasks are kept, as given to the constructor. */
     private final Path file;
@@ -78,7 +85,7 @@ public class Storage {
      *
      * @param filePath where to keep the tasks, such as {@code data/alfred.txt}
      */
-    public Storage(String filePath) {
+    Storage(String filePath) {
         this.file = Path.of(filePath);
     }
 
@@ -143,7 +150,7 @@ public class Storage {
      * @return the tasks that could be read, and how many lines were skipped
      * @throws AlfredException if the file exists but cannot be read at all
      */
-    public LoadResult load() throws AlfredException {
+    LoadResult load() throws AlfredException {
         List<Task> tasks = new ArrayList<>();
         if (!Files.exists(file)) {
             return new LoadResult(tasks, 0);

@@ -1,3 +1,9 @@
+package alfred;
+
+import alfred.command.Command;
+import alfred.command.ExitCommand;
+import alfred.task.TaskList;
+
 /**
  * Alfred the Butler: a personal chatbot that keeps a list of tasks, taking one
  * command per line until the user says {@code bye} or the input runs out. The

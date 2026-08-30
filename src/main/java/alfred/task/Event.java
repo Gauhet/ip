@@ -1,5 +1,9 @@
+package alfred.task;
+
 import java.time.LocalDate;
 import java.util.List;
+
+import alfred.Dates;
 
 /**
  * A task that spans a stretch of days, for example

@@ -1,3 +1,5 @@
+package alfred.task;
+
 import java.util.List;
 
 /**

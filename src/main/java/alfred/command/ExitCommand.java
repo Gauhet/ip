@@ -1,3 +1,10 @@
+package alfred.command;
+
+import alfred.Parser;
+import alfred.Storage;
+import alfred.Ui;
+import alfred.task.TaskList;
+
 /**
  * Says goodbye and ends the conversation.
  *

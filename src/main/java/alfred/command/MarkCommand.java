@@ -1,3 +1,10 @@
+package alfred.command;
+
+import alfred.AlfredException;
+import alfred.Storage;
+import alfred.Ui;
+import alfred.task.TaskList;
+
 /**
  * Marks one task as done.
  *

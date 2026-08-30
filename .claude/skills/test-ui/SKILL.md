@@ -50,8 +50,12 @@ rm -rf "$WORK" && mkdir -p "$WORK/build"
 ### 1. Compile
 
 ```bash
-javac -d "$WORK/build" src/main/java/*.java
+javac -d "$WORK/build" $(find src/main/java -name '*.java')
 ```
+
+The sources sit in packages under `src/main/java`, so `find` collects the file
+list. A `src/main/java/*.java` glob matches only the top level, which now holds
+no sources at all, so it would compile nothing.
 
 If compilation fails, stop. Report the compiler errors and do not run any case —
 a failure to build is not a test failure, and running stale class files would
@@ -145,7 +149,7 @@ way that swallows individual results or keeps going after a failure.
    r=0
    for in in $inputs; do
      r=$((r + 1))
-     java -cp "$WORK/build" AlfredTheButler < "$in" > "$WORK/tc1.r$r.actual" 2>&1
+     java -cp "$WORK/build" alfred.AlfredTheButler < "$in" > "$WORK/tc1.r$r.actual" 2>&1
      cat "$WORK/tc1.r$r.actual" >> "$WORK/tc1.actual"
    done
    ```
@@ -193,7 +197,7 @@ for n in $(seq 1 "$CASES"); do
   r=0
   for in in $inputs; do
     r=$((r + 1))
-    timeout 10 java -cp "$WORK/build" AlfredTheButler < "$in" > "$WORK/tc$n.r$r.actual" 2>&1
+    timeout 10 java -cp "$WORK/build" alfred.AlfredTheButler < "$in" > "$WORK/tc$n.r$r.actual" 2>&1
     cat "$WORK/tc$n.r$r.actual" >> "$WORK/tc$n.actual"
   done
   norm "$expected"          > "$WORK/tc$n.e.norm"

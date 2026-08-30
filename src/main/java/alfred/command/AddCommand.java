@@ -1,3 +1,12 @@
+package alfred.command;
+
+import alfred.AlfredException;
+import alfred.Parser;
+import alfred.Storage;
+import alfred.Ui;
+import alfred.task.Task;
+import alfred.task.TaskList;
+
 /**
  * Stores a new task at the end of the list.
  *
