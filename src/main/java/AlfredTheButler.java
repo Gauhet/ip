@@ -1,6 +1,3 @@
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Alfred the Butler: a personal chatbot that keeps a list of tasks, taking one
  * command per line until the user says {@code bye} or the input runs out. The
@@ -9,8 +6,8 @@ import java.util.List;
  *
  * <p>This class holds the command loop and nothing else that can be given a
  * home of its own: what the user sees and types is {@link Ui}'s, what a typed
- * line means is {@link Parser}'s, and what is written to and read from disk is
- * {@link Storage}'s.
+ * line means is {@link Parser}'s, the tasks themselves are {@link TaskList}'s,
+ * and what is written to and read from disk is {@link Storage}'s.
  */
 public class AlfredTheButler {
     /**
@@ -30,7 +27,7 @@ public class AlfredTheButler {
      */
     public static void main(String[] args) {
         Ui ui = new Ui();
-        List<Task> tasks = new ArrayList<>();
+        TaskList tasks = new TaskList();
         Storage storage = new Storage();
         boolean isRunning = true;
 
@@ -40,7 +37,7 @@ public class AlfredTheButler {
         // the empty list above in place rather than stopping the program.
         try {
             Storage.LoadResult loaded = storage.load();
-            tasks = loaded.tasks();
+            tasks = new TaskList(loaded.tasks());
             // Said only when there is something to say. On a first run there is
             // no file yet, and announcing that nothing came back would be noise.
             if (!tasks.isEmpty()) {
@@ -83,19 +80,17 @@ public class AlfredTheButler {
                 case LIST -> ui.showList(tasks);
                 case UNMARK -> {
                     int index = Parser.parseTaskIndex(arguments, tasks.size());
-                    tasks.get(index).unmarkDone();
                     isListChanged = true;
-                    ui.showUnmarked(tasks.get(index));
+                    ui.showUnmarked(tasks.unmarkDone(index));
                 }
                 case MARK -> {
                     int index = Parser.parseTaskIndex(arguments, tasks.size());
-                    tasks.get(index).markDone();
                     isListChanged = true;
-                    ui.showMarked(tasks.get(index));
+                    ui.showMarked(tasks.markDone(index));
                 }
                 case DELETE -> {
                     int index = Parser.parseTaskIndex(arguments, tasks.size());
-                    Task removed = tasks.remove(index);
+                    Task removed = tasks.delete(index);
                     isListChanged = true;
                     ui.showRemoved(removed, tasks.size());
                 }
@@ -116,7 +111,7 @@ public class AlfredTheButler {
                 // Saved after the reply, so that a command the user has been
                 // told succeeded is on disk before the next one is read.
                 if (isListChanged) {
-                    storage.save(tasks);
+                    storage.save(tasks.toList());
                 }
             } catch (AlfredException e) {
                 ui.showError(e.getMessage());

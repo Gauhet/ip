@@ -178,7 +178,7 @@ public class Ui {
      *
      * @param tasks the tasks to show, in the order they are stored
      */
-    public void showList(List<Task> tasks) {
+    public void showList(TaskList tasks) {
         // One line for the heading, then one per task.
         String[] lines = new String[tasks.size() + 1];
         lines[0] = "Here are the tasks in your list:";
@@ -207,7 +207,7 @@ public class Ui {
      * @param tasks every stored task, in the order they are stored
      * @param date the day being asked about
      */
-    public void showTasksOn(List<Task> tasks, LocalDate date) {
+    public void showTasksOn(TaskList tasks, LocalDate date) {
         String when = Dates.format(date);
         List<String> lines = new ArrayList<>();
         for (int i = 0; i < tasks.size(); i++) {
