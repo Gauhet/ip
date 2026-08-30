@@ -8,8 +8,48 @@
  * home of its own: what the user sees and types is {@link Ui}'s, what a typed
  * line means is {@link Parser}'s, the tasks themselves are {@link TaskList}'s,
  * and what is written to and read from disk is {@link Storage}'s.
+ *
+ * <p>A run is an object rather than a static method, so that those four are
+ * fields set up once instead of locals threaded through every call. It also
+ * means a second chatbot, saving somewhere else, is another instance rather
+ * than another program.
  */
 public class AlfredTheButler {
+    /**
+     * Where a normal run keeps its tasks. Named here rather than inside
+     * {@link Storage}, so that the class that does the saving does not also
+     * decide where to save.
+     */
+    private static final String SAVE_FILE = "data/alfred.txt";
+
+    /** Everything the user sees and types. */
+    private final Ui ui;
+
+    /** The save file this run reads from and writes to. */
+    private final Storage storage;
+
+    /**
+     * The tasks. Not final, because the list read back at startup replaces the
+     * empty one this starts with.
+     */
+    private TaskList tasks;
+
+    /**
+     * Sets up a run that keeps its tasks in one named file.
+     *
+     * <p>Nothing is read here. Loading is left to {@link #run()} because it has
+     * something to say to the user — how many tasks came back, or that the file
+     * could not be read — and saying it from a constructor would put it before
+     * the greeting, which is not the order a conversation goes in.
+     *
+     * @param filePath where to keep the tasks, such as {@code data/alfred.txt}
+     */
+    public AlfredTheButler(String filePath) {
+        ui = new Ui();
+        storage = new Storage(filePath);
+        tasks = new TaskList();
+    }
+
     /**
      * Greets the user, then handles one command per line until {@code bye} or
      * the end of the input: {@code list}, {@code on <date>},
@@ -21,37 +61,14 @@ public class AlfredTheButler {
      * becomes an ordinary reply and the loop carries on. Catching in one place
      * lets each method throw its own message without knowing how it is printed.
      *
-     * <p>The saved tasks are read back before the first command, and every
-     * command that changes the list is followed by a save, so that the file on
-     * disk always matches what the user has just been shown.
+     * <p>Every command that changes the list is followed by a save, so that the
+     * file on disk always matches what the user has just been shown.
      */
-    public static void main(String[] args) {
-        Ui ui = new Ui();
-        TaskList tasks = new TaskList();
-        Storage storage = new Storage();
+    public void run() {
         boolean isRunning = true;
 
         ui.showWelcome();
-        // Loaded in its own try, because this runs before the loop below and so
-        // cannot rely on the loop's catch. A file that cannot be read leaves
-        // the empty list above in place rather than stopping the program.
-        try {
-            Storage.LoadResult loaded = storage.load();
-            tasks = new TaskList(loaded.tasks());
-            // Said only when there is something to say. On a first run there is
-            // no file yet, and announcing that nothing came back would be noise.
-            if (!tasks.isEmpty()) {
-                ui.showLoaded(tasks.size());
-            }
-            // Warned about separately, and even when nothing else was restored,
-            // because the damaged lines are dropped from the file as soon as the
-            // list next changes.
-            if (loaded.skippedLines() > 0) {
-                ui.showSkippedLines(loaded.skippedLines());
-            }
-        } catch (AlfredException e) {
-            ui.showError(e.getMessage());
-        }
+        restoreTasks();
         while (isRunning) {
             // End of input is treated as `bye`, so that a piped or redirected
             // session that simply runs out of lines finishes the same way a
@@ -125,5 +142,42 @@ public class AlfredTheButler {
             }
         }
         ui.showFarewell();
+    }
+
+    /**
+     * Reads back the tasks the last run left behind, and says what came of it.
+     *
+     * <p>This has a {@code try} of its own because it runs before the loop and
+     * so cannot rely on the loop's catch. A file that cannot be read leaves the
+     * empty list in place rather than stopping the program: the user can still
+     * work, and the first save will write a file that can be read.
+     */
+    private void restoreTasks() {
+        try {
+            Storage.LoadResult loaded = storage.load();
+            tasks = new TaskList(loaded.tasks());
+            // Said only when there is something to say. On a first run there is
+            // no file yet, and announcing that nothing came back would be noise.
+            if (!tasks.isEmpty()) {
+                ui.showLoaded(tasks.size());
+            }
+            // Warned about separately, and even when nothing else was restored,
+            // because the damaged lines are dropped from the file as soon as the
+            // list next changes.
+            if (loaded.skippedLines() > 0) {
+                ui.showSkippedLines(loaded.skippedLines());
+            }
+        } catch (AlfredException e) {
+            ui.showError(e.getMessage());
+        }
+    }
+
+    /**
+     * Starts one run of the chatbot, saving to the usual file.
+     *
+     * @param args ignored; the save file is not yet something to choose
+     */
+    public static void main(String[] args) {
+        new AlfredTheButler(SAVE_FILE).run();
     }
 }
