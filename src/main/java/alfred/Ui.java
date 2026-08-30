@@ -1,7 +1,12 @@
+package alfred;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+
+import alfred.task.Task;
+import alfred.task.TaskList;
 
 /**
  * Everything the user sees and types: the banner, the reply blocks, and the

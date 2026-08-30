@@ -1,4 +1,20 @@
+package alfred;
+
 import java.time.LocalDate;
+
+import alfred.command.AddCommand;
+import alfred.command.Command;
+import alfred.command.DeleteCommand;
+import alfred.command.ExitCommand;
+import alfred.command.ListCommand;
+import alfred.command.MarkCommand;
+import alfred.command.OnCommand;
+import alfred.command.UnmarkCommand;
+import alfred.task.Deadline;
+import alfred.task.Event;
+import alfred.task.Task;
+import alfred.task.TaskList;
+import alfred.task.ToDo;
 
 /**
  * Makes sense of what the user typed: which command a line names, and what the

@@ -1,3 +1,11 @@
+package alfred.command;
+
+import alfred.AlfredException;
+import alfred.Parser;
+import alfred.Storage;
+import alfred.Ui;
+import alfred.task.TaskList;
+
 /**
  * Something the user has asked for, ready to be carried out.
  *

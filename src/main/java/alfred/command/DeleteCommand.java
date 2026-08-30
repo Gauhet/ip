@@ -1,3 +1,11 @@
+package alfred.command;
+
+import alfred.AlfredException;
+import alfred.Storage;
+import alfred.Ui;
+import alfred.task.Task;
+import alfred.task.TaskList;
+
 /**
  * Drops one task from the list.
  *

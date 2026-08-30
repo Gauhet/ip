@@ -1,8 +1,15 @@
+package alfred;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+
+import alfred.task.Deadline;
+import alfred.task.Event;
+import alfred.task.Task;
+import alfred.task.ToDo;
 
 /**
  * Keeps the task list on the hard disk, so that tasks outlive a single run of

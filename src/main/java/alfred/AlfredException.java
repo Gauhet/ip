@@ -1,3 +1,5 @@
+package alfred;
+
 /**
  * Something the program can tell the user about and carry on from: a mistake in
  * what they typed, such as an unrecognized command or one missing part of its
