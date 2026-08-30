@@ -4,19 +4,26 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.LocalDate;
+import java.util.Locale;
 
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests {@link Dates#parse(String)}.
+ * Tests {@link Dates}.
  *
- * <p>The tests are grouped by the three things the method can do, because those
- * are the three things a caller has to be able to rely on: it returns the day
- * the text names, it refuses text that is not shaped like a date, or it refuses
- * text that is shaped like one but names no real day. The last two are checked
- * by their message and not only by the exception type, since both throw an
- * {@link AlfredException} and telling them apart is the whole point of the
- * distinction.
+ * <p>The {@link Dates#parse(String)} tests are grouped by the three things that
+ * method can do, because those are the three things a caller has to be able to
+ * rely on: it returns the day the text names, it refuses text that is not
+ * shaped like a date, or it refuses text that is shaped like one but names no
+ * real day. The last two are checked by their message and not only by the
+ * exception type, since both throw an {@link AlfredException} and telling them
+ * apart is the whole point of the distinction.
+ *
+ * <p>The {@link Dates#format(LocalDate)} tests cover the form a date takes when
+ * it is shown, and pin the one property of it that is a decision rather than an
+ * accident: the month is named in English whatever locale the machine is set
+ * to. Left to the default locale, the same task would read differently from one
+ * machine to the next, so a test guards it.
  *
  * <p>The test class sits in package {@code alfred} because {@code parse} is
  * package-private. That is deliberate: the visibility stays as narrow as the
@@ -105,6 +112,41 @@ public class DatesTest {
     @Test
     public void parse_zeroDay_nonexistentDateExceptionThrown() {
         assertNonexistentDateRefused("2019-10-00");
+    }
+
+    @Test
+    public void format_ordinaryDate_monthNamedAndDayPadded() {
+        assertEquals("Oct 15 2019", Dates.format(LocalDate.of(2019, 10, 15)));
+    }
+
+    @Test
+    public void format_singleDigitDay_dayPaddedToTwoDigits() {
+        assertEquals("Jan 01 2019", Dates.format(LocalDate.of(2019, 1, 1)));
+    }
+
+    @Test
+    public void format_lastDayOfYear_displayFormReturned() {
+        assertEquals("Dec 31 2019", Dates.format(LocalDate.of(2019, 12, 31)));
+    }
+
+    @Test
+    public void format_leapDay_displayFormReturned() {
+        assertEquals("Feb 29 2020", Dates.format(LocalDate.of(2020, 2, 29)));
+    }
+
+    @Test
+    public void format_nonEnglishDefaultLocale_monthNamedInEnglish() {
+        Locale original = Locale.getDefault();
+        try {
+            // German would name this month Okt, so the assertion below fails
+            // if the display format ever stops pinning its locale.
+            Locale.setDefault(Locale.GERMANY);
+            assertEquals("Oct 15 2019", Dates.format(LocalDate.of(2019, 10, 15)));
+        } finally {
+            // Restored whatever the assertion did, so that a failure here
+            // cannot leak a locale into the tests that run after it.
+            Locale.setDefault(original);
+        }
     }
 
     /**
