@@ -82,7 +82,7 @@ public class Dates {
      * @throws AlfredException if the text is not in the accepted format, or is
      *         in that format but names a day that does not exist
      */
-    public static LocalDate parse(String text) throws AlfredException {
+    static LocalDate parse(String text) throws AlfredException {
         if (!SHAPE.matcher(text).matches()) {
             throw new AlfredException("I don't know '" + text + "' as a date, sir. Do use "
                     + FORMAT + ", as in " + EXAMPLE + ".");

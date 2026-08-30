@@ -62,7 +62,7 @@ public class Ui {
      *
      * @return true if a line is waiting, false at the end of the input
      */
-    public boolean hasNextCommand() {
+    boolean hasNextCommand() {
         return scanner.hasNextLine();
     }
 
@@ -72,12 +72,12 @@ public class Ui {
      *
      * @return the line the user typed, without leading or trailing spaces
      */
-    public String readCommand() {
+    String readCommand() {
         return scanner.nextLine().trim();
     }
 
     /** Prints the banner and the welcome message. */
-    public void showWelcome() {
+    void showWelcome() {
         System.out.println(DIVIDER);
         System.out.println(BANNER);
         System.out.println(INDENT + "Hello! I'm " + NAME);
@@ -96,7 +96,7 @@ public class Ui {
      *
      * @param taskCount how many tasks came back
      */
-    public void showLoaded(int taskCount) {
+    void showLoaded(int taskCount) {
         reply("I've brought back " + describeCount(taskCount, "task") + " from last time, sir.");
     }
 
@@ -105,7 +105,7 @@ public class Ui {
      *
      * @param skippedLines how many lines were left out
      */
-    public void showSkippedLines(int skippedLines) {
+    void showSkippedLines(int skippedLines) {
         reply("I could not make sense of " + describeCount(skippedLines, "line")
                         + " in your saved tasks, sir.",
                 "I have left them out, and they will be gone once the list changes.");
@@ -116,7 +116,7 @@ public class Ui {
      *
      * @param message the refusal, written for the person who typed the command
      */
-    public void showError(String message) {
+    void showError(String message) {
         reply(message);
     }
 
@@ -129,7 +129,7 @@ public class Ui {
      *
      * @param e the fault that escaped the command that caused it
      */
-    public void showInternalError(RuntimeException e) {
+    void showInternalError(RuntimeException e) {
         reply("Something went wrong on my end, sir: " + e,
                 "Your tasks are unharmed. Do carry on.");
     }

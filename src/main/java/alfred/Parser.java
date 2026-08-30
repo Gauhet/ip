@@ -60,7 +60,7 @@ public class Parser {
      * @throws AlfredException if the line is empty, names no known command, or
      *         is missing something the command it names needs
      */
-    public static Command parse(String line) throws AlfredException {
+    static Command parse(String line) throws AlfredException {
         // Worth its own message: saying the command was not recognized
         // would be misleading when none was typed.
         if (line.isEmpty()) {
@@ -95,7 +95,7 @@ public class Parser {
      * @return the todo the arguments describe
      * @throws AlfredException if no description was given
      */
-    public static ToDo parseToDo(String arguments) throws AlfredException {
+    private static ToDo parseToDo(String arguments) throws AlfredException {
         if (arguments.isEmpty()) {
             throw new AlfredException("A todo needs a description, sir.");
         }
@@ -116,7 +116,7 @@ public class Parser {
      * @throws AlfredException if the description or the due date is missing,
      *         or the due date cannot be read
      */
-    public static Deadline parseDeadline(String arguments) throws AlfredException {
+    private static Deadline parseDeadline(String arguments) throws AlfredException {
         String complaint = "A deadline needs a description and a /by date, sir.";
         int separator = arguments.indexOf(BY_SEPARATOR);
         if (separator == -1) {
@@ -146,7 +146,7 @@ public class Parser {
      *         missing, if either date cannot be read, or if the event ends
      *         before it starts
      */
-    public static Event parseEvent(String arguments) throws AlfredException {
+    private static Event parseEvent(String arguments) throws AlfredException {
         String complaint = "An event needs a description, a /from date, and a /to date, sir.";
         int fromSeparator = arguments.indexOf(FROM_SEPARATOR);
         if (fromSeparator == -1) {
@@ -186,7 +186,7 @@ public class Parser {
      * @return the day being asked about
      * @throws AlfredException if no date was given, or it cannot be read
      */
-    public static LocalDate parseOnDate(String arguments) throws AlfredException {
+    private static LocalDate parseOnDate(String arguments) throws AlfredException {
         if (arguments.isEmpty()) {
             throw new AlfredException("The on command needs a date, sir.");
         }
@@ -207,7 +207,7 @@ public class Parser {
      * @return the index the number points at, which may be outside the list
      * @throws AlfredException if the arguments are not a number
      */
-    public static int parseTaskIndex(String arguments) throws AlfredException {
+    private static int parseTaskIndex(String arguments) throws AlfredException {
         try {
             // Also covers a missing number, since parsing an empty string
             // fails the same way.
