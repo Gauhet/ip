@@ -1,0 +1,22 @@
+/**
+ * Marks one task as not done after all.
+ */
+public class UnmarkCommand extends Command {
+    /** Which task to unmark, counting from 0, as yet unchecked against the list. */
+    private final int index;
+
+    /**
+     * Creates a command that will mark one task as not done.
+     *
+     * @param index which task, counting from 0
+     */
+    public UnmarkCommand(int index) {
+        this.index = index;
+    }
+
+    @Override
+    public void execute(TaskList tasks, Ui ui, Storage storage) throws AlfredException {
+        ui.showUnmarked(tasks.unmarkDone(index));
+        storage.save(tasks.toList());
+    }
+}

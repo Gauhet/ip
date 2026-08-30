@@ -1,0 +1,27 @@
+import java.time.LocalDate;
+
+/**
+ * Shows the tasks that fall on one day.
+ *
+ * <p>The day is kept as a {@link LocalDate} rather than as the text that was
+ * typed, so that the question of what counts as a date is settled once, while
+ * the line is being read, and not again here.
+ */
+public class OnCommand extends Command {
+    /** The day being asked about. */
+    private final LocalDate date;
+
+    /**
+     * Creates a command that will show one day's tasks.
+     *
+     * @param date the day being asked about
+     */
+    public OnCommand(LocalDate date) {
+        this.date = date;
+    }
+
+    @Override
+    public void execute(TaskList tasks, Ui ui, Storage storage) {
+        ui.showTasksOn(tasks, date);
+    }
+}

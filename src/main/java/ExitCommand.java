@@ -1,0 +1,19 @@
+/**
+ * Says goodbye and ends the conversation.
+ *
+ * <p>Made by {@link Parser} for a {@code bye}, and by the command loop when the
+ * input runs out. Those are the same thing to the user — a session that is
+ * over — and treating them as one command is what keeps the parting message
+ * from being printed in two places and drifting apart.
+ */
+public class ExitCommand extends Command {
+    @Override
+    public void execute(TaskList tasks, Ui ui, Storage storage) {
+        ui.showFarewell();
+    }
+
+    @Override
+    public boolean isExit() {
+        return true;
+    }
+}

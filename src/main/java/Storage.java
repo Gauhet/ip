@@ -31,28 +31,6 @@ import java.util.List;
  * list a run begins with is the list the previous run ended with.
  */
 public class Storage {
-    /**
-     * The folder the save file lives in. Created when it is not there, which is
-     * what the first run on a new computer finds.
-     */
-    private static final Path FOLDER = Path.of("data");
-
-    /**
-     * Where the tasks are kept. Hard-coded because nothing yet asks for a second
-     * save file.
-     *
-     * <p>The path is relative, so it is read against whatever directory the
-     * program is started from rather than against one particular computer's
-     * layout. It is also built a segment at a time rather than written as
-     * {@code "data/alfred.txt"}, so that the separator between them is the one
-     * the operating system in use expects.
-     *
-     * <p>Naming the folder separately, rather than asking the file for its
-     * parent, is what makes {@link #save(java.util.List)} safe: a path with no
-     * folder in it has no parent, and creating that would fail.
-     */
-    private static final Path FILE = FOLDER.resolve("alfred.txt");
-
     /** What goes between two fields of a line, with a space on each side. */
     private static final String SEPARATOR = " | ";
 
@@ -82,6 +60,28 @@ public class Storage {
      */
     public record LoadResult(List<Task> tasks, int skippedLines) { }
 
+    /** Where the tasks are kept, as given to the constructor. */
+    private final Path file;
+
+    /**
+     * Prepares to keep the tasks in one named file.
+     *
+     * <p>Taking the path rather than deciding it is what keeps the choice of
+     * where to save out of this class: a test can point it at a scratch file,
+     * and nothing here has to know which file a real run uses.
+     *
+     * <p>The path is written with forward slashes and turned into a
+     * {@link Path} here, which reads it with whatever separator the operating
+     * system in use expects. A relative path, such as {@code data/alfred.txt},
+     * is read against the directory the program was started from rather than
+     * against one particular computer's layout.
+     *
+     * @param filePath where to keep the tasks, such as {@code data/alfred.txt}
+     */
+    public Storage(String filePath) {
+        this.file = Path.of(filePath);
+    }
+
     /**
      * Writes the whole task list to the save file, replacing whatever it held
      * before, and creating the file and its folder if they are not there yet.
@@ -100,10 +100,15 @@ public class Storage {
             lines.add(joinFields(task.toFileFields()));
         }
         try {
-            // Creates the folder if it is missing and does nothing if it is
-            // already there, so the first run needs no special case.
-            Files.createDirectories(FOLDER);
-            Files.write(FILE, lines);
+            Path folder = file.getParent();
+            // Null when the path is a bare filename, naming no folder to put the
+            // file in, so there is nothing to create. Otherwise the folder is
+            // made if it is missing and left alone if it is not, so the first
+            // run on a new computer needs no special case.
+            if (folder != null) {
+                Files.createDirectories(folder);
+            }
+            Files.write(file, lines);
         } catch (IOException e) {
             // Reported the same way as a mistyped command, so that a disk
             // problem becomes a reply the user can read rather than a stack
@@ -140,13 +145,13 @@ public class Storage {
      */
     public LoadResult load() throws AlfredException {
         List<Task> tasks = new ArrayList<>();
-        if (!Files.exists(FILE)) {
+        if (!Files.exists(file)) {
             return new LoadResult(tasks, 0);
         }
 
         List<String> lines;
         try {
-            lines = Files.readAllLines(FILE);
+            lines = Files.readAllLines(file);
         } catch (IOException e) {
             // A file that cannot be opened or decoded at all is different from
             // a file with a bad line in it: there is nothing to salvage.
