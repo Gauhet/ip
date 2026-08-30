@@ -10,10 +10,10 @@
  * the tasks themselves are {@link TaskList}'s, and what is written to and read
  * from disk is {@link Storage}'s.
  *
- * <p>A run is an object rather than a static method, so that those four are
- * fields set up once instead of locals threaded through every call. It also
- * means a second chatbot, saving somewhere else, is another instance rather
- * than another program.
+ * <p>A run is an object rather than a static method, so that the parts it works
+ * with are fields set up once instead of locals threaded through every call. It
+ * also means a second chatbot, saving somewhere else, is another instance
+ * rather than another program.
  */
 public class AlfredTheButler {
     /**

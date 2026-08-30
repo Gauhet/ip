@@ -101,10 +101,10 @@ public class Storage {
         }
         try {
             Path folder = file.getParent();
-            // Null when the path names a file and no folder to put it in, which
-            // there is then nothing to create. Otherwise the folder is made if
-            // it is missing and left alone if it is not, so the first run on a
-            // new computer needs no special case.
+            // Null when the path is a bare filename, naming no folder to put the
+            // file in, so there is nothing to create. Otherwise the folder is
+            // made if it is missing and left alone if it is not, so the first
+            // run on a new computer needs no special case.
             if (folder != null) {
                 Files.createDirectories(folder);
             }
