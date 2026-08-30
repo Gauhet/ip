@@ -6,8 +6,9 @@
  *
  * <p>This class holds the command loop and nothing else that can be given a
  * home of its own: what the user sees and types is {@link Ui}'s, what a typed
- * line means is {@link Parser}'s, the tasks themselves are {@link TaskList}'s,
- * and what is written to and read from disk is {@link Storage}'s.
+ * line means is {@link Parser}'s, what to do about it is the {@link Command}'s,
+ * the tasks themselves are {@link TaskList}'s, and what is written to and read
+ * from disk is {@link Storage}'s.
  *
  * <p>A run is an object rather than a static method, so that those four are
  * fields set up once instead of locals threaded through every call. It also
@@ -57,79 +58,34 @@ public class AlfredTheButler {
      * and the three that add a task, {@code todo}, {@code deadline}, and
      * {@code event}. Any other word is refused rather than guessed at.
      *
+     * <p>What each of those does is the command's own business, not this
+     * method's: a line is turned into a {@link Command} and carried out, so
+     * this loop is the same however many commands there come to be.
+     *
      * <p>Commands run inside a {@code try} so that a mistake in what was typed
      * becomes an ordinary reply and the loop carries on. Catching in one place
-     * lets each method throw its own message without knowing how it is printed.
-     *
-     * <p>Every command that changes the list is followed by a save, so that the
-     * file on disk always matches what the user has just been shown.
+     * lets each command throw its own message without knowing how it is
+     * printed.
      */
     public void run() {
-        boolean isRunning = true;
+        boolean isExit = false;
 
         ui.showWelcome();
         restoreTasks();
-        while (isRunning) {
-            // End of input is treated as `bye`, so that a piped or redirected
-            // session that simply runs out of lines finishes the same way a
-            // typed one does instead of failing to read a line that is not there.
-            if (!ui.hasNextCommand()) {
-                break;
-            }
+        while (!isExit) {
             try {
-                Parser.ParsedCommand parsed = Parser.parse(ui.readCommand());
-                String arguments = parsed.arguments();
-
-                // Left null by the commands that do not add anything, which is
-                // what tells the code below there is nothing to store.
-                Task added = null;
-
-                // Set by every command that changes the list, so that the save
-                // below happens once, in one place, rather than in each arm.
-                boolean isListChanged = false;
-
-                // An arrow switch, so no arm can fall through into the next by
-                // accident, and so `break` keeps its usual meaning in the loop.
-                // No default arm is needed: an unknown keyword has already been
-                // refused by the parser, so every value reaching here is listed.
-                switch (parsed.command()) {
-                case BYE -> isRunning = false;
-                case LIST -> ui.showList(tasks);
-                case UNMARK -> {
-                    int index = Parser.parseTaskIndex(arguments);
-                    isListChanged = true;
-                    ui.showUnmarked(tasks.unmarkDone(index));
-                }
-                case MARK -> {
-                    int index = Parser.parseTaskIndex(arguments);
-                    isListChanged = true;
-                    ui.showMarked(tasks.markDone(index));
-                }
-                case DELETE -> {
-                    int index = Parser.parseTaskIndex(arguments);
-                    Task removed = tasks.delete(index);
-                    isListChanged = true;
-                    ui.showRemoved(removed, tasks.size());
-                }
-                case TODO -> added = Parser.parseToDo(arguments);
-                case DEADLINE -> added = Parser.parseDeadline(arguments);
-                case EVENT -> added = Parser.parseEvent(arguments);
-                case ON -> ui.showTasksOn(tasks, Parser.parseOnDate(arguments));
-                }
-
-                // Storing and confirming is the same for every kind of task, so
-                // it is done once here rather than repeated in each arm above.
-                if (added != null) {
-                    tasks.add(added);
-                    isListChanged = true;
-                    ui.showAdded(added, tasks.size());
-                }
-
-                // Saved after the reply, so that a command the user has been
-                // told succeeded is on disk before the next one is read.
-                if (isListChanged) {
-                    storage.save(tasks.toList());
-                }
+                // End of input is treated as `bye`, so that a piped or
+                // redirected session that simply runs out of lines finishes the
+                // same way a typed one does instead of failing to read a line
+                // that is not there.
+                Command command = ui.hasNextCommand()
+                        ? Parser.parse(ui.readCommand())
+                        : new ExitCommand();
+                command.execute(tasks, ui, storage);
+                // Asked after the command has run, and skipped if it threw, so
+                // that a command which could not be carried out cannot end the
+                // session on its way out.
+                isExit = command.isExit();
             } catch (AlfredException e) {
                 ui.showError(e.getMessage());
             } catch (RuntimeException e) {
@@ -141,7 +97,6 @@ public class AlfredTheButler {
                 ui.showInternalError(e);
             }
         }
-        ui.showFarewell();
     }
 
     /**

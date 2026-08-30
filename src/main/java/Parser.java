@@ -7,8 +7,9 @@ import java.time.LocalDate;
  * <p>Everything here turns text into something the program can act on — a
  * {@link Command}, a {@link Task}, a list index, a date — and refuses text it
  * cannot, with a message written for the person who typed it. Nothing here
- * prints, stores, or changes anything, which is what lets the command loop be
- * read as a list of decisions rather than as string handling.
+ * prints, stores, or changes anything: a command is built, not carried out,
+ * which is what lets a line be refused before anything has happened to the
+ * task list.
  *
  * <p>The methods are static because reading a line needs nothing remembered
  * between one line and the next. An object would be the answer if the parser
@@ -30,27 +31,20 @@ public class Parser {
     private static final String TO_SEPARATOR = "/to";
 
     /**
-     * One line of input, read far enough to say which command it names and what
-     * is left for that command to read.
+     * Reads a line of input as the command it asks for, ready to be carried
+     * out.
      *
-     * <p>The two travel together because they come from one split of one line,
-     * and returning them separately would mean splitting it twice and risking
-     * the two halves being read from different lines.
-     *
-     * @param command the command the first word names
-     * @param arguments everything after the first word, trimmed, or an empty
-     *        string if the line was only a keyword
-     */
-    public record ParsedCommand(Command command, String arguments) { }
-
-    /**
-     * Reads a line of input as a command and its arguments.
+     * <p>This is where a keyword becomes an object. Each arm builds the command
+     * that keyword names, reading the rest of the line the way that command
+     * needs it read, so everything a command requires is settled here and it
+     * can be carried out without the line it came from.
      *
      * @param line what the user typed, already trimmed
-     * @return the command named by the line, with the rest of the line
-     * @throws AlfredException if the line is empty, or names no known command
+     * @return the command the line asks for
+     * @throws AlfredException if the line is empty, names no known command, or
+     *         is missing something the command it names needs
      */
-    public static ParsedCommand parse(String line) throws AlfredException {
+    public static Command parse(String line) throws AlfredException {
         // Worth its own message: saying the command was not recognized
         // would be misleading when none was typed.
         if (line.isEmpty()) {
@@ -59,8 +53,23 @@ public class Parser {
         // Everything up to the first space names the command; the rest
         // is that command's own input, which only it knows how to read.
         String[] parts = line.split(" ", 2);
+        String keyword = parts[0];
         String arguments = parts.length > 1 ? parts[1].trim() : "";
-        return new ParsedCommand(Command.fromKeyword(parts[0]), arguments);
+
+        return switch (keyword) {
+        case "bye" -> new ExitCommand();
+        case "list" -> new ListCommand();
+        case "todo" -> new AddCommand(parseToDo(arguments));
+        case "deadline" -> new AddCommand(parseDeadline(arguments));
+        case "event" -> new AddCommand(parseEvent(arguments));
+        case "mark" -> new MarkCommand(parseTaskIndex(arguments));
+        case "unmark" -> new UnmarkCommand(parseTaskIndex(arguments));
+        case "delete" -> new DeleteCommand(parseTaskIndex(arguments));
+        case "on" -> new OnCommand(parseOnDate(arguments));
+        // Only the keyword is quoted back. Repeating the whole line would bury
+        // the one word that was not understood.
+        default -> throw new AlfredException("I'm afraid I don't know '" + keyword + "', sir.");
+        };
     }
 
     /**
