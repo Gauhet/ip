@@ -40,7 +40,23 @@ After writing or editing any `.java` or `.md` file, and before reporting that ch
 
 The skill fetches the three guides from their URLs on every run rather than working from an embedded copy, so it follows the guides as they stand rather than as they stood when it was written. If a guide cannot be fetched, it reports that the check did not run. Treat that as an unfinished check, not as a pass.
 
-Run the style check **before** the text UI tests below. A style fix can change what the program prints, and the tests have to run against the code as it will be left, not as it was midway through.
+Run the style check **before** the tests below. A style fix can change what the program prints, and the tests have to run against the code as it will be left, not as it was midway through.
+
+## Unit tests
+
+The JUnit tests live under `src/test/java`, in a package and a file that mirror the class under test: `alfred.Parser`, in `src/main/java/alfred/Parser.java`, is tested by `alfred.ParserTest`, in `src/test/java/alfred/ParserTest.java`. Name each test method `featureUnderTest_testScenario_expectedBehavior`, as in `parse_emptyLine_exceptionThrown`. Run the tests with `./gradlew test`.
+
+**Aim to cover the top 50% of the methods in `src/main/java`, ranked by value.** Rank each method by what breaks if it is wrong and by how much a test can see of it, then test the more valuable half. Complex, core, and critical business logic comes first: index and offset arithmetic, data that has to survive a round trip to disk, and anything whose wording the user reads and acts on. The half to leave out is the methods that only print, only wire the program together, or only return a field. Say which methods you counted as the valuable half and why, since the target is a judgment rather than a measurement, and this project has no coverage tool to settle it.
+
+After every change to the code under `src/main/java`, and before reporting that change as done:
+
+1. **Add or update the JUnit tests the change affects**, so that the target still holds. A new method that belongs in the valuable half needs tests of its own. A changed method needs its existing tests brought back into line, and a method that has become more important needs the tests it never had.
+1. **Run `./gradlew test`** over the whole suite.
+1. **Report the result**, including how many tests ran. On failure, show the failing case with its expected and actual values. Do not describe a code change as complete or working while a test is failing.
+
+Run the unit tests **after** the style check and **before** the text UI tests. A unit test is faster and points at one method, so a fault it can catch is cheaper to find there than in a console session.
+
+When a case fails, decide whether the program or the expectation is wrong, and fix that one. Never weaken an assertion, delete a case, or relax a test to make the suite pass: a test edited to agree with a bug is worse than no test at all. Check as well that a new test can fail. An assertion that holds whatever the code does costs the same to run as a real one and protects nothing.
 
 ## Testing the text UI
 
