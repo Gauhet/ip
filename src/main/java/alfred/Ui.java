@@ -54,6 +54,17 @@ public class Ui {
     private final Scanner scanner = new Scanner(System.in);
 
     /**
+     * Opens the console interface a run talks through.
+     *
+     * <p>The scanner over standard input belongs to the object, so one of these
+     * is made for a whole run rather than one per command. It is never closed,
+     * because closing a scanner closes what it reads from, and standard input is
+     * not this class's to close.
+     */
+    public Ui() {
+    }
+
+    /**
      * Says whether there is another command to read.
      *
      * <p>Asked before every read, because input that has run out — a piped or

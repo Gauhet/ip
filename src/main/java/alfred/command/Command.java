@@ -23,6 +23,18 @@ import alfred.task.TaskList;
  */
 public abstract class Command {
     /**
+     * Sets up the part of a command that every kind shares, which is nothing.
+     *
+     * <p>Whatever a command needs either arrives in the subclass's own
+     * constructor, such as the task an {@link AddCommand} is to add, or is
+     * handed to {@link #execute(TaskList, Ui, Storage)} when the time comes.
+     * Protected rather than public, because a bare command is not a command:
+     * only a subclass can say what carrying it out means.
+     */
+    protected Command() {
+    }
+
+    /**
      * Carries out what the user asked for.
      *
      * <p>A command that changes the task list is responsible for saving it, so

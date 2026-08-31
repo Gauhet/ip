@@ -14,6 +14,15 @@ import alfred.task.TaskList;
  * from being printed in two places and drifting apart.
  */
 public class ExitCommand extends Command {
+    /**
+     * Creates a command that will say goodbye and end the session.
+     *
+     * <p>Nothing is passed in, because the parting is the same however the
+     * session came to an end.
+     */
+    public ExitCommand() {
+    }
+
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) {
         ui.showFarewell();
