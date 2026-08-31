@@ -28,17 +28,25 @@ Unless the user says otherwise, assume that you are assisting a student working 
 
 Ensure that Java 25 is used when running the application or build tasks. On macOS, use `sdk use java 25.0.3.fx-zulu` to switch to Java 25 if needed.
 
+## Coding standard
+
+**All Java code in this project follows the [se-edu Java conventions (intermediate)](https://se-education.org/guides/conventions/java/intermediate.html)**, without exception. That covers every `.java` file in the repository — the tests under `src/test/java` as much as the code under `src/main/java`. Code that breaks the standard is not finished, however well it works.
+
+**Invoke the `seedu-java-coding-standard` skill before writing or editing any `.java` file**, so the code comes out conforming rather than being corrected afterwards, and again after editing one, before reporting that change as done. If the skill is not available — most often because it was added or edited during the current session and has not been picked up yet — read `.claude/skills/seedu-java-coding-standard/SKILL.md` and follow its steps directly instead. Never skip the check because the skill did not load.
+
+The skill keeps the rules written out in `.claude/skills/seedu-java-coding-standard/rules.md` so they can be applied while typing, and treats the page at the URL above as the authority whenever a rule is contested or that file is silent.
+
 ## Checking style
 
 This project follows three style guides:
 
-* [se-edu Java conventions (intermediate)](https://se-education.org/guides/conventions/java/intermediate.html), for everything under `src/main/java`.
+* [se-edu Java conventions (intermediate)](https://se-education.org/guides/conventions/java/intermediate.html), for every `.java` file, tests included. This is the coding standard above, and the `seedu-java-coding-standard` skill is what checks it.
 * [se-edu Markdown conventions](https://se-education.org/guides/conventions/markdown.html), for every `.md` file.
 * [Google developer documentation style guide](https://developers.google.com/style), for all prose a reader sees: Markdown files, Javadoc, comments, and the messages the program prints.
 
-After writing or editing any `.java` or `.md` file, and before reporting that change as done, **invoke the `style-check` skill**. If it is not available — most often because it was added or edited during the current session and has not been picked up yet — read `.claude/skills/style-check/SKILL.md` and follow its steps directly instead. Never skip the check because the skill did not load.
+After writing or editing any `.java` or `.md` file, and before reporting that change as done, **invoke the `style-check` skill**, which covers all three guides and calls the `seedu-java-coding-standard` skill for the Java one. If it is not available — most often because it was added or edited during the current session and has not been picked up yet — read `.claude/skills/style-check/SKILL.md` and follow its steps directly instead. Never skip the check because the skill did not load.
 
-The skill fetches the three guides from their URLs on every run rather than working from an embedded copy, so it follows the guides as they stand rather than as they stood when it was written. If a guide cannot be fetched, it reports that the check did not run. Treat that as an unfinished check, not as a pass.
+The skill fetches the Markdown and Google guides from their URLs on every run rather than working from an embedded copy, so it follows them as they stand rather than as they stood when it was written. If a guide cannot be fetched, it reports that the check did not run. Treat that as an unfinished check, not as a pass. The Java guide is the one exception: it is written out in the coding standard skill so it can be applied while typing, and that skill fetches the page whenever a rule is contested.
 
 Run the style check **before** the tests below. A style fix can change what the program prints, and the tests have to run against the code as it will be left, not as it was midway through.
 
@@ -72,12 +80,14 @@ Expected output belongs in the plan only after it has been produced by an actual
 
 ## Git
 
-This project follows the [se-edu Git conventions](https://se-education.org/guides/conventions/git.html) for commit messages and branch names.
+**Every commit in this project follows the [se-edu Git conventions](https://se-education.org/guides/conventions/git.html)**, without exception, and so does every branch name. That covers the subject line, the body, and the name of the branch the commit lands on. A message that breaks the conventions is not ready to commit, however accurate it is.
 
-Before proposing a commit message, and before creating any commit, **invoke the `commit-check` skill**. If it is not available — most often because it was added or edited during the current session and has not been picked up yet — read `.claude/skills/commit-check/SKILL.md` and follow its steps directly instead. Never skip the check because the skill did not load.
+**Invoke the `seedu-git-standard` skill before drafting a commit message**, so the message comes out conforming rather than being corrected afterwards, and again before proposing one for approval or creating any commit. Invoke it when naming or renaming a branch too. If the skill is not available — most often because it was added or edited during the current session and has not been picked up yet — read `.claude/skills/seedu-git-standard/SKILL.md` and follow its steps directly instead. Never skip the check because the skill did not load.
 
-The skill fetches the conventions from their URL on every run rather than working from an embedded copy. If the guide cannot be fetched, it reports that the check did not run. Treat that as an unfinished check, not as a pass.
+The skill keeps the rules written out in `.claude/skills/seedu-git-standard/rules.md` so they can be applied while drafting, and treats the page at the URL above as the authority whenever a rule is contested or that file is silent. It also covers getting a message approved, and correcting one that has already been committed.
 
-Use lightweight tags unless the user requests an annotated tag.
+A subject line is worth more care than most checks, because it is the one thing that cannot be fixed later: an unpushed message can be amended, a pushed one cannot be corrected without rewriting published history.
+
+Use lightweight tags unless the user requests an annotated tag. The se-edu conventions say nothing about tags, so this rule is the project's own.
 When proposing or creating a commit message, include enough detail to explain the rationale for the change. Weigh this against the size of the change: a small, self-explanatory commit does not need a body.
 Do not commit or push unless explicitly asked.

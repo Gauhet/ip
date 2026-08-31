@@ -1,49 +1,52 @@
 ---
-name: commit-check
-description: Check a drafted commit message, and the current branch name, against the se-edu Git conventions fetched live from their URL. Use before creating any commit, when proposing a commit message for approval, when asked to check or review a commit message, and when naming or renaming a branch.
+name: seedu-git-standard
+description: The Git standard this project follows — the se-edu Git conventions for commit message subjects, bodies, and branch names. Use before drafting or proposing a commit message, before creating any commit, when naming or renaming a branch, and whenever asked to check a commit message or a branch name against the conventions.
 ---
 
-# commit-check
+# seedu-git-standard
 
-Checks a commit message **before it becomes a commit**, against the se-edu Git
-conventions. The rules are **read from the guide at run time**, not copied into
-this file, so the check follows the guide as it stands today rather than as it
-stood when this skill was written.
+Every commit in this project follows the
+[se-edu Git conventions](https://se-education.org/guides/conventions/git.html).
+So does every branch name.
 
-This is a draft check. It runs on a message you are about to commit, not as a
-sweep over history.
+The rules are written out in [rules.md](rules.md), so you can apply them while
+drafting rather than only catching them afterwards. **The page at the URL above
+outranks that file.** Fetch it whenever a rule is contested, whenever a finding
+would change a message, and whenever `rules.md` is silent on the question in
+front of you. If the fetch fails and the answer matters, say the check could not
+be settled rather than guessing.
 
-## The guide
+Two things outrank both: this project's own instructions in `AGENTS.md`, and
+anything the user has said about how they want their messages written. See
+"Local rules that outrank the guide" below.
 
-`https://se-education.org/guides/conventions/git.html`
+## When to use this
 
-It covers three things: the subject line, the body, and branch names. All three
-are in scope here.
+* **Before drafting a commit message.** Read `rules.md` first, so the message
+  comes out conforming. A subject rewritten before it is committed costs
+  nothing; the same subject rewritten afterwards costs an amend, or cannot be
+  fixed at all once it is pushed.
+* **Before creating any commit**, and before proposing a message for approval,
+  as `AGENTS.md` requires.
+* **When creating or renaming a branch.**
+* **Whenever asked** to check a commit message, a subject line, or a branch
+  name against the conventions.
+
+This skill covers the whole of it: the rules, the checks over a drafted
+message, the branch name, getting the message approved, and what to do about a
+message that has already been committed.
 
 ## Procedure
 
-### 1. Fetch the guide
+### 1. Write the draft to a file
 
-Fetch `https://se-education.org/guides/conventions/git.html` with WebFetch,
-asking for every rule it states on subject lines, bodies, and branch names,
-along with its examples. The page is short, so ask for the rules in full.
+Check a message that exists on disk, not one that exists only in your head —
+that is how a 74-character subject gets through. Put it in the scratch
+directory, then set `MSG` to its path.
 
-**If the fetch fails, stop and say so.** Report that the check did not run. Do
-not fall back on remembered rules and present the result as a completed check:
-the point of fetching is that the guide, not a recollection of it, is the
-authority.
-
-WebFetch caches the page for about 15 minutes, so checking two drafts in a row
-costs one fetch.
-
-### 2. Run the mechanical checks
-
-Write the drafted message to a scratch file first — checking a message that
-only exists in your head is how a 74-character subject gets through. Then:
+### 2. Check the subject and body
 
 ```bash
-MSG="$1"   # path to the file holding the drafted message
-
 subject=$(sed -n '1p' "$MSG")
 n=${#subject}
 [ "$n" -gt 72 ] && echo "FAIL subject is $n chars (hard limit 72)"
@@ -88,31 +91,52 @@ branch=$(git rev-parse --abbrev-ref HEAD)
 case "$branch" in
   master|main)
     echo "OK '$branch' is the default branch; the naming rules do not apply" ;;
+  branch-A-*|branch-Level-*)
+    echo "OK '$branch' is a course increment branch; the course names it, not you" ;;
   *)
     printf '%s' "$branch" | grep -qE '^([0-9]+-)?[a-z0-9]+(-[a-z0-9]+)*$' ||
       echo "FAIL branch '$branch' is not in kebab case" ;;
 esac
 ```
 
+The increment branches are the exception, and a real one. The course prescribes
+`branch-A-<Increment>` and `branch-Level-<n>` by name — `branch-A-CodingStandard`,
+`branch-Level-7` — so they are not kebab case and cannot be made kebab case
+without breaking what the course asks for. Reporting them as violations every
+time would train the reader to ignore the check. Every branch the student names
+themselves, such as `add-gradle-support`, follows the guide.
+
 A branch name is worth fixing early, while `git branch -m <new-name>` is all it
 takes. Once a branch is pushed and others have it, renaming stops being free.
 
 ### 4. Read what the commands cannot see
 
+The rules that matter most are the ones no pattern can check:
+
 * **Does the subject say what the commit does?** A subject that passes every
   mechanical rule can still be uninformative. `Update files` breaks nothing and
   tells the reader nothing.
 * **Does the body explain what and why, rather than how?** The how is in the
-  diff. Reviewers read the body for the reasoning that is not in the diff.
+  diff. A reader goes to the body for the reasoning that is *not* in the diff.
+* **Can a reader judge the change without reading it?** That is the standard
+  the guide sets for a body. If it takes so much explaining that the body runs
+  long, the commit wants splitting into finer-grained ones.
 * **Is the scope prefix, if used, accurate?** `Person class: Remove static
   imports` is only right if the change is confined to that class.
+* **Does the body follow the shape in `rules.md`** — the situation, why it has
+  to change, what is being done, and why that way?
 
-### 5. Report and get approval
+### 5. Report
 
-Show the message in full, in a fenced block, then say which rules it was
-checked against and anything that failed. `AGENTS.md` requires the message to
-be approved before the commit is made, so end by asking — never commit off the
-back of a clean check alone.
+Show the message in full, in a fenced block, then say what it was checked
+against and anything that failed. Separate:
+
+* **Violations** — a stated rule is broken.
+* **Judgment calls** — the rule arguably applies, but the draft is defensible.
+  Say which way you lean, and leave the decision to the user.
+
+`AGENTS.md` requires a message to be approved before the commit is made, so end
+by asking. Never commit off the back of a clean check alone.
 
 ## Local rules that outrank the guide
 
@@ -145,10 +169,3 @@ git log --oneline origin/$(git rev-parse --abbrev-ref HEAD)..HEAD
   it would mean rewriting published history and force-pushing, which can break
   anyone who has already pulled the branch. That is the user's call to make
   explicitly, not something to offer as a convenience.
-
-## Notes
-
-* This skill checks and reports. The only edit it ever offers is amending an
-  unpushed commit message, and only after asking.
-* The guide outranks this file. If the fetched page contradicts something
-  written here, follow the page and say that the skill is out of date.

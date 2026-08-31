@@ -38,13 +38,13 @@ public class Parser {
      * surrounding spaces are not part of it, so that a missing description can
      * be told apart from a missing keyword rather than looking the same.
      */
-    private static final String BY_SEPARATOR = "/by";
+    private static final String SEPARATOR_BY = "/by";
 
     /** Keyword that separates an event's description from its start time. */
-    private static final String FROM_SEPARATOR = "/from";
+    private static final String SEPARATOR_FROM = "/from";
 
     /** Keyword that separates an event's start time from its end time. */
-    private static final String TO_SEPARATOR = "/to";
+    private static final String SEPARATOR_TO = "/to";
 
     /**
      * Prevents this class from being instantiated, since reading a line needs
@@ -82,18 +82,18 @@ public class Parser {
         String arguments = parts.length > 1 ? parts[1].trim() : "";
 
         return switch (keyword) {
-        case "bye" -> new ExitCommand();
-        case "list" -> new ListCommand();
-        case "todo" -> new AddCommand(parseToDo(arguments));
-        case "deadline" -> new AddCommand(parseDeadline(arguments));
-        case "event" -> new AddCommand(parseEvent(arguments));
-        case "mark" -> new MarkCommand(parseTaskIndex(arguments));
-        case "unmark" -> new UnmarkCommand(parseTaskIndex(arguments));
-        case "delete" -> new DeleteCommand(parseTaskIndex(arguments));
-        case "on" -> new OnCommand(parseOnDate(arguments));
-        // Only the keyword is quoted back. Repeating the whole line would bury
-        // the one word that was not understood.
-        default -> throw new AlfredException("I'm afraid I don't know '" + keyword + "', sir.");
+            case "bye" -> new ExitCommand();
+            case "list" -> new ListCommand();
+            case "todo" -> new AddCommand(parseToDo(arguments));
+            case "deadline" -> new AddCommand(parseDeadline(arguments));
+            case "event" -> new AddCommand(parseEvent(arguments));
+            case "mark" -> new MarkCommand(parseTaskIndex(arguments));
+            case "unmark" -> new UnmarkCommand(parseTaskIndex(arguments));
+            case "delete" -> new DeleteCommand(parseTaskIndex(arguments));
+            case "on" -> new OnCommand(parseOnDate(arguments));
+            // Only the keyword is quoted back. Repeating the whole line would
+            // bury the one word that was not understood.
+            default -> throw new AlfredException("I'm afraid I don't know '" + keyword + "', sir.");
         };
     }
 
@@ -127,12 +127,12 @@ public class Parser {
      */
     private static Deadline parseDeadline(String arguments) throws AlfredException {
         String complaint = "A deadline needs a description and a /by date, sir.";
-        int separator = arguments.indexOf(BY_SEPARATOR);
+        int separator = arguments.indexOf(SEPARATOR_BY);
         if (separator == -1) {
             throw new AlfredException(complaint);
         }
         String description = arguments.substring(0, separator).trim();
-        String by = arguments.substring(separator + BY_SEPARATOR.length()).trim();
+        String by = arguments.substring(separator + SEPARATOR_BY.length()).trim();
         // Checked for presence before being read, so that a date left out
         // draws the complaint about the command rather than one about the
         // format of an empty string.
@@ -157,19 +157,19 @@ public class Parser {
      */
     private static Event parseEvent(String arguments) throws AlfredException {
         String complaint = "An event needs a description, a /from date, and a /to date, sir.";
-        int fromSeparator = arguments.indexOf(FROM_SEPARATOR);
+        int fromSeparator = arguments.indexOf(SEPARATOR_FROM);
         if (fromSeparator == -1) {
             throw new AlfredException(complaint);
         }
         // Looked for after /from, so that a /to inside the description
         // is not mistaken for the one that starts the end date.
-        int toSeparator = arguments.indexOf(TO_SEPARATOR, fromSeparator + FROM_SEPARATOR.length());
+        int toSeparator = arguments.indexOf(SEPARATOR_TO, fromSeparator + SEPARATOR_FROM.length());
         if (toSeparator == -1) {
             throw new AlfredException(complaint);
         }
         String description = arguments.substring(0, fromSeparator).trim();
-        String from = arguments.substring(fromSeparator + FROM_SEPARATOR.length(), toSeparator).trim();
-        String to = arguments.substring(toSeparator + TO_SEPARATOR.length()).trim();
+        String from = arguments.substring(fromSeparator + SEPARATOR_FROM.length(), toSeparator).trim();
+        String to = arguments.substring(toSeparator + SEPARATOR_TO.length()).trim();
         if (description.isEmpty() || from.isEmpty() || to.isEmpty()) {
             throw new AlfredException(complaint);
         }
