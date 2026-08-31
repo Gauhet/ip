@@ -80,12 +80,16 @@ Expected output belongs in the plan only after it has been produced by an actual
 
 ## Git
 
-This project follows the [se-edu Git conventions](https://se-education.org/guides/conventions/git.html) for commit messages and branch names.
+**Every commit in this project follows the [se-edu Git conventions](https://se-education.org/guides/conventions/git.html)**, without exception, and so does every branch name. That covers the subject line, the body, and the name of the branch the commit lands on. A message that breaks the conventions is not ready to commit, however accurate it is.
 
-Before proposing a commit message, and before creating any commit, **invoke the `commit-check` skill**. If it is not available — most often because it was added or edited during the current session and has not been picked up yet — read `.claude/skills/commit-check/SKILL.md` and follow its steps directly instead. Never skip the check because the skill did not load.
+**Invoke the `seedu-git-standard` skill before drafting a commit message**, so the message comes out conforming rather than being corrected afterwards, and again before proposing one for approval or creating any commit. Invoke it when naming or renaming a branch too. If the skill is not available — most often because it was added or edited during the current session and has not been picked up yet — read `.claude/skills/seedu-git-standard/SKILL.md` and follow its steps directly instead. Never skip the check because the skill did not load.
 
-The skill fetches the conventions from their URL on every run rather than working from an embedded copy. If the guide cannot be fetched, it reports that the check did not run. Treat that as an unfinished check, not as a pass.
+The skill keeps the rules written out in `.claude/skills/seedu-git-standard/rules.md` so they can be applied while drafting, and treats the page at the URL above as the authority whenever a rule is contested or that file is silent.
 
-Use lightweight tags unless the user requests an annotated tag.
+Getting a message approved, and correcting one that has already been committed, is the `commit-check` skill's, which applies the standard as part of that workflow. Invoking either one reaches the same rules.
+
+A subject line is worth more care than most checks, because it is the one thing that cannot be fixed later: an unpushed message can be amended, a pushed one cannot be corrected without rewriting published history.
+
+Use lightweight tags unless the user requests an annotated tag. The se-edu conventions say nothing about tags, so this rule is the project's own.
 When proposing or creating a commit message, include enough detail to explain the rationale for the change. Weigh this against the size of the change: a small, self-explanatory commit does not need a body.
 Do not commit or push unless explicitly asked.
