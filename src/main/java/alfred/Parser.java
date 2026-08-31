@@ -47,6 +47,15 @@ public class Parser {
     private static final String TO_SEPARATOR = "/to";
 
     /**
+     * Prevents this class from being instantiated, since reading a line needs
+     * nothing remembered between one line and the next. This is the line to
+     * delete if a command ever spans several lines and the parser has to start
+     * holding state.
+     */
+    private Parser() {
+    }
+
+    /**
      * Reads a line of input as the command it asks for, ready to be carried
      * out.
      *

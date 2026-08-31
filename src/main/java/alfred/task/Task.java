@@ -12,8 +12,14 @@ import alfred.Storage;
  * such as {@code [T]}, in front of the display form defined here.
  */
 public abstract class Task {
+    /** What the user has to do, in the words they described it in. */
     private final String name;
 
+    /**
+     * Whether the task has been completed. The one thing about a task that
+     * changes after it is made, which is why it is the one field that is not
+     * final.
+     */
     private boolean isDone;
 
     /**

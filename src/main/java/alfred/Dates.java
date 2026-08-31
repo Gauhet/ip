@@ -62,6 +62,17 @@ public class Dates {
             DateTimeFormatter.ofPattern("MMM dd yyyy", Locale.ENGLISH);
 
     /**
+     * Prevents this class from being instantiated.
+     *
+     * <p>Converting a date needs nothing remembered between one conversion and
+     * the next, so an instance would carry no state and could answer no question
+     * the class cannot answer itself. Saying so with a private constructor is
+     * clearer than leaving a public one that nothing has a reason to call.
+     */
+    private Dates() {
+    }
+
+    /**
      * Writes a date the way it is shown to the user.
      *
      * <p>This is not the form {@link #parse(String)} reads, and deliberately

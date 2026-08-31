@@ -13,6 +13,16 @@ import alfred.task.TaskList;
  * has to read.
  */
 public class ListCommand extends Command {
+    /**
+     * Creates a command that will show the whole list.
+     *
+     * <p>Nothing is passed in: which tasks to show is not settled when the
+     * command is made but when it is carried out, since the list arrives as an
+     * argument to {@link #execute(TaskList, Ui, Storage)}.
+     */
+    public ListCommand() {
+    }
+
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) {
         ui.showList(tasks);
