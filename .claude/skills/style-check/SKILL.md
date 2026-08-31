@@ -1,14 +1,14 @@
 ---
 name: style-check
-description: Check the project's code and documentation against the three style guides it follows, fetched live from their URLs — the se-edu Java (intermediate) conventions, the se-edu Markdown conventions, and the Google developer documentation style guide. Use after writing or editing any .java or .md file, and whenever asked to check the style, check the coding standard, review the conventions, or confirm that code follows the guidelines.
+description: Check the project's code and documentation against the three style guides it follows — the se-edu Markdown conventions and the Google developer documentation style guide, fetched live from their URLs, plus the se-edu Java conventions by way of the seedu-java-coding-standard skill. Use after writing or editing any .java or .md file, and whenever asked to check the style, review the conventions, or confirm that the documentation follows the guidelines.
 ---
 
 # style-check
 
-Checks changed `.java` and `.md` files against three style guides. The rules are
-**read from the guides themselves at run time**, not copied into this file, so
-the check follows the guides as they stand today rather than as they stood when
-this skill was written.
+Checks changed `.java` and `.md` files against three style guides. The Markdown
+and Google rules are **read from the guides themselves at run time**, not copied
+into this file, so the check follows them as they stand today rather than as
+they stood when this skill was written.
 
 ## The guides
 
@@ -17,6 +17,15 @@ this skill was written.
 | `.java` | se-edu Java conventions (intermediate) | `https://se-education.org/guides/conventions/java/intermediate.html` |
 | `.md` | se-edu Markdown conventions | `https://se-education.org/guides/conventions/markdown.html` |
 | Prose in both | Google developer documentation style guide | `https://developers.google.com/style` |
+
+**The Java guide belongs to the `seedu-java-coding-standard` skill.** It is this
+project's coding standard, it covers every `.java` file including the tests, and
+it has its own written-out rules and its own mechanical checks. Whenever a
+`.java` file is in scope, invoke that skill and fold its findings into the
+report below, instead of checking the Java rules here. If it is not available,
+read `.claude/skills/seedu-java-coding-standard/SKILL.md` and follow it
+directly. What stays here for `.java` files is the prose inside them: Javadoc,
+comments, and the messages the program prints, which the Google guide governs.
 
 The Google guide applies to every piece of writing a reader sees: Markdown
 files, Javadoc, ordinary comments, and the messages the program prints.
@@ -51,9 +60,6 @@ difference has to be visible to the reader.
 
 Fetch with WebFetch, one call per page, always at the start of a run:
 
-1. `https://se-education.org/guides/conventions/java/intermediate.html` — ask
-   for every rule, by section. Skip this fetch when no `.java` file is in
-   scope.
 1. `https://se-education.org/guides/conventions/markdown.html` — ask for every
    rule. Skip this fetch when no `.md` file is in scope.
 1. `https://developers.google.com/style/highlights` — ask for the key rules on
@@ -87,16 +93,8 @@ still has to be read against the fetched guide before it becomes a finding —
 each of these over-reports by design, because a check that misses violations is
 worse than one that raises a few false alarms.
 
-For `.java` files:
-
-```bash
-grep -nP '\t' $FILES                                  # tabs; indent must be 4 spaces
-awk 'length > 110 { print FILENAME":"FNR" ("length" chars)" }' $FILES   # soft limit 110, hard 120
-grep -nP '[ \t]+$' $FILES                             # trailing whitespace
-grep -nE 'import .*\*;' $FILES                        # wildcard imports
-grep -nE '\b\w+ +\w+ *\[\] *[;=,)]' $FILES            # array specifier on the variable, not the type
-grep -nE '^\s+public\s' $FILES | grep -v '('          # public members that are not methods, i.e. public fields
-```
+The `.java` commands live in the `seedu-java-coding-standard` skill, which runs
+them as part of its own procedure. Nothing needs repeating here.
 
 For `.md` files, missing blank lines before lists and code fences, and ordered
 lists numbered sequentially instead of with a repeated `1.`:
@@ -133,13 +131,6 @@ two-clause sentences.
 The rules a regex cannot see are the ones worth the most care. Read each
 changed file against the fetched guides and judge:
 
-* **Javadoc.** Does every public class and method have a header comment? Does
-  each comment open with a sentence that summarizes, rather than diving
-  straight into `@param`? Is there a blank line before the parameter section?
-  Getters, setters, and overridden methods are exempt.
-* **Names.** Classes and enums are nouns in PascalCase; methods are verbs in
-  camelCase; constants are `UPPER_SNAKE_CASE`; booleans read like booleans
-  (`isDone`); collections are plural; associated constants share a prefix.
 * **Headings.** Sentence case, per the Google guide — not title case.
 * **Voice and person.** Active voice, second person, present tense.
 * **Formatting of things a reader types or sees.** Code-related text in code

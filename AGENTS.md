@@ -28,17 +28,25 @@ Unless the user says otherwise, assume that you are assisting a student working 
 
 Ensure that Java 25 is used when running the application or build tasks. On macOS, use `sdk use java 25.0.3.fx-zulu` to switch to Java 25 if needed.
 
+## Coding standard
+
+**All Java code in this project follows the [se-edu Java conventions (intermediate)](https://se-education.org/guides/conventions/java/intermediate.html)**, without exception. That covers every `.java` file in the repository — the tests under `src/test/java` as much as the code under `src/main/java`. Code that breaks the standard is not finished, however well it works.
+
+**Invoke the `seedu-java-coding-standard` skill before writing or editing any `.java` file**, so the code comes out conforming rather than being corrected afterwards, and again after editing one, before reporting that change as done. If the skill is not available — most often because it was added or edited during the current session and has not been picked up yet — read `.claude/skills/seedu-java-coding-standard/SKILL.md` and follow its steps directly instead. Never skip the check because the skill did not load.
+
+The skill keeps the rules written out in `.claude/skills/seedu-java-coding-standard/rules.md` so they can be applied while typing, and treats the page at the URL above as the authority whenever a rule is contested or that file is silent.
+
 ## Checking style
 
 This project follows three style guides:
 
-* [se-edu Java conventions (intermediate)](https://se-education.org/guides/conventions/java/intermediate.html), for everything under `src/main/java`.
+* [se-edu Java conventions (intermediate)](https://se-education.org/guides/conventions/java/intermediate.html), for every `.java` file, tests included. This is the coding standard above, and the `seedu-java-coding-standard` skill is what checks it.
 * [se-edu Markdown conventions](https://se-education.org/guides/conventions/markdown.html), for every `.md` file.
 * [Google developer documentation style guide](https://developers.google.com/style), for all prose a reader sees: Markdown files, Javadoc, comments, and the messages the program prints.
 
-After writing or editing any `.java` or `.md` file, and before reporting that change as done, **invoke the `style-check` skill**. If it is not available — most often because it was added or edited during the current session and has not been picked up yet — read `.claude/skills/style-check/SKILL.md` and follow its steps directly instead. Never skip the check because the skill did not load.
+After writing or editing any `.java` or `.md` file, and before reporting that change as done, **invoke the `style-check` skill**, which covers all three guides and calls the `seedu-java-coding-standard` skill for the Java one. If it is not available — most often because it was added or edited during the current session and has not been picked up yet — read `.claude/skills/style-check/SKILL.md` and follow its steps directly instead. Never skip the check because the skill did not load.
 
-The skill fetches the three guides from their URLs on every run rather than working from an embedded copy, so it follows the guides as they stand rather than as they stood when it was written. If a guide cannot be fetched, it reports that the check did not run. Treat that as an unfinished check, not as a pass.
+The skill fetches the Markdown and Google guides from their URLs on every run rather than working from an embedded copy, so it follows them as they stand rather than as they stood when it was written. If a guide cannot be fetched, it reports that the check did not run. Treat that as an unfinished check, not as a pass. The Java guide is the one exception: it is written out in the coding standard skill so it can be applied while typing, and that skill fetches the page whenever a rule is contested.
 
 Run the style check **before** the tests below. A style fix can change what the program prints, and the tests have to run against the code as it will be left, not as it was midway through.
 
