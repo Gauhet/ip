@@ -33,4 +33,24 @@ Prerequisites: JDK 25, update IntelliJ to the most recent version.
    ____________________________________________________________
    ```
 
+## Creating and running the JAR file
+
+The build script uses the [Gradle Shadow plugin](https://gradleup.com/shadow/) to package the program and its dependencies into a single executable JAR file, often called a _fat JAR_. Because everything is inside one file, you can copy it to any computer with JDK 25 installed and run it there, without Gradle or the source code.
+
+1. From the project directory, build the JAR file:
+
+   ```
+   ./gradlew shadowJar
+   ```
+
+   On Windows, run `.\gradlew.bat shadowJar` instead.
+1. Find the JAR file at `build/libs/alfred.jar`. Git ignores the `build` folder, so you rebuild the JAR file with the command above instead of finding it in the repository.
+1. Run the JAR file from a terminal:
+
+   ```
+   java -jar build/libs/alfred.jar
+   ```
+
+   The program saves your task list to a `data` folder inside the folder you run the command from, so run it from the folder where you want that data kept.
+
 **Warning:** Keep the `src\main\java` folder as the root folder for Java files (i.e., don't rename those folders or move Java files to another folder outside of this folder path), as this is the default location some tools (e.g., Gradle) expect to find Java files.
