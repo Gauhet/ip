@@ -52,6 +52,34 @@ public abstract class Task {
         return false;
     }
 
+    /**
+     * Tells whether this task's description contains the given keyword,
+     * ignoring the difference between uppercase and lowercase.
+     *
+     * <p>Case is ignored because the user is searching, not quoting: someone
+     * looking for {@code book} means the word, not one particular spelling of
+     * it, and a search that answers "nothing found" over a capital letter reads
+     * as a fault rather than as an answer.
+     *
+     * <p>Only the description is searched, not the dates or the type box, so
+     * that what is matched is the words the user wrote. A keyword is matched
+     * anywhere inside it rather than only at a word boundary, which is the
+     * simpler rule and the one a user expects from a search box; matching whole
+     * words only would mean deciding what separates one word from another, and
+     * would make {@code find book} miss {@code bookshop}.
+     *
+     * <p>Defined here rather than on each subclass because every kind of task
+     * has a description and none of them searches it differently, unlike
+     * {@link #occursOn(LocalDate)}, where the answer depends on dates only some
+     * kinds carry.
+     *
+     * @param keyword the text being searched for
+     * @return true if the description contains it
+     */
+    public boolean matches(String keyword) {
+        return name.toLowerCase().contains(keyword.toLowerCase());
+    }
+
     /** Marks this task as completed. */
     public void markDone() {
         isDone = true;

@@ -16,6 +16,7 @@ import alfred.command.AddCommand;
 import alfred.command.Command;
 import alfred.command.DeleteCommand;
 import alfred.command.ExitCommand;
+import alfred.command.FindCommand;
 import alfred.command.ListCommand;
 import alfred.command.MarkCommand;
 import alfred.command.OnCommand;
@@ -119,6 +120,11 @@ public class ParserTest {
     @Test
     public void parse_on_onCommandReturned() throws AlfredException {
         assertInstanceOf(OnCommand.class, Parser.parse("on 2019-10-15"));
+    }
+
+    @Test
+    public void parse_find_findCommandReturned() throws AlfredException {
+        assertInstanceOf(FindCommand.class, Parser.parse("find book"));
     }
 
     @Test
@@ -269,6 +275,11 @@ public class ParserTest {
     public void parse_onWithUnreadableDate_dateRefusalSurfaces() {
         assertRefused("on 2019-02-30",
                 "There is no such date as '2019-02-30', sir. Do check the day and the month.");
+    }
+
+    @Test
+    public void parse_findWithoutKeyword_exceptionThrown() {
+        assertRefused("find", "The find command needs a keyword, sir.");
     }
 
     @Test

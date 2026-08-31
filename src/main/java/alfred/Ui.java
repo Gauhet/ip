@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.function.Predicate;
 
 import alfred.task.Task;
 import alfred.task.TaskList;
@@ -225,18 +226,63 @@ public class Ui {
      */
     public void showTasksOn(TaskList tasks, LocalDate date) {
         String when = Dates.format(date);
-        List<String> lines = new ArrayList<>();
-        for (int i = 0; i < tasks.size(); i++) {
-            if (tasks.get(i).occursOn(date)) {
-                lines.add((i + 1) + "." + tasks.get(i));
-            }
-        }
+        List<String> lines = numberMatches(tasks, task -> task.occursOn(date));
         if (lines.isEmpty()) {
             reply("You have nothing on " + when + ", sir.");
             return;
         }
         lines.add(0, "Here is what you have on " + when + ":");
         reply(lines.toArray(new String[0]));
+    }
+
+    /**
+     * Prints the tasks whose description contains a keyword, in the order they
+     * are stored.
+     *
+     * <p>Numbered by place in the whole list, on the same terms and for the same
+     * reason as {@link #showTasksOn(TaskList, LocalDate)}: the number shown is
+     * the one {@code mark}, {@code unmark}, and {@code delete} will act on.
+     *
+     * <p>The keyword is not quoted back in the "nothing found" message, because
+     * it is the last thing the user typed and is still on the screen above the
+     * answer.
+     *
+     * @param tasks every stored task, in the order they are stored
+     * @param keyword the text being searched for
+     */
+    public void showMatchingTasks(TaskList tasks, String keyword) {
+        List<String> lines = numberMatches(tasks, task -> task.matches(keyword));
+        if (lines.isEmpty()) {
+            reply("I found no matching tasks, sir.");
+            return;
+        }
+        lines.add(0, "Here are the matching tasks in your list:");
+        reply(lines.toArray(new String[0]));
+    }
+
+    /**
+     * Returns the display lines for the tasks a test accepts, each numbered by
+     * its place in the whole list.
+     *
+     * <p>Shared by the two commands that show part of the list, so that the
+     * numbering rule they both depend on is written once and cannot drift apart
+     * between them. The test is passed in as a {@link Predicate}, which is the
+     * standard way to hand a yes-or-no question to a method; writing the loop
+     * out again in each caller would work as well and is what this replaced,
+     * at the cost of two copies of the one line that has to be right.
+     *
+     * @param tasks every stored task, in the order they are stored
+     * @param isMatch the test a task has to pass to be shown
+     * @return a mutable list of numbered lines, empty if nothing matched
+     */
+    private static List<String> numberMatches(TaskList tasks, Predicate<Task> isMatch) {
+        List<String> lines = new ArrayList<>();
+        for (int i = 0; i < tasks.size(); i++) {
+            if (isMatch.test(tasks.get(i))) {
+                lines.add((i + 1) + "." + tasks.get(i));
+            }
+        }
+        return lines;
     }
 
     /**

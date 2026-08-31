@@ -6,6 +6,7 @@ import alfred.command.AddCommand;
 import alfred.command.Command;
 import alfred.command.DeleteCommand;
 import alfred.command.ExitCommand;
+import alfred.command.FindCommand;
 import alfred.command.ListCommand;
 import alfred.command.MarkCommand;
 import alfred.command.OnCommand;
@@ -91,6 +92,7 @@ public class Parser {
             case "unmark" -> new UnmarkCommand(parseTaskIndex(arguments));
             case "delete" -> new DeleteCommand(parseTaskIndex(arguments));
             case "on" -> new OnCommand(parseOnDate(arguments));
+            case "find" -> new FindCommand(parseKeyword(arguments));
             // Only the keyword is quoted back. Repeating the whole line would
             // bury the one word that was not understood.
             default -> throw new AlfredException("I'm afraid I don't know '" + keyword + "', sir.");
@@ -200,6 +202,30 @@ public class Parser {
             throw new AlfredException("The on command needs a date, sir.");
         }
         return Dates.parse(arguments);
+    }
+
+    /**
+     * Reads the keyword a {@code find} command is searching for.
+     *
+     * <p>Everything after the keyword is taken as one piece of text rather than
+     * as a list of words, so that {@code find read book} searches for the phrase
+     * {@code read book}. Treating the words as alternatives would need a rule
+     * for whether a task has to contain all of them or any of them, which is a
+     * decision the user has no way to state on the command line.
+     *
+     * <p>An empty search is refused rather than answered, because every
+     * description contains the empty string, so the reply would be the whole
+     * list — an answer that looks like a working search and is not one.
+     *
+     * @param arguments everything the user typed after {@code find}
+     * @return the text to search descriptions for
+     * @throws AlfredException if no keyword was given
+     */
+    private static String parseKeyword(String arguments) throws AlfredException {
+        if (arguments.isEmpty()) {
+            throw new AlfredException("The find command needs a keyword, sir.");
+        }
+        return arguments;
     }
 
     /**

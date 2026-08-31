@@ -2,6 +2,7 @@ package alfred.task;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -20,6 +21,11 @@ import org.junit.jupiter.api.Test;
  * <p>The marking tests cover {@link Task#markDone()} and
  * {@link Task#unmarkDone()} on the simplest kind that has them, since neither
  * behaves differently for a deadline or an event.
+ *
+ * <p>The keyword tests cover {@link Task#matches(String)} for the same reason:
+ * it reads only the description, which every kind has and none of them stores
+ * differently. What it does <em>not</em> read is checked on a deadline, in
+ * {@link DeadlineTest}, since a todo has no date to leave out of the search.
  */
 public class ToDoTest {
     @Test
@@ -27,6 +33,42 @@ public class ToDoTest {
         ToDo todo = new ToDo("read book");
         assertFalse(todo.occursOn(LocalDate.of(2019, 10, 15)));
         assertFalse(todo.occursOn(LocalDate.of(1999, 1, 1)));
+    }
+
+    @Test
+    public void matches_wordInDescription_true() {
+        assertTrue(new ToDo("read book").matches("book"));
+    }
+
+    @Test
+    public void matches_wordNotInDescription_false() {
+        assertFalse(new ToDo("read book").matches("meeting"));
+    }
+
+    @Test
+    public void matches_differentCase_true() {
+        // A search is for the word, not for one spelling of it, so neither a
+        // capitalized keyword nor a capitalized description should hide a match.
+        assertTrue(new ToDo("read book").matches("BOOK"));
+        assertTrue(new ToDo("Read Book").matches("book"));
+    }
+
+    @Test
+    public void matches_partOfLongerWord_true() {
+        // The rule is containment, not whole words: find book turns up bookshop.
+        assertTrue(new ToDo("visit bookshop").matches("book"));
+    }
+
+    @Test
+    public void matches_phraseSpanningWords_true() {
+        assertTrue(new ToDo("read book tonight").matches("read book"));
+    }
+
+    @Test
+    public void matches_wordsPresentButNotAdjacent_false() {
+        // The keyword is one piece of text, so the words have to appear
+        // together and in order rather than merely both be present.
+        assertFalse(new ToDo("read a book").matches("read book"));
     }
 
     @Test

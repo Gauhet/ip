@@ -1775,6 +1775,224 @@ bye
 
 ---
 
+## TC24: `find <keyword>` shows the tasks whose description matches
+
+**Aim:** `find <keyword>` shows every task whose description contains the
+keyword, whatever its kind or its mark, ignores the difference between uppercase
+and lowercase, and numbers what it shows by each task's place in the whole list.
+
+The list holds two tasks with `book` in them and one without, so a reply that
+showed everything and a reply that showed nothing are both visibly wrong.
+
+The numbering carries the same weight it does in TC22. The two matches are tasks
+1 and 3 of 3, and the gap where `2.` would be is the visible sign that these are
+list numbers rather than a fresh count of the matches. The `delete 2` in the
+middle then closes the gap, and the `unmark 2` after it acts on the number the
+reply above it printed, which is what the whole rule is for: were the matches
+renumbered from 1, that same `unmark 2` would have hit the wrong task both
+before and after the delete.
+
+`find BOOK` repeats the previous search in capitals to show that case is
+ignored, and `find Milk` searches for the one task the other searches leave out,
+so neither reply can be right by accident. `find homework` is the answer to a
+search that matches nothing, which is a sentence rather than an empty list.
+
+**Input:**
+
+```
+todo read book
+todo buy milk
+deadline return book /by 2019-06-06
+mark 1
+mark 3
+find book
+find BOOK
+find Milk
+find homework
+delete 2
+find book
+unmark 2
+bye
+```
+
+**Expected output:**
+
+```
+    ____________________________________________________________
+            _     _      _____  ____   _____  ____
+           / \   | |    |  ___||  _ \ | ____||  _ \
+          / _ \  | |    | |_   | |_) ||  _|  | | | |
+         / ___ \ | |___ |  _|  |  _ < | |___ | |_| |
+        /_/   \_\|_____||_|    |_| \_\|_____||____/
+                    P E N N Y W O R T H
+
+      Butler to the Wayne family  --  At your service
+     Hello! I'm AlfredTheButler
+     What can I do for you?
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Got it. I've added this task:
+       [T][ ] read book
+     Now you have 1 task in the list.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Got it. I've added this task:
+       [T][ ] buy milk
+     Now you have 2 tasks in the list.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Got it. I've added this task:
+       [D][ ] return book (by: Jun 06 2019)
+     Now you have 3 tasks in the list.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Nice! I've marked this task as done:
+       [T][X] read book
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Nice! I've marked this task as done:
+       [D][X] return book (by: Jun 06 2019)
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Here are the matching tasks in your list:
+     1.[T][X] read book
+     3.[D][X] return book (by: Jun 06 2019)
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Here are the matching tasks in your list:
+     1.[T][X] read book
+     3.[D][X] return book (by: Jun 06 2019)
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Here are the matching tasks in your list:
+     2.[T][ ] buy milk
+    ____________________________________________________________
+
+    ____________________________________________________________
+     I found no matching tasks, sir.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Noted. I've removed this task:
+       [T][ ] buy milk
+     Now you have 2 tasks in the list.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Here are the matching tasks in your list:
+     1.[T][X] read book
+     2.[D][X] return book (by: Jun 06 2019)
+    ____________________________________________________________
+
+    ____________________________________________________________
+     OK, I've marked this task as not done yet:
+       [D][ ] return book (by: Jun 06 2019)
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Bye. Hope to see you again soon!
+    ____________________________________________________________
+```
+
+---
+
+## TC25: `find` checks its keyword and searches for the whole of it
+
+**Aim:** `find` refuses a missing keyword, answers a keyword that matches
+nothing, and treats everything after the command as one piece of text rather
+than as separate words.
+
+The first search runs before anything has been added, so an empty list is
+answered rather than crashed on. `find` on its own is refused, because an empty
+keyword is contained in every description and would print the whole list — an
+answer that looks like a working search and is not one.
+
+The last three searches are the same words in three arrangements. `find read
+book` matches the phrase, `find book read` does not, and `find READ BOOK`
+matches again, which together pin the rule: the keyword is one phrase, matched
+in the order it was typed, and case is ignored. A search that split the keyword
+into words would make `find book read` match too.
+
+The closing `list` shows the one real task untouched, so neither the refusal nor
+any of the searches disturbed the list.
+
+**Input:**
+
+```
+find book
+find
+todo read book tonight
+find read book
+find book read
+find READ BOOK
+list
+bye
+```
+
+**Expected output:**
+
+```
+    ____________________________________________________________
+            _     _      _____  ____   _____  ____
+           / \   | |    |  ___||  _ \ | ____||  _ \
+          / _ \  | |    | |_   | |_) ||  _|  | | | |
+         / ___ \ | |___ |  _|  |  _ < | |___ | |_| |
+        /_/   \_\|_____||_|    |_| \_\|_____||____/
+                    P E N N Y W O R T H
+
+      Butler to the Wayne family  --  At your service
+     Hello! I'm AlfredTheButler
+     What can I do for you?
+    ____________________________________________________________
+
+    ____________________________________________________________
+     I found no matching tasks, sir.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     The find command needs a keyword, sir.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Got it. I've added this task:
+       [T][ ] read book tonight
+     Now you have 1 task in the list.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Here are the matching tasks in your list:
+     1.[T][ ] read book tonight
+    ____________________________________________________________
+
+    ____________________________________________________________
+     I found no matching tasks, sir.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Here are the matching tasks in your list:
+     1.[T][ ] read book tonight
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Here are the tasks in your list:
+     1.[T][ ] read book tonight
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Bye. Hope to see you again soon!
+    ____________________________________________________________
+```
+
+---
+
 ## Known gaps (not yet covered)
 
 No invalid command crashes the program any more. Blank input, an unknown
@@ -1791,6 +2009,9 @@ format to use or that the day does not exist, covered by TC19. A date missing
 altogether is covered by TC11, an event that ends before it starts by TC21, and
 an unreadable date in the save file by TC18. Asking what falls on one day is
 covered by TC22, and the ways that question can be malformed by TC23.
+
+Searching descriptions for a keyword is covered by TC24, and a missing keyword,
+a keyword that matches nothing, and a keyword of several words by TC25.
 
 One gap is a limit of the program rather than of the tests. Only `yyyy-mm-dd` is
 accepted, so `2/12/2019` is refused rather than understood, and a time of day
