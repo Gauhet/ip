@@ -84,9 +84,7 @@ Expected output belongs in the plan only after it has been produced by an actual
 
 **Invoke the `seedu-git-standard` skill before drafting a commit message**, so the message comes out conforming rather than being corrected afterwards, and again before proposing one for approval or creating any commit. Invoke it when naming or renaming a branch too. If the skill is not available — most often because it was added or edited during the current session and has not been picked up yet — read `.claude/skills/seedu-git-standard/SKILL.md` and follow its steps directly instead. Never skip the check because the skill did not load.
 
-The skill keeps the rules written out in `.claude/skills/seedu-git-standard/rules.md` so they can be applied while drafting, and treats the page at the URL above as the authority whenever a rule is contested or that file is silent.
-
-Getting a message approved, and correcting one that has already been committed, is the `commit-check` skill's, which applies the standard as part of that workflow. Invoking either one reaches the same rules.
+The skill keeps the rules written out in `.claude/skills/seedu-git-standard/rules.md` so they can be applied while drafting, and treats the page at the URL above as the authority whenever a rule is contested or that file is silent. It also covers getting a message approved, and correcting one that has already been committed.
 
 A subject line is worth more care than most checks, because it is the one thing that cannot be fixed later: an unpushed message can be amended, a pushed one cannot be corrected without rewriting published history.
 

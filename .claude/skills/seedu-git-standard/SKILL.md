@@ -32,10 +32,9 @@ anything the user has said about how they want their messages written. See
 * **Whenever asked** to check a commit message, a subject line, or a branch
   name against the conventions.
 
-This skill covers the rules and the checks. The `commit-check` skill wraps it
-in the workflow around one particular drafted message: writing the draft out,
-getting it approved, and dealing with a message that has already been
-committed.
+This skill covers the whole of it: the rules, the checks over a drafted
+message, the branch name, getting the message approved, and what to do about a
+message that has already been committed.
 
 ## Procedure
 
