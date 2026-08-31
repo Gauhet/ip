@@ -48,11 +48,11 @@ public class Storage {
     private static final char ESCAPE_CHAR = '\\';
 
     /** How many fields a line has, by type letter, counting the type letter itself. */
-    private static final int TODO_FIELDS = 3;
+    private static final int FIELDS_TODO = 3;
 
-    private static final int DEADLINE_FIELDS = 4;
+    private static final int FIELDS_DEADLINE = 4;
 
-    private static final int EVENT_FIELDS = 5;
+    private static final int FIELDS_EVENT = 5;
 
     /**
      * What one call to {@link Storage#load()} found: the tasks it could read,
@@ -278,10 +278,10 @@ public class Storage {
         List<String> fields = splitFields(line);
         String type = fields.get(0);
         int expectedFields = switch (type) {
-        case "T" -> TODO_FIELDS;
-        case "D" -> DEADLINE_FIELDS;
-        case "E" -> EVENT_FIELDS;
-        default -> throw new AlfredException("Unknown task type: " + type);
+            case "T" -> FIELDS_TODO;
+            case "D" -> FIELDS_DEADLINE;
+            case "E" -> FIELDS_EVENT;
+            default -> throw new AlfredException("Unknown task type: " + type);
         };
         if (fields.size() != expectedFields) {
             throw new AlfredException("A " + type + " line needs " + expectedFields + " fields");
@@ -292,10 +292,10 @@ public class Storage {
             throw new AlfredException("A task needs a description");
         }
         Task task = switch (type) {
-        case "T" -> new ToDo(description);
-        case "D" -> new Deadline(description, Dates.parse(fields.get(3)));
-        case "E" -> new Event(description, Dates.parse(fields.get(3)), Dates.parse(fields.get(4)));
-        default -> throw new AlfredException("Unknown task type: " + type);
+            case "T" -> new ToDo(description);
+            case "D" -> new Deadline(description, Dates.parse(fields.get(3)));
+            case "E" -> new Event(description, Dates.parse(fields.get(3)), Dates.parse(fields.get(4)));
+            default -> throw new AlfredException("Unknown task type: " + type);
         };
 
         // Checked rather than compared against "1" alone, so that a status of
