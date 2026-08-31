@@ -41,6 +41,21 @@ public class DeadlineTest {
     }
 
     @Test
+    public void matches_dueDate_false() {
+        // Only the description is searched. Were the whole display form searched
+        // instead, find oct would turn up every task due in October, which is a
+        // date question the on command already answers properly.
+        Deadline deadline = createDeadline();
+        assertFalse(deadline.matches("2019-10-15"));
+        assertFalse(deadline.matches("Oct"));
+    }
+
+    @Test
+    public void matches_wordInDescription_true() {
+        assertTrue(createDeadline().matches("book"));
+    }
+
+    @Test
     public void toString_notDone_dueDateShownInReadersForm() {
         assertEquals("[D][ ] return book (by: Oct 15 2019)", createDeadline().toString());
     }
