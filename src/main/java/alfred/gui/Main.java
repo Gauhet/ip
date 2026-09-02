@@ -70,7 +70,7 @@ public class Main extends Application {
 
         // Alfred greets the user before anything is typed, as the console
         // version of the program does when it starts.
-        dialogContainer.getChildren().add(DialogBox.createAlfredDialog(
+        dialogContainer.getChildren().add(DialogBox.getAlfredDialog(
                 "Hello! I'm AlfredTheButler. What can I do for you?", alfredImage));
 
         AnchorPane mainLayout = new AnchorPane();
@@ -144,8 +144,8 @@ public class Main extends Application {
         String alfredText = alfred.getResponse(userText);
 
         dialogContainer.getChildren().addAll(
-                DialogBox.createUserDialog(userText, userImage),
-                DialogBox.createAlfredDialog(alfredText, alfredImage));
+                DialogBox.getUserDialog(userText, userImage),
+                DialogBox.getAlfredDialog(alfredText, alfredImage));
         userInput.clear();
     }
 }
