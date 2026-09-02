@@ -58,6 +58,16 @@ public class AlfredTheButler {
     }
 
     /**
+     * Sets up a run that keeps its tasks where a normal run keeps them.
+     *
+     * <p>The window creates a chatbot without saying where to save, since it
+     * has no more reason to choose than {@link #main(String[])} has.
+     */
+    public AlfredTheButler() {
+        this(SAVE_FILE);
+    }
+
+    /**
      * Greets the user, then handles one command per line until {@code bye} or
      * the end of the input: {@code list}, {@code on <date>},
      * {@code mark <number>}, {@code unmark <number>}, {@code delete <number>},
@@ -103,6 +113,21 @@ public class AlfredTheButler {
                 ui.showInternalError(e);
             }
         }
+    }
+
+    /**
+     * Returns what Alfred says back to one line sent from the window.
+     *
+     * <p>The line is echoed rather than obeyed. What this method is for is the
+     * shape of the exchange — the window hands over a line and gets an answer
+     * to show — and that shape is worth settling before the answer is a real
+     * one. Carrying a command out is still {@link #run()}'s, and joining the
+     * two is a later step.
+     *
+     * @param input The line the user typed.
+     */
+    public String getResponse(String input) {
+        return "Alfred heard: " + input;
     }
 
     /**

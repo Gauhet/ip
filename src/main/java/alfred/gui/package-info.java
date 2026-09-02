@@ -5,9 +5,9 @@
  * {@link alfred.gui.Main} builds the window, and
  * {@link alfred.gui.DialogBox} is one message within it.
  *
- * <p>Nothing here is connected to the chatbot yet. The window shows what the
- * user types and nothing else, so a command typed into it is echoed rather
- * than obeyed. The text version of the program in {@code alfred} is still
- * where the commands are read and answered.
+ * <p>The window asks {@link alfred.AlfredTheButler} for an answer to every
+ * line the user sends, but the answer is a placeholder that echoes the line
+ * back. The text version of the program is still the only one that carries a
+ * command out.
  */
 package alfred.gui;

@@ -1,5 +1,6 @@
 package alfred.gui;
 
+import alfred.AlfredTheButler;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -21,10 +22,10 @@ import javafx.stage.Stage;
  * next, held inside a {@link ScrollPane} so that a conversation longer than the
  * window can be scrolled through.
  *
- * <p>The window echoes and nothing more. A line sent with the button or the
- * Enter key appears in the conversation as the user's own dialog box, but
- * nothing answers it: the window is not connected to the part of the program
- * that reads commands and keeps the task list.
+ * <p>A line sent with the button or the Enter key is shown as the user's own
+ * dialog box, and the answer {@link AlfredTheButler} gives for it as Alfred's.
+ * That answer is a placeholder that echoes the line back, so a command typed
+ * into the window is still not carried out.
  */
 public class Main extends Application {
     /** The avatar shown beside what the user says. */
@@ -34,6 +35,9 @@ public class Main extends Application {
     /** The avatar shown beside what Alfred says. */
     private final Image alfredImage =
             new Image(this.getClass().getResourceAsStream("/images/DaAlfred.png"));
+
+    /** The chatbot the window asks for an answer to each line. */
+    private final AlfredTheButler alfred = new AlfredTheButler();
 
     /** The scrolling view onto the conversation. */
     private ScrollPane scrollPane;
@@ -129,14 +133,19 @@ public class Main extends Application {
     }
 
     /**
-     * Shows what the user typed as a new dialog box at the end of the
+     * Adds the line the user sent and Alfred's answer to it to the end of the
      * conversation, then empties the text field ready for the next line.
      *
-     * <p>Nothing answers it yet. The line is shown and no more, because the
-     * window is not connected to the part of the program that reads commands.
+     * <p>Both boxes are added at once, so that a line and its answer arrive
+     * together as they do in a conversation.
      */
     private void handleUserInput() {
-        dialogContainer.getChildren().add(DialogBox.createUserDialog(userInput.getText(), userImage));
+        String userText = userInput.getText();
+        String alfredText = alfred.getResponse(userText);
+
+        dialogContainer.getChildren().addAll(
+                DialogBox.createUserDialog(userText, userImage),
+                DialogBox.createAlfredDialog(alfredText, alfredImage));
         userInput.clear();
     }
 }
