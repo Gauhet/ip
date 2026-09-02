@@ -21,8 +21,10 @@ import javafx.stage.Stage;
  * next, held inside a {@link ScrollPane} so that a conversation longer than the
  * window can be scrolled through.
  *
- * <p>The window does nothing yet. Typing into the text field and pressing the
- * button have no effect, because nothing is listening to either of them.
+ * <p>The window echoes and nothing more. A line sent with the button or the
+ * Enter key appears in the conversation as the user's own dialog box, but
+ * nothing answers it: the window is not connected to the part of the program
+ * that reads commands and keeps the task list.
  */
 public class Main extends Application {
     /** The avatar shown beside what the user says. */
@@ -62,12 +64,10 @@ public class Main extends Application {
         userInput = new TextField();
         sendButton = new Button("Send");
 
-        // A sample exchange, so that the layout can be seen before there is
-        // anything to put in it.
-        DialogBox greeting = DialogBox.createAlfredDialog(
-                "Hello! I'm AlfredTheButler. What can I do for you?", alfredImage);
-        DialogBox reply = DialogBox.createUserDialog("Hello!", userImage);
-        dialogContainer.getChildren().addAll(greeting, reply);
+        // Alfred greets the user before anything is typed, as the console
+        // version of the program does when it starts.
+        dialogContainer.getChildren().add(DialogBox.createAlfredDialog(
+                "Hello! I'm AlfredTheButler. What can I do for you?", alfredImage));
 
         AnchorPane mainLayout = new AnchorPane();
         mainLayout.getChildren().addAll(scrollPane, userInput, sendButton);
@@ -108,5 +108,35 @@ public class Main extends Application {
 
         AnchorPane.setLeftAnchor(userInput, 1.0);
         AnchorPane.setBottomAnchor(userInput, 1.0);
+
+        // Handling user input
+
+        // The two ways of sending a line are the button and the Enter key, and
+        // both do the same thing. A button click is a mouse event, while Enter
+        // in a text field is that field's own action event, so the two are set
+        // separately even though they share a handler.
+        sendButton.setOnMouseClicked((event) -> {
+            handleUserInput();
+        });
+        userInput.setOnAction((event) -> {
+            handleUserInput();
+        });
+
+        // A new dialog box makes the container taller, and the pane stays where
+        // it was, so the newest message ends up below the bottom of the view.
+        // Scrolling to the end whenever the height changes keeps it in sight.
+        dialogContainer.heightProperty().addListener((observable) -> scrollPane.setVvalue(1.0));
+    }
+
+    /**
+     * Shows what the user typed as a new dialog box at the end of the
+     * conversation, then empties the text field ready for the next line.
+     *
+     * <p>Nothing answers it yet. The line is shown and no more, because the
+     * window is not connected to the part of the program that reads commands.
+     */
+    private void handleUserInput() {
+        dialogContainer.getChildren().add(DialogBox.createUserDialog(userInput.getText(), userImage));
+        userInput.clear();
     }
 }
