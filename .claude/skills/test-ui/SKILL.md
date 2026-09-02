@@ -50,12 +50,23 @@ rm -rf "$WORK" && mkdir -p "$WORK/build"
 ### 1. Compile
 
 ```bash
-javac -d "$WORK/build" $(find src/main/java -name '*.java')
+CLASSPATH=$(./gradlew --quiet printClasspath | tail -1)
+javac -cp "$CLASSPATH" -d "$WORK/build" $(find src/main/java -name '*.java')
 ```
 
 The sources sit in packages under `src/main/java`, so `find` collects the file
 list. A `src/main/java/*.java` glob matches only the top level, which now holds
 no sources at all, so it would compile nothing.
+
+Some of those sources are the JavaFX window in `alfred.gui`, which does not
+compile without the JavaFX jars. Gradle downloaded them, and the
+`printClasspath` task in `build.gradle` prints where they are, so `javac` gets
+the same classpath the Gradle build uses. Compile every source, the window
+included: a text UI test that skipped part of the program would pass while the
+program failed to build.
+
+Running a case needs no such classpath, because the text version of the program
+uses nothing from JavaFX.
 
 If compilation fails, stop. Report the compiler errors and do not run any case —
 a failure to build is not a test failure, and running stale class files would

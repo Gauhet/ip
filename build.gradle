@@ -58,7 +58,16 @@ test {
 }
 
 application {
-    mainClass = 'alfred.AlfredTheButler'
+    mainClass = 'alfred.gui.Launcher'
+}
+
+// Prints the compile classpath, so that a tool run outside Gradle can find the
+// JavaFX jars. The text UI tests compile with plain javac and need it.
+tasks.register('printClasspath') {
+    FileCollection compileClasspath = sourceSets.main.compileClasspath
+    doLast {
+        println compileClasspath.asPath
+    }
 }
 
 jar {
