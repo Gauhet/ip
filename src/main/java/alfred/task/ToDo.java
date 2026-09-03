@@ -21,13 +21,12 @@ public class ToDo extends Task {
      *
      * <p>A todo carries no dates, so it adds nothing at the end: its line is the
      * type letter and the two fields every task saves, and it is the shortest of
-     * the three kinds of line in the save file.
+     * the three kinds of line in the save file. Passing no extra fields at all is
+     * what a varargs parameter makes possible without an overload of its own.
      */
     @Override
     public List<String> toFileFields() {
-        List<String> fields = super.toFileFields();
-        fields.add(0, "T");
-        return fields;
+        return buildFileFields("T");
     }
 
     @Override

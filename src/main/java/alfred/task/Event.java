@@ -41,11 +41,7 @@ public class Event extends Task {
      */
     @Override
     public List<String> toFileFields() {
-        List<String> fields = super.toFileFields();
-        fields.add(0, "E");
-        fields.add(from.toString());
-        fields.add(to.toString());
-        return fields;
+        return buildFileFields("E", from.toString(), to.toString());
     }
 
     /**

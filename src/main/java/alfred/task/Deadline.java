@@ -35,10 +35,7 @@ public class Deadline extends Task {
      */
     @Override
     public List<String> toFileFields() {
-        List<String> fields = super.toFileFields();
-        fields.add(0, "D");
-        fields.add(by.toString());
-        return fields;
+        return buildFileFields("D", by.toString());
     }
 
     /**

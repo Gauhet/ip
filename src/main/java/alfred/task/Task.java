@@ -91,13 +91,15 @@ public abstract class Task {
     }
 
     /**
-     * Returns the fields this task shares with every other kind, in the order
-     * they are saved: the status, then the description. The status is a digit
-     * rather than a box, because the file is read by the program rather than by
-     * a person.
+     * Returns this task's fields, in the order they are saved: the type letter,
+     * the status, the description, and then whatever the kind of task carries of
+     * its own.
      *
-     * <p>Each subclass puts its own type letter at the front and adds any fields
-     * of its own at the end, the same way {@link #toString()} is built up.
+     * <p>Every subclass builds its answer with
+     * {@link #buildFileFields(String, String...)}, which is what settles the
+     * order once for all three kinds. There is no shared answer to inherit here,
+     * because no kind of task can be saved without the type letter that says
+     * which kind it is, and only the subclass knows that letter.
      *
      * <p>The fields are returned separately rather than already joined into a
      * line, so that only {@link Storage} knows what separates them and how a
@@ -105,16 +107,33 @@ public abstract class Task {
      * would have to be kept in step with the code that splits the line back up,
      * in another file.
      *
-     * @return a mutable list holding this task's shared fields
+     * @return a list holding this task's fields, in the order they are saved
      */
-    public List<String> toFileFields() {
+    public abstract List<String> toFileFields();
+
+    /**
+     * Returns the fields of one save line: the type letter, then the status and
+     * the description that every task saves, then any fields this kind of task
+     * adds of its own. The status is a digit rather than a box, because the file
+     * is read by the program rather than by a person.
+     *
+     * <p>The extra fields are a varargs parameter because each kind of task has
+     * a different number of them: none for a todo, one for a deadline, two for an
+     * event. A subclass therefore names its fields in the order they are saved,
+     * in one call, rather than assembling a list and pushing its type letter in
+     * at the front afterwards.
+     *
+     * @param type the letter naming the kind of task, such as {@code D}
+     * @param extraFields the fields this kind adds after the description, in the
+     *        order they are saved, and none for a kind that adds none
+     * @return a mutable list holding the whole line's fields, in order
+     */
+    protected List<String> buildFileFields(String type, String... extraFields) {
         List<String> fields = new ArrayList<>();
-        if (isDone) {
-            fields.add("1");
-        } else {
-            fields.add("0");
-        }
+        fields.add(type);
+        fields.add(isDone ? "1" : "0");
         fields.add(name);
+        fields.addAll(List.of(extraFields));
         return fields;
     }
 

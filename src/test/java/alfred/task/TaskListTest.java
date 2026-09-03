@@ -25,11 +25,12 @@ import alfred.AlfredException;
  * that takes an index is tried just below the list, just above it, and against
  * an empty list. Those are the three places an off-by-one shows up.
  *
- * <p>The second is the copying. The class promises that a list handed in cannot
- * be changed from outside afterwards, and that the list handed out cannot be
- * used to change what is stored. Neither promise is visible in ordinary use, and
- * both would be quietly broken by returning the stored list directly, so each
- * gets a test.
+ * <p>The second is the copying. The class promises that the tasks handed in
+ * cannot be changed from outside afterwards, whether they arrive as a list or as
+ * the array behind a varargs call, and that the list handed out cannot be used
+ * to change what is stored. None of those promises is visible in ordinary use,
+ * and each would be quietly broken by keeping or returning what was passed, so
+ * each gets a test.
  */
 public class TaskListTest {
     private static final String NO_SUCH_TASK = "There is no such task, sir.";
@@ -39,25 +40,29 @@ public class TaskListTest {
 
     @BeforeEach
     public void setUp() {
-        tasks = new TaskList();
-        tasks.add(new ToDo("first"));
-        tasks.add(new ToDo("second"));
-        tasks.add(new ToDo("third"));
+        tasks = new TaskList(new ToDo("first"), new ToDo("second"), new ToDo("third"));
     }
 
     @Test
-    public void newList_noTasksAdded_emptyAndSizeZero() {
+    public void newList_noTasksGiven_emptyAndSizeZero() {
         TaskList empty = new TaskList();
         assertTrue(empty.isEmpty());
         assertEquals(0, empty.size());
     }
 
     @Test
-    public void add_severalTasks_storedInTheOrderAdded() {
+    public void newList_severalTasksGiven_storedInTheOrderGiven() {
         assertFalse(tasks.isEmpty());
         assertEquals(3, tasks.size());
         assertEquals("[T][ ] first", tasks.get(0).toString());
         assertEquals("[T][ ] third", tasks.get(2).toString());
+    }
+
+    @Test
+    public void add_listAlreadyHoldingTasks_taskStoredAtTheEnd() {
+        tasks.add(new ToDo("fourth"));
+        assertEquals(4, tasks.size());
+        assertEquals("[T][ ] fourth", tasks.get(3).toString());
     }
 
     @Test
@@ -143,6 +148,16 @@ public class TaskListTest {
     @Test
     public void unmarkDone_indexJustPastEnd_exceptionThrown() {
         assertRefused(() -> tasks.unmarkDone(3));
+    }
+
+    @Test
+    public void newList_sourceArrayChangedAfterwards_storedTasksUnaffected() {
+        // An array passed to a varargs parameter is the caller's own array, not
+        // one the call made, so the copying the class promises has to cover it.
+        Task[] source = { new ToDo("first") };
+        TaskList list = new TaskList(source);
+        source[0] = new ToDo("swapped in behind the list's back");
+        assertEquals("[T][ ] first", list.get(0).toString());
     }
 
     @Test

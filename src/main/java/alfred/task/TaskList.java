@@ -36,14 +36,30 @@ public class TaskList {
     /** The tasks, in the order they were added, which is the order they are shown and saved in. */
     private final List<Task> tasks;
 
-    /** Creates an empty list, which is what a first run starts from. */
-    public TaskList() {
-        this.tasks = new ArrayList<>();
+    /**
+     * Creates a list holding the tasks named, in the order they are named, or an
+     * empty list if none are named — which is what a first run starts from.
+     *
+     * <p>One varargs constructor covers both, so {@code new TaskList()} and
+     * {@code new TaskList(first, second)} are the same constructor rather than
+     * two that have to be kept in step. That is worth having because the empty
+     * case is not a special case: an empty list is a list of no tasks, and
+     * writing it as one says so.
+     *
+     * @param tasks the tasks to start with, in the order they are to be kept
+     */
+    public TaskList(Task... tasks) {
+        this.tasks = new ArrayList<>(List.of(tasks));
     }
 
     /**
      * Creates a list holding the given tasks, in the order given, which is how
      * a run starts from what the save file held.
+     *
+     * <p>Kept alongside the varargs constructor because the tasks read back from
+     * the save file arrive as a list. Handing that list to the varargs form would
+     * mean turning it into an array first, purely so that this constructor could
+     * turn it back into a list.
      *
      * <p>The tasks are copied rather than kept as the list that was passed in,
      * so that whoever supplied them cannot go on changing this list afterwards.
