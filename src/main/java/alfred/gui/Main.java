@@ -24,7 +24,7 @@ public class Main extends Application {
     /**
      * Builds the window and shows it.
      *
-     * @param stage the primary stage JavaFX provides, which is the window itself
+     * @param stage the primary stage JavaFX provides, which is the window itself.
      */
     @Override
     public void start(Stage stage) {

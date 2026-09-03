@@ -19,7 +19,7 @@ public class DeleteCommand extends Command {
     /**
      * Creates a command that will remove one task.
      *
-     * @param index which task, counting from 0
+     * @param index which task, counting from 0.
      */
     public DeleteCommand(int index) {
         this.index = index;

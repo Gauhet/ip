@@ -186,7 +186,7 @@ public class TaskListTest {
      * Checks that an operation refuses an index naming no stored task, with the
      * message written for the person who typed the number.
      *
-     * @param operation the call to try
+     * @param operation the call to try.
      */
     private void assertRefused(Executable operation) {
         AlfredException e = assertThrows(AlfredException.class, operation);

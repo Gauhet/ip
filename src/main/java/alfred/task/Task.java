@@ -21,7 +21,7 @@ public abstract class Task {
     /**
      * Creates a task that starts out not done.
      *
-     * @param name the description of the task
+     * @param name the description of the task.
      */
     protected Task(String name) {
         this.name = name;
@@ -34,8 +34,8 @@ public abstract class Task {
      * <p>A task with no date falls on no day, which is the answer inherited by
      * {@link ToDo}. The kinds that carry a date override it.
      *
-     * @param date the day being asked about
-     * @return true if this task falls on that day
+     * @param date the day being asked about.
+     * @return true if this task falls on that day.
      */
     public boolean occursOn(LocalDate date) {
         return false;
@@ -48,8 +48,8 @@ public abstract class Task {
      * <p>Only the description is searched, and a keyword matches anywhere inside
      * it, so that {@code find book} also finds {@code bookshop}.
      *
-     * @param keyword the text being searched for
-     * @return true if the description contains it
+     * @param keyword the text being searched for.
+     * @return true if the description contains it.
      */
     public boolean matches(String keyword) {
         return name.toLowerCase().contains(keyword.toLowerCase());
@@ -73,7 +73,7 @@ public abstract class Task {
      * <p>The fields are returned separately rather than joined into a line, so
      * that only {@link Storage} knows what separates them.
      *
-     * @return a list holding this task's fields, in the order they are saved
+     * @return a list holding this task's fields, in the order they are saved.
      */
     public abstract List<String> toFileFields();
 
@@ -86,10 +86,10 @@ public abstract class Task {
      * <p>The extra fields are varargs because each kind has a different number
      * of them: none for a todo, one for a deadline, two for an event.
      *
-     * @param type the letter naming the kind of task, such as {@code D}
+     * @param type the letter naming the kind of task, such as {@code D}.
      * @param extraFields the fields this kind adds after the description, in the
-     *        order they are saved, and none for a kind that adds none
-     * @return a mutable list holding the whole line's fields, in order
+     *        order they are saved, and none for a kind that adds none.
+     * @return a mutable list holding the whole line's fields, in order.
      */
     protected List<String> buildFileFields(String type, String... extraFields) {
         List<String> fields = new ArrayList<>();
@@ -103,7 +103,7 @@ public abstract class Task {
     /**
      * Returns the status box and description, for example {@code [X] read book}.
      *
-     * @return the display form of this task, without any type box
+     * @return the display form of this task, without any type box.
      */
     @Override
     public String toString() {

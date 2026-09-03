@@ -64,7 +64,7 @@ public class ParserTest {
      * Gives each test its own task list and its own save file, so that no test
      * can see what another one wrote.
      *
-     * @param tempDir a scratch folder JUnit creates and deletes per test
+     * @param tempDir a scratch folder JUnit creates and deletes per test.
      */
     @BeforeEach
     public void setUp(@TempDir Path tempDir) {
@@ -306,8 +306,8 @@ public class ParserTest {
      * Reads a line and carries out the command it asks for, so that what the
      * parser built can be seen in the task list afterwards.
      *
-     * @param line the line to read, as the user would type it
-     * @throws AlfredException if the line is refused, or the command fails
+     * @param line the line to read, as the user would type it.
+     * @throws AlfredException if the line is refused, or the command fails.
      */
     private void run(String line) throws AlfredException {
         Parser.parse(line).execute(tasks, ui, storage);
@@ -316,8 +316,8 @@ public class ParserTest {
     /**
      * Checks that a line is refused with one exact message.
      *
-     * @param line the line to read
-     * @param expectedMessage the refusal the user should see
+     * @param line the line to read.
+     * @param expectedMessage the refusal the user should see.
      */
     private void assertRefused(String line, String expectedMessage) {
         AlfredException e = assertThrows(AlfredException.class, () -> Parser.parse(line));

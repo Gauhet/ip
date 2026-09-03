@@ -93,7 +93,7 @@ public class EventTest {
      * Returns an event running from December 2 to December 4, the fixture the
      * range tests are built around.
      *
-     * @return a fresh event, so that marking one test's copy cannot affect another
+     * @return a fresh event, so that marking one test's copy cannot affect another.
      */
     private Event createThreeDayEvent() {
         return new Event("project meeting", DEC_2, DEC_4);

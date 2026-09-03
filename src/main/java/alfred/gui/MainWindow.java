@@ -64,7 +64,7 @@ public class MainWindow extends AnchorPane {
      * <p>Alfred greets the user here rather than in {@link #initialize()}, which
      * runs while there is still no chatbot to ask.
      *
-     * @param alfred the chatbot to ask
+     * @param alfred the chatbot to ask.
      */
     public void setAlfred(AlfredTheButler alfred) {
         this.alfred = alfred;

@@ -42,8 +42,8 @@ public class DialogBox extends HBox {
      * <p>The box is both the root of the layout it loads and the controller for
      * it, so a caller need not know there is an FXML file behind it.
      *
-     * @param message what was said
-     * @param avatar the picture of whoever said it
+     * @param message what was said.
+     * @param avatar the picture of whoever said it.
      */
     private DialogBox(String message, Image avatar) {
         try {
@@ -68,9 +68,9 @@ public class DialogBox extends HBox {
      * the one nearest its owner, and that corner moves with the box.
      */
     private void flip() {
-        ObservableList<Node> tmp = FXCollections.observableArrayList(this.getChildren());
-        Collections.reverse(tmp);
-        this.getChildren().setAll(tmp);
+        ObservableList<Node> reversedChildren = FXCollections.observableArrayList(this.getChildren());
+        Collections.reverse(reversedChildren);
+        this.getChildren().setAll(reversedChildren);
         this.setAlignment(Pos.TOP_LEFT);
         dialog.getStyleClass().add("reply-label");
     }
@@ -79,9 +79,9 @@ public class DialogBox extends HBox {
      * Returns a dialog box for something the user said, on the left of the
      * conversation.
      *
-     * @param message what the user said
-     * @param avatar the user's avatar
-     * @return the box to add to the conversation
+     * @param message what the user said.
+     * @param avatar the user's avatar.
+     * @return the box to add to the conversation.
      */
     public static DialogBox getUserDialog(String message, Image avatar) {
         DialogBox box = new DialogBox(message, avatar);
@@ -96,7 +96,7 @@ public class DialogBox extends HBox {
      * A reply with no command behind it is left alone.
      *
      * @param commandType the name of the command's class, or null if the line
-     *     named no command
+     *     named no command.
      */
     private void changeDialogStyle(String commandType) {
         if (commandType == null) {
@@ -125,9 +125,9 @@ public class DialogBox extends HBox {
      * Returns a dialog box for something Alfred said, on the right of the
      * conversation.
      *
-     * @param message what Alfred said
-     * @param avatar Alfred's avatar
-     * @return the box to add to the conversation
+     * @param message what Alfred said.
+     * @param avatar Alfred's avatar.
+     * @return the box to add to the conversation.
      */
     public static DialogBox getAlfredDialog(String message, Image avatar) {
         return new DialogBox(message, avatar);
@@ -137,10 +137,10 @@ public class DialogBox extends HBox {
      * Returns a dialog box for Alfred's answer to a command, colored by the kind
      * of command it answers.
      *
-     * @param message what Alfred said
-     * @param avatar Alfred's avatar
-     * @param commandType the name of the class of the command answered
-     * @return the box to add to the conversation
+     * @param message what Alfred said.
+     * @param avatar Alfred's avatar.
+     * @param commandType the name of the class of the command answered.
+     * @return the box to add to the conversation.
      */
     public static DialogBox getAlfredDialog(String message, Image avatar, String commandType) {
         DialogBox box = new DialogBox(message, avatar);

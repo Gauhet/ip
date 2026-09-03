@@ -49,8 +49,8 @@ public class Storage {
      * What one call to {@link Storage#load()} found: the tasks it could read,
      * and how many lines it had to give up on.
      *
-     * @param tasks the tasks that were read, in the order they were saved
-     * @param skippedLines how many lines could not be understood
+     * @param tasks the tasks that were read, in the order they were saved.
+     * @param skippedLines how many lines could not be understood.
      */
     record LoadResult(List<Task> tasks, int skippedLines) { }
 
@@ -63,7 +63,7 @@ public class Storage {
      * <p>A relative path is read against the directory the program was started
      * from.
      *
-     * @param filePath where to keep the tasks, such as {@code data/alfred.txt}
+     * @param filePath where to keep the tasks, such as {@code data/alfred.txt}.
      */
     Storage(String filePath) {
         this.file = Path.of(filePath);
@@ -75,8 +75,8 @@ public class Storage {
      *
      * <p>A full rewrite cannot leave the file half-updated.
      *
-     * @param tasks the tasks to save, in the order they are stored
-     * @throws AlfredException if the file cannot be written
+     * @param tasks the tasks to save, in the order they are stored.
+     * @throws AlfredException if the file cannot be written.
      */
     public void save(List<Task> tasks) throws AlfredException {
         List<String> lines = new ArrayList<>();
@@ -105,8 +105,8 @@ public class Storage {
      * can refuse a line has to raise that one and not an unchecked exception.
      * {@link Dates#parse(String)} is the case to watch.
      *
-     * @return the tasks that could be read, and how many lines were skipped
-     * @throws AlfredException if the file exists but cannot be read at all
+     * @return the tasks that could be read, and how many lines were skipped.
+     * @throws AlfredException if the file exists but cannot be read at all.
      */
     LoadResult load() throws AlfredException {
         List<Task> tasks = new ArrayList<>();
@@ -143,8 +143,8 @@ public class Storage {
      * <p>The message of a file exception is often only the path, so the class
      * name is used to say what kind of failure it was.
      *
-     * @param e the problem that came back from the file system
-     * @return a short description naming the kind of failure and the path
+     * @param e the problem that came back from the file system.
+     * @return a short description naming the kind of failure and the path.
      */
     private static String describe(IOException e) {
         String kind = e.getClass().getSimpleName();
@@ -158,15 +158,15 @@ public class Storage {
      * Joins a task's fields into one line, escaping any separator character
      * inside a field.
      *
-     * @param fields the task's fields, in the order they are saved
-     * @return the line to write to the file
+     * @param fields the task's fields, in the order they are saved.
+     * @return the line to write to the file.
      */
     private static String joinFields(List<String> fields) {
-        List<String> escaped = new ArrayList<>();
+        List<String> escapedFields = new ArrayList<>();
         for (String field : fields) {
-            escaped.add(escape(field));
+            escapedFields.add(escape(field));
         }
-        return String.join(SEPARATOR, escaped);
+        return String.join(SEPARATOR, escapedFields);
     }
 
     /**
@@ -174,8 +174,8 @@ public class Storage {
      * separator. The escape character is escaped first; doing it second would
      * escape the marks added for the separators as well.
      *
-     * @param field one field of a line, as the user typed it
-     * @return the field as it is written to the file
+     * @param field one field of a line, as the user typed it.
+     * @return the field as it is written to the file.
      */
     private static String escape(String field) {
         return field.replace(String.valueOf(ESCAPE_CHAR), "" + ESCAPE_CHAR + ESCAPE_CHAR)
@@ -188,8 +188,8 @@ public class Storage {
      * <p>Scanning character by character is what lets an escaped separator be
      * told apart from a real one.
      *
-     * @param line one line of the save file
-     * @return the fields of that line, in order, with the escaping removed
+     * @param line one line of the save file.
+     * @return the fields of that line, in order, with the escaping removed.
      */
     private static List<String> splitFields(String line) {
         List<String> fields = new ArrayList<>();
@@ -218,9 +218,9 @@ public class Storage {
      * <p>Every part of the line is checked, because the file can be edited by
      * hand and a wrong line should cost only itself.
      *
-     * @param line a single line of the save file
-     * @return the task that line describes
-     * @throws AlfredException if the line is not a task this program wrote
+     * @param line a single line of the save file.
+     * @return the task that line describes.
+     * @throws AlfredException if the line is not a task this program wrote.
      */
     private static Task parseTask(String line) throws AlfredException {
         List<String> fields = splitFields(line);

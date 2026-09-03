@@ -48,7 +48,7 @@ public class AlfredTheButler {
      * <p>Nothing is read here: loading has something to say to the user, and it
      * belongs after the greeting.
      *
-     * @param filePath where to keep the tasks, such as {@code data/alfred.txt}
+     * @param filePath where to keep the tasks, such as {@code data/alfred.txt}.
      */
     public AlfredTheButler(String filePath) {
         ui = new Ui();
@@ -107,7 +107,7 @@ public class AlfredTheButler {
      * loop. Loading is part of it because a window that had not loaded would
      * save an empty list over the tasks on disk.
      *
-     * @return the greeting, and what came of reading the save file
+     * @return the greeting, and what came of reading the save file.
      */
     public String getGreeting() {
         ui.startCapturing();
@@ -122,8 +122,8 @@ public class AlfredTheButler {
      * <p>What this does not do is end the session: there is no loop here to
      * stop, so {@code bye} is answered like any other command.
      *
-     * @param input the line the user typed
-     * @return the reply, as the console would have printed it, one line per line
+     * @param input the line the user typed.
+     * @return the reply, as the console would have printed it, one line per line.
      */
     public String getResponse(String input) {
         ui.startCapturing();
@@ -149,7 +149,7 @@ public class AlfredTheButler {
      * Returns the kind of the command last carried out, named by its class.
      *
      * @return the class name of the last command, or null before one has been
-     *     carried out
+     *     carried out.
      */
     public String getCommandType() {
         return commandType;
@@ -162,8 +162,8 @@ public class AlfredTheButler {
      */
     private void restoreTasks() {
         try {
-            Storage.LoadResult loaded = storage.load();
-            tasks = new TaskList(loaded.tasks());
+            Storage.LoadResult loadResult = storage.load();
+            tasks = new TaskList(loadResult.tasks());
             // Said only when there is something to say. On a first run there is
             // no file yet, and announcing that nothing came back would be noise.
             if (!tasks.isEmpty()) {
@@ -171,8 +171,8 @@ public class AlfredTheButler {
             }
             // Warned about separately, and even when nothing else was restored,
             // because the damaged lines are dropped as soon as the list changes.
-            if (loaded.skippedLines() > 0) {
-                ui.showSkippedLines(loaded.skippedLines());
+            if (loadResult.skippedLines() > 0) {
+                ui.showSkippedLines(loadResult.skippedLines());
             }
         } catch (AlfredException e) {
             ui.showError(e.getMessage());
@@ -182,7 +182,7 @@ public class AlfredTheButler {
     /**
      * Starts one run of the chatbot, saving to the usual file.
      *
-     * @param args ignored; the save file is not yet something to choose
+     * @param args ignored; the save file is not yet something to choose.
      */
     public static void main(String[] args) {
         new AlfredTheButler(SAVE_FILE).run();

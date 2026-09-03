@@ -19,7 +19,7 @@ public class MarkCommand extends Command {
     /**
      * Creates a command that will mark one task as done.
      *
-     * @param index which task, counting from 0
+     * @param index which task, counting from 0.
      */
     public MarkCommand(int index) {
         this.index = index;

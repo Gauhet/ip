@@ -152,7 +152,7 @@ public class DatesTest {
     /**
      * Checks that the text is refused for not being in the accepted format.
      *
-     * @param text the date as it was written
+     * @param text the date as it was written.
      */
     private void assertFormatRefused(String text) {
         AlfredException e = assertThrows(AlfredException.class, () -> Dates.parse(text));
@@ -164,7 +164,7 @@ public class DatesTest {
      * Checks that the text is refused for naming a day that does not exist,
      * rather than for being in the wrong format.
      *
-     * @param text the date as it was written
+     * @param text the date as it was written.
      */
     private void assertNonexistentDateRefused(String text) {
         AlfredException e = assertThrows(AlfredException.class, () -> Dates.parse(text));

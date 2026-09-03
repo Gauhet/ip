@@ -82,7 +82,7 @@ public class DeadlineTest {
     /**
      * Returns a deadline due on October 15, 2019.
      *
-     * @return a fresh deadline, so that marking one test's copy cannot affect another
+     * @return a fresh deadline, so that marking one test's copy cannot affect another.
      */
     private Deadline createDeadline() {
         return new Deadline("return book", OCT_15);

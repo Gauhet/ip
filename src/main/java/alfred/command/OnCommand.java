@@ -20,7 +20,7 @@ public class OnCommand extends Command {
     /**
      * Creates a command that will show one day's tasks.
      *
-     * @param date the day being asked about
+     * @param date the day being asked about.
      */
     public OnCommand(LocalDate date) {
         this.date = date;

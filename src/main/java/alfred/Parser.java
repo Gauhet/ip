@@ -47,10 +47,10 @@ public class Parser {
     /**
      * Reads a line of input as the command it asks for, ready to be carried out.
      *
-     * @param line what the user typed, already trimmed
-     * @return the command the line asks for
+     * @param line what the user typed, already trimmed.
+     * @return the command the line asks for.
      * @throws AlfredException if the line is empty, names no known command, or
-     *         is missing something the command it names needs
+     *         is missing something the command it names needs.
      */
     static Command parse(String line) throws AlfredException {
         // Worth its own message: saying the command was not recognized
@@ -84,9 +84,9 @@ public class Parser {
     /**
      * Builds a todo from the description part of a {@code todo} command.
      *
-     * @param arguments everything the user typed after the keyword
-     * @return the todo the arguments describe
-     * @throws AlfredException if no description was given
+     * @param arguments everything the user typed after the keyword.
+     * @return the todo the arguments describe.
+     * @throws AlfredException if no description was given.
      */
     private static ToDo parseToDo(String arguments) throws AlfredException {
         if (arguments.isEmpty()) {
@@ -99,10 +99,10 @@ public class Parser {
      * Builds a deadline from the {@code <description> /by <date>} part of a
      * {@code deadline} command.
      *
-     * @param arguments everything the user typed after the keyword
-     * @return the deadline the arguments describe
+     * @param arguments everything the user typed after the keyword.
+     * @return the deadline the arguments describe.
      * @throws AlfredException if the description or the due date is missing,
-     *         or the due date cannot be read
+     *         or the due date cannot be read.
      */
     private static Deadline parseDeadline(String arguments) throws AlfredException {
         String complaint = "A deadline needs a description and a /by date, sir.";
@@ -124,11 +124,11 @@ public class Parser {
      * Builds an event from the {@code <description> /from <start> /to <end>}
      * part of an {@code event} command.
      *
-     * @param arguments everything the user typed after the keyword
-     * @return the event the arguments describe
+     * @param arguments everything the user typed after the keyword.
+     * @return the event the arguments describe.
      * @throws AlfredException if the description, the start, or the end is
      *         missing, if either date cannot be read, or if the event ends
-     *         before it starts
+     *         before it starts.
      */
     private static Event parseEvent(String arguments) throws AlfredException {
         String complaint = "An event needs a description, a /from date, and a /to date, sir.";
@@ -164,9 +164,9 @@ public class Parser {
      * <p>A missing date is caught here, since {@link Dates} would quote back an
      * empty string.
      *
-     * @param arguments everything the user typed after {@code on}
-     * @return the day being asked about
-     * @throws AlfredException if no date was given, or it cannot be read
+     * @param arguments everything the user typed after {@code on}.
+     * @return the day being asked about.
+     * @throws AlfredException if no date was given, or it cannot be read.
      */
     private static LocalDate parseOnDate(String arguments) throws AlfredException {
         if (arguments.isEmpty()) {
@@ -181,9 +181,9 @@ public class Parser {
      * <p>Everything after the keyword is taken as one phrase. An empty search is
      * refused, since every description contains the empty string.
      *
-     * @param arguments everything the user typed after {@code find}
-     * @return the text to search descriptions for
-     * @throws AlfredException if no keyword was given
+     * @param arguments everything the user typed after {@code find}.
+     * @return the text to search descriptions for.
+     * @throws AlfredException if no keyword was given.
      */
     private static String parseKeyword(String arguments) throws AlfredException {
         if (arguments.isEmpty()) {
@@ -200,9 +200,9 @@ public class Parser {
      * task is {@link TaskList}'s to answer.
      *
      * @param arguments everything typed after {@code mark}, {@code unmark}
-     *        or {@code delete}
-     * @return the index the number points at, which may be outside the list
-     * @throws AlfredException if the arguments are not a number
+     *        or {@code delete}.
+     * @return the index the number points at, which may be outside the list.
+     * @throws AlfredException if the arguments are not a number.
      */
     private static int parseTaskIndex(String arguments) throws AlfredException {
         try {

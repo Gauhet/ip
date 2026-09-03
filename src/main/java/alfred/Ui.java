@@ -60,7 +60,7 @@ public class Ui {
     /**
      * Says whether there is another command to read.
      *
-     * @return true if a line is waiting, false at the end of the input
+     * @return true if a line is waiting, false at the end of the input.
      */
     boolean hasNextCommand() {
         return scanner.hasNextLine();
@@ -70,7 +70,7 @@ public class Ui {
      * Reads the next command line, trimmed so that a stray space around a
      * command does not stop it being recognized.
      *
-     * @return the line the user typed, without leading or trailing spaces
+     * @return the line the user typed, without leading or trailing spaces.
      */
     String readCommand() {
         return scanner.nextLine().trim();
@@ -85,7 +85,7 @@ public class Ui {
      * Returns everything said since {@link #startCapturing()}, and goes back to
      * printing.
      *
-     * @return what was said, or an empty string if nothing was
+     * @return what was said, or an empty string if nothing was.
      */
     String stopCapturing() {
         String said = String.join("\n", captured);
@@ -121,7 +121,7 @@ public class Ui {
     /**
      * Reports that tasks were restored from the save file.
      *
-     * @param taskCount how many tasks came back
+     * @param taskCount how many tasks came back.
      */
     void showLoaded(int taskCount) {
         reply("I've brought back " + describeCount(taskCount, "task") + " from last time, sir.");
@@ -130,7 +130,7 @@ public class Ui {
     /**
      * Warns that part of the save file could not be understood.
      *
-     * @param skippedLines how many lines were left out
+     * @param skippedLines how many lines were left out.
      */
     void showSkippedLines(int skippedLines) {
         reply("I could not make sense of " + describeCount(skippedLines, "line")
@@ -141,7 +141,7 @@ public class Ui {
     /**
      * Reports something the user can put right, such as a mistyped command.
      *
-     * @param message the refusal, written for the person who typed the command
+     * @param message the refusal, written for the person who typed the command.
      */
     void showError(String message) {
         reply(message);
@@ -150,7 +150,7 @@ public class Ui {
     /**
      * Reports a fault in the program itself, rather than in what was typed.
      *
-     * @param e the fault that escaped the command that caused it
+     * @param e the fault that escaped the command that caused it.
      */
     void showInternalError(RuntimeException e) {
         reply("Something went wrong on my end, sir: " + e,
@@ -161,8 +161,8 @@ public class Ui {
      * Confirms that a task has been stored, showing the task itself so the user
      * can see how it was understood.
      *
-     * @param task the task that was just added
-     * @param taskCount how many tasks are stored now that it has been added
+     * @param task the task that was just added.
+     * @param taskCount how many tasks are stored now that it has been added.
      */
     public void showAdded(Task task, int taskCount) {
         reply("Got it. I've added this task:",
@@ -173,8 +173,8 @@ public class Ui {
     /**
      * Confirms that a task has been dropped from the list.
      *
-     * @param task the task that was removed
-     * @param taskCount how many tasks are left
+     * @param task the task that was removed.
+     * @param taskCount how many tasks are left.
      */
     public void showRemoved(Task task, int taskCount) {
         reply("Noted. I've removed this task:",
@@ -185,7 +185,7 @@ public class Ui {
     /**
      * Confirms that a task is now done, showing it with its new mark.
      *
-     * @param task the task that was marked
+     * @param task the task that was marked.
      */
     public void showMarked(Task task) {
         reply("Nice! I've marked this task as done:", SUB_INDENT + task);
@@ -194,7 +194,7 @@ public class Ui {
     /**
      * Confirms that a task is no longer done, showing it with its new mark.
      *
-     * @param task the task that was unmarked
+     * @param task the task that was unmarked.
      */
     public void showUnmarked(Task task) {
         reply("OK, I've marked this task as not done yet:", SUB_INDENT + task);
@@ -204,7 +204,7 @@ public class Ui {
      * Prints the stored tasks as a numbered list under a heading, numbered
      * from 1.
      *
-     * @param tasks the tasks to show, in the order they are stored
+     * @param tasks the tasks to show, in the order they are stored.
      */
     public void showList(TaskList tasks) {
         // One line for the heading, then one per task.
@@ -222,8 +222,8 @@ public class Ui {
      * <p>Numbered by place in the whole list, not among the matches, because
      * {@code mark 2} acts on the whole list.
      *
-     * @param tasks every stored task, in the order they are stored
-     * @param date the day being asked about
+     * @param tasks every stored task, in the order they are stored.
+     * @param date the day being asked about.
      */
     public void showTasksOn(TaskList tasks, LocalDate date) {
         String when = Dates.format(date);
@@ -243,8 +243,8 @@ public class Ui {
      * <p>Numbered by place in the whole list, for the same reason as
      * {@link #showTasksOn(TaskList, LocalDate)}.
      *
-     * @param tasks every stored task, in the order they are stored
-     * @param keyword the text being searched for
+     * @param tasks every stored task, in the order they are stored.
+     * @param keyword the text being searched for.
      */
     public void showMatchingTasks(TaskList tasks, String keyword) {
         List<String> lines = numberMatches(tasks, task -> task.matches(keyword));
@@ -260,9 +260,9 @@ public class Ui {
      * Returns the display lines for the tasks a test accepts, each numbered by
      * its place in the whole list.
      *
-     * @param tasks every stored task, in the order they are stored
-     * @param isMatch the test a task has to pass to be shown
-     * @return a mutable list of numbered lines, empty if nothing matched
+     * @param tasks every stored task, in the order they are stored.
+     * @param isMatch the test a task has to pass to be shown.
+     * @return a mutable list of numbered lines, empty if nothing matched.
      */
     private static List<String> numberMatches(TaskList tasks, Predicate<Task> isMatch) {
         List<String> lines = new ArrayList<>();
@@ -278,7 +278,7 @@ public class Ui {
      * Prints one or more lines inside a divider block, each indented, followed
      * by a blank line — or collects them, while capturing.
      *
-     * @param lines the lines to display, in order
+     * @param lines the lines to display, in order.
      */
     private void reply(String... lines) {
         if (captured != null) {
@@ -298,9 +298,9 @@ public class Ui {
      * Returns a count with its noun, made plural unless there is exactly one of
      * them, for example {@code 1 task} or {@code 2 tasks}.
      *
-     * @param count how many there are
-     * @param noun the singular form of what is being counted
-     * @return the count and the noun, ready to drop into a sentence
+     * @param count how many there are.
+     * @param noun the singular form of what is being counted.
+     * @return the count and the noun, ready to drop into a sentence.
      */
     private static String describeCount(int count, String noun) {
         if (count == 1) {

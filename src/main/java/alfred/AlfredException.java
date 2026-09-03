@@ -9,7 +9,7 @@ public class AlfredException extends Exception {
     /**
      * Creates an exception carrying the message to show the user.
      *
-     * @param message the explanation, phrased as Alfred would say it
+     * @param message the explanation, phrased as Alfred would say it.
      */
     public AlfredException(String message) {
         super(message);

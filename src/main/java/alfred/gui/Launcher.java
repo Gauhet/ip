@@ -14,7 +14,7 @@ public class Launcher {
     /**
      * Starts the graphical application.
      *
-     * @param args command line arguments, handed on to JavaFX unread
+     * @param args command line arguments, handed on to JavaFX unread.
      */
     public static void main(String[] args) {
         Application.launch(Main.class, args);

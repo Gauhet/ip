@@ -18,9 +18,9 @@ public class Event extends Task {
     /**
      * Creates an event that starts out not done.
      *
-     * @param description what the event is
-     * @param from the day it starts
-     * @param to the day it ends
+     * @param description what the event is.
+     * @param from the day it starts.
+     * @param to the day it ends.
      */
     public Event(String description, LocalDate from, LocalDate to) {
         super(description);

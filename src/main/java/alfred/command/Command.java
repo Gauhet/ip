@@ -32,11 +32,11 @@ public abstract class Command {
      * <p>A command that changes the task list is responsible for saving it, so
      * that the file on disk matches what the user has just been told.
      *
-     * @param tasks the tasks to act on
-     * @param ui what to tell the user through
-     * @param storage where to keep the tasks
+     * @param tasks the tasks to act on.
+     * @param ui what to tell the user through.
+     * @param storage where to keep the tasks.
      * @throws AlfredException if the command cannot be carried out, with a
-     *         message written for the person who typed it
+     *         message written for the person who typed it.
      */
     public abstract void execute(TaskList tasks, Ui ui, Storage storage) throws AlfredException;
 
@@ -46,7 +46,7 @@ public abstract class Command {
      * <p>False for all but one command, so it is answered here and overridden by
      * the one that says otherwise.
      *
-     * @return true if nothing more should be read after this command
+     * @return true if nothing more should be read after this command.
      */
     public boolean isExit() {
         return false;

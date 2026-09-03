@@ -27,7 +27,7 @@ public class TaskList {
      * <p>One varargs constructor covers both, rather than two that have to be
      * kept in step.
      *
-     * @param tasks the tasks to start with, in the order they are to be kept
+     * @param tasks the tasks to start with, in the order they are to be kept.
      */
     public TaskList(Task... tasks) {
         this.tasks = new ArrayList<>(List.of(tasks));
@@ -40,7 +40,7 @@ public class TaskList {
      * <p>The tasks are copied, so that whoever supplied them cannot go on
      * changing this list afterwards.
      *
-     * @param tasks the tasks to start with, in the order they are to be kept
+     * @param tasks the tasks to start with, in the order they are to be kept.
      */
     public TaskList(List<Task> tasks) {
         this.tasks = new ArrayList<>(tasks);
@@ -49,7 +49,7 @@ public class TaskList {
     /**
      * Returns how many tasks are stored.
      *
-     * @return the number of tasks
+     * @return the number of tasks.
      */
     public int size() {
         return tasks.size();
@@ -58,7 +58,7 @@ public class TaskList {
     /**
      * Says whether there are no tasks at all.
      *
-     * @return true if nothing is stored
+     * @return true if nothing is stored.
      */
     public boolean isEmpty() {
         return tasks.isEmpty();
@@ -67,8 +67,8 @@ public class TaskList {
     /**
      * Returns the task at one position, counting from 0.
      *
-     * @param index which task, from 0 up to one less than {@link #size()}
-     * @return the task stored there
+     * @param index which task, from 0 up to one less than {@link #size()}.
+     * @return the task stored there.
      */
     public Task get(int index) {
         return tasks.get(index);
@@ -77,7 +77,7 @@ public class TaskList {
     /**
      * Adds a task to the end of the list.
      *
-     * @param task the task to store
+     * @param task the task to store.
      */
     public void add(Task task) {
         tasks.add(task);
@@ -87,9 +87,9 @@ public class TaskList {
      * Removes the task at one position, closing the gap so that the tasks after
      * it move up a number.
      *
-     * @param index which task, counting from 0
-     * @return the task that was removed, so it can be shown to the user
-     * @throws AlfredException if no task is stored at that index
+     * @param index which task, counting from 0.
+     * @return the task that was removed, so it can be shown to the user.
+     * @throws AlfredException if no task is stored at that index.
      */
     public Task delete(int index) throws AlfredException {
         checkIndex(index);
@@ -99,9 +99,9 @@ public class TaskList {
     /**
      * Marks the task at one position as done.
      *
-     * @param index which task, counting from 0
-     * @return the task, now carrying its new mark
-     * @throws AlfredException if no task is stored at that index
+     * @param index which task, counting from 0.
+     * @return the task, now carrying its new mark.
+     * @throws AlfredException if no task is stored at that index.
      */
     public Task markDone(int index) throws AlfredException {
         checkIndex(index);
@@ -113,9 +113,9 @@ public class TaskList {
     /**
      * Marks the task at one position as not done after all.
      *
-     * @param index which task, counting from 0
-     * @return the task, now carrying its new mark
-     * @throws AlfredException if no task is stored at that index
+     * @param index which task, counting from 0.
+     * @return the task, now carrying its new mark.
+     * @throws AlfredException if no task is stored at that index.
      */
     public Task unmarkDone(int index) throws AlfredException {
         checkIndex(index);
@@ -130,8 +130,8 @@ public class TaskList {
      * <p>Checked before the list is asked, because the list would answer with an
      * exception that reads as a fault rather than as a reply to the user.
      *
-     * @param index the index to check, counting from 0
-     * @throws AlfredException if it falls outside the stored tasks
+     * @param index the index to check, counting from 0.
+     * @throws AlfredException if it falls outside the stored tasks.
      */
     private void checkIndex(int index) throws AlfredException {
         if (index < 0 || index >= tasks.size()) {
@@ -144,7 +144,7 @@ public class TaskList {
      *
      * <p>The list is a copy, so that saving cannot change what is stored.
      *
-     * @return the tasks, in the order they are stored
+     * @return the tasks, in the order they are stored.
      */
     public List<Task> toList() {
         return List.copyOf(tasks);

@@ -15,7 +15,7 @@ public class UnmarkCommand extends Command {
     /**
      * Creates a command that will mark one task as not done.
      *
-     * @param index which task, counting from 0
+     * @param index which task, counting from 0.
      */
     public UnmarkCommand(int index) {
         this.index = index;

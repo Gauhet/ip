@@ -54,7 +54,7 @@ public class StorageTest {
     /**
      * Points the storage at a file of this test's own.
      *
-     * @param tempDir a scratch folder JUnit creates and deletes per test
+     * @param tempDir a scratch folder JUnit creates and deletes per test.
      */
     @BeforeEach
     public void setUp(@TempDir Path tempDir) {
@@ -211,8 +211,8 @@ public class StorageTest {
      * Checks that a description survives being written and read back, whatever
      * characters it holds.
      *
-     * @param description the description to put through the save file
-     * @throws AlfredException if the file cannot be written or read
+     * @param description the description to put through the save file.
+     * @throws AlfredException if the file cannot be written or read.
      */
     private void assertDescriptionSurvives(String description) throws AlfredException {
         storage.save(List.of(new ToDo(description)));
@@ -225,9 +225,9 @@ public class StorageTest {
      * Checks that one damaged line is left out and counted, rather than read as
      * a task or taking the whole file down.
      *
-     * @param line the line to put in the save file
-     * @throws AlfredException if the file cannot be read
-     * @throws IOException if the line cannot be written
+     * @param line the line to put in the save file.
+     * @throws AlfredException if the file cannot be read.
+     * @throws IOException if the line cannot be written.
      */
     private void assertLineSkipped(String line) throws AlfredException, IOException {
         Files.write(file, List.of(line));
@@ -240,8 +240,8 @@ public class StorageTest {
      * Returns the tasks as the text they are shown by, which is what makes a
      * restored list comparable without every task class needing an equals.
      *
-     * @param tasks the tasks to describe
-     * @return one display form per task, in the order given
+     * @param tasks the tasks to describe.
+     * @return one display form per task, in the order given.
      */
     private List<String> describeAll(List<Task> tasks) {
         return tasks.stream().map(Task::toString).toList();
