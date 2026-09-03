@@ -44,12 +44,13 @@ public class Main extends Application {
             fxmlLoader.<MainWindow>getController().setAlfred(alfred);
 
             // The layout gives the window its size but has nothing to say about
-            // the window itself. It is fixed at that size, since the controls
-            // in it are placed at set positions rather than laid out to fit.
+            // the window itself. The controls follow the edges they are
+            // anchored to, so the window can be resized; the smallest sizes it
+            // allows are the ones below which the conversation and the text
+            // field stop being usable.
             stage.setTitle("AlfredTheButler");
-            stage.setResizable(false);
-            stage.setMinHeight(600.0);
-            stage.setMinWidth(400.0);
+            stage.setMinHeight(220);
+            stage.setMinWidth(417);
 
             stage.show();
         } catch (IOException e) {
