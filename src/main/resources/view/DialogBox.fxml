@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.net.URL?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.image.ImageView?>
@@ -13,10 +14,20 @@
          xmlns="http://javafx.com/javafx/17"
          xmlns:fx="http://javafx.com/fxml/1">
   <children>
-    <Label fx:id="dialog" text="Label" wrapText="true" minHeight="-Infinity" />
+    <Label fx:id="dialog" text="Label" wrapText="true" minHeight="-Infinity">
+      <HBox.margin>
+        <Insets left="7.0" right="7.0" />
+      </HBox.margin>
+      <padding>
+        <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
+      </padding>
+    </Label>
     <ImageView fx:id="displayPicture" fitHeight="99.0" fitWidth="99.0" pickOnBounds="true" preserveRatio="true" />
   </children>
   <padding>
     <Insets bottom="15.0" left="5.0" right="5.0" top="15.0" />
   </padding>
+  <stylesheets>
+    <URL value="@../css/dialog-box.css" />
+  </stylesheets>
 </fx:root>

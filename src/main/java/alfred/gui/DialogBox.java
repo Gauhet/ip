@@ -82,12 +82,16 @@ public class DialogBox extends HBox {
      * <p>The children are reversed rather than laid out the other way round in
      * a second FXML file, so that everything the two sides share is described
      * once and only the direction differs.
+     *
+     * <p>The bubble is restyled as well, because the corner it leaves square is
+     * the one nearest its owner, and that corner moves with the box.
      */
     private void flip() {
         ObservableList<Node> tmp = FXCollections.observableArrayList(this.getChildren());
         Collections.reverse(tmp);
         this.getChildren().setAll(tmp);
         this.setAlignment(Pos.TOP_LEFT);
+        dialog.getStyleClass().add("reply-label");
     }
 
     /**
