@@ -2,6 +2,7 @@ package alfred;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.nio.file.Path;
 
@@ -101,6 +102,31 @@ public class AlfredTheButlerTest {
     @Test
     public void getResponse_nothingButSpaces_inputRequested() {
         assertEquals("You'll have to give me something to work with, sir.", alfred.getResponse("   "));
+    }
+
+    @Test
+    public void getCommandType_afterEachKindOfCommand_commandClassNamed() {
+        alfred.getResponse("todo polish the silver");
+        assertEquals("AddCommand", alfred.getCommandType());
+
+        alfred.getResponse("mark 1");
+        assertEquals("MarkCommand", alfred.getCommandType());
+
+        alfred.getResponse("delete 1");
+        assertEquals("DeleteCommand", alfred.getCommandType());
+    }
+
+    @Test
+    public void getCommandType_beforeAnyCommand_null() {
+        assertNull(alfred.getCommandType());
+    }
+
+    @Test
+    public void getCommandType_refusedCommand_nullRatherThanThePreviousKind() {
+        alfred.getResponse("todo polish the silver");
+
+        alfred.getResponse("mark 9");
+        assertNull(alfred.getCommandType());
     }
 
     @Test

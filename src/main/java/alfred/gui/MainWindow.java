@@ -95,10 +95,11 @@ public class MainWindow extends AnchorPane {
     private void handleUserInput() {
         String userText = userInput.getText();
         String alfredText = alfred.getResponse(userText);
+        String commandType = alfred.getCommandType();
 
         dialogContainer.getChildren().addAll(
                 DialogBox.getUserDialog(userText, userImage),
-                DialogBox.getAlfredDialog(alfredText, alfredImage));
+                DialogBox.getAlfredDialog(alfredText, alfredImage, commandType));
         userInput.clear();
     }
 }

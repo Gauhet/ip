@@ -49,6 +49,14 @@ public class AlfredTheButler {
     private TaskList tasks;
 
     /**
+     * The kind of the command last carried out, named by its class, or null
+     * before any has been. Kept so that the window can color a reply by the
+     * kind of command it answers, which is something the reply itself does not
+     * say.
+     */
+    private String commandType;
+
+    /**
      * Sets up a run that keeps its tasks in one named file.
      *
      * <p>Nothing is read here. Loading is left to {@link #run()} because it has
@@ -168,14 +176,29 @@ public class AlfredTheButler {
             // but not at the console.
             Command command = Parser.parse(input.trim());
             command.execute(tasks, ui, storage);
+            commandType = command.getClass().getSimpleName();
         } catch (AlfredException e) {
+            // Forgotten rather than left as it was, so that a refusal is not
+            // colored as though the command before it had just run again.
+            commandType = null;
             ui.showError(e.getMessage());
         } catch (RuntimeException e) {
+            commandType = null;
             // The same safety net the loop has, and for the same reason: a bug
             // in one command costs that command rather than the session.
             ui.showInternalError(e);
         }
         return ui.stopCapturing();
+    }
+
+    /**
+     * Returns the kind of the command last carried out, named by its class.
+     *
+     * @return the class name of the last command, or null before one has been
+     *     carried out.
+     */
+    public String getCommandType() {
+        return commandType;
     }
 
     /**

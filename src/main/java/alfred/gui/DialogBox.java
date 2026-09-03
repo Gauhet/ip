@@ -108,6 +108,44 @@ public class DialogBox extends HBox {
     }
 
     /**
+     * Colors the bubble by the kind of command the reply answers.
+     *
+     * <p>A reply says what happened but not what was asked, and the three
+     * kinds of command that change the list are the ones worth telling apart
+     * at a glance. Marking and unmarking share a color, being two halves of
+     * the same act.
+     *
+     * <p>A reply with no command behind it is left alone. A refused line names
+     * no command, and neither does anything said before the first one, so
+     * there is nothing to color it by.
+     *
+     * @param commandType The name of the command's class, or null if the line
+     *     named no command.
+     */
+    private void changeDialogStyle(String commandType) {
+        if (commandType == null) {
+            return;
+        }
+
+        switch (commandType) {
+            case "AddCommand":
+                dialog.getStyleClass().add("add-label");
+                break;
+            case "MarkCommand":
+                dialog.getStyleClass().add("marked-label");
+                break;
+            case "UnmarkCommand":
+                dialog.getStyleClass().add("marked-label");
+                break;
+            case "DeleteCommand":
+                dialog.getStyleClass().add("delete-label");
+                break;
+            default:
+                // Do nothing
+        }
+    }
+
+    /**
      * Returns a dialog box for something Alfred said, on the right of the
      * conversation.
      *
@@ -116,5 +154,19 @@ public class DialogBox extends HBox {
      */
     public static DialogBox getAlfredDialog(String message, Image avatar) {
         return new DialogBox(message, avatar);
+    }
+
+    /**
+     * Returns a dialog box for Alfred's answer to a command, colored by the
+     * kind of command it answers.
+     *
+     * @param message What Alfred said.
+     * @param avatar Alfred's avatar.
+     * @param commandType The name of the class of the command answered.
+     */
+    public static DialogBox getAlfredDialog(String message, Image avatar, String commandType) {
+        DialogBox box = new DialogBox(message, avatar);
+        box.changeDialogStyle(commandType);
+        return box;
     }
 }
