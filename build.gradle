@@ -16,6 +16,22 @@ repositories {
 
 dependencies {
     String jUnitVersion = '5.14.4'
+    String javaFxVersion = '17.0.7'
+
+    // Every platform's JavaFX jars are listed, not just this machine's, so that
+    // the project builds and runs on Windows, macOS and Linux alike.
+    implementation "org.openjfx:javafx-base:${javaFxVersion}:win"
+    implementation "org.openjfx:javafx-base:${javaFxVersion}:mac"
+    implementation "org.openjfx:javafx-base:${javaFxVersion}:linux"
+    implementation "org.openjfx:javafx-controls:${javaFxVersion}:win"
+    implementation "org.openjfx:javafx-controls:${javaFxVersion}:mac"
+    implementation "org.openjfx:javafx-controls:${javaFxVersion}:linux"
+    implementation "org.openjfx:javafx-fxml:${javaFxVersion}:win"
+    implementation "org.openjfx:javafx-fxml:${javaFxVersion}:mac"
+    implementation "org.openjfx:javafx-fxml:${javaFxVersion}:linux"
+    implementation "org.openjfx:javafx-graphics:${javaFxVersion}:win"
+    implementation "org.openjfx:javafx-graphics:${javaFxVersion}:mac"
+    implementation "org.openjfx:javafx-graphics:${javaFxVersion}:linux"
 
     testImplementation "org.junit.jupiter:junit-jupiter-api:${jUnitVersion}"
 
@@ -42,7 +58,16 @@ test {
 }
 
 application {
-    mainClass = 'alfred.AlfredTheButler'
+    mainClass = 'alfred.gui.Launcher'
+}
+
+// Prints the compile classpath, so that a tool run outside Gradle can find the
+// JavaFX jars. The text UI tests compile with plain javac and need it.
+tasks.register('printClasspath') {
+    FileCollection compileClasspath = sourceSets.main.compileClasspath
+    doLast {
+        println compileClasspath.asPath
+    }
 }
 
 jar {

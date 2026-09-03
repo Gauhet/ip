@@ -24,6 +24,13 @@ import alfred.task.TaskList;
  * move to another kind of interface, such as a window, is a change to this
  * class alone.
  *
+ * <p>The window is that other interface, and it is served by
+ * {@link #startCapturing()} and {@link #stopCapturing()}: between the two, a
+ * reply is collected and handed back rather than printed. Every message goes
+ * through one method, so the choice is made once there instead of once per
+ * message, and neither the commands nor the task list can tell which interface
+ * they are answering.
+ *
  * <p>This class holds a {@link Scanner} over standard input, so one instance is
  * made and used for a whole run rather than one per command.
  */
@@ -53,6 +60,15 @@ public class Ui {
 
     /** Where the user's commands are read from, kept open for the whole run. */
     private final Scanner scanner = new Scanner(System.in);
+
+    /**
+     * The lines said since capturing began, or null while replies are being
+     * printed. A window has to be handed what was said so that it can put it in
+     * a dialog box, and the console has to have it printed. Collecting the lines
+     * instead of printing them is the whole of the difference, so it is the only
+     * thing this class does differently for the two.
+     */
+    private List<String> captured;
 
     /**
      * Opens the console interface a run talks through.
@@ -88,8 +104,41 @@ public class Ui {
         return scanner.nextLine().trim();
     }
 
-    /** Prints the banner and the welcome message. */
+    /**
+     * Starts collecting what is said instead of printing it.
+     *
+     * <p>Paired with {@link #stopCapturing()}, which hands back what was
+     * collected and puts this back to printing.
+     */
+    void startCapturing() {
+        captured = new ArrayList<>();
+    }
+
+    /**
+     * Returns everything said since {@link #startCapturing()}, one line per
+     * line, and goes back to printing.
+     *
+     * @return what was said, or an empty string if nothing was
+     */
+    String stopCapturing() {
+        String said = String.join("\n", captured);
+        captured = null;
+        return said;
+    }
+
+    /**
+     * Prints the banner and the welcome message.
+     *
+     * <p>The banner is left out of a captured greeting. It is drawn out of
+     * characters lined up in columns, which needs the fixed-width font a
+     * console has and a window does not.
+     */
     void showWelcome() {
+        if (captured != null) {
+            reply("Hello! I'm " + NAME, "What can I do for you?");
+            return;
+        }
+
         System.out.println(DIVIDER);
         System.out.println(BANNER);
         System.out.println(INDENT + "Hello! I'm " + NAME);
@@ -287,11 +336,22 @@ public class Ui {
 
     /**
      * Prints one or more lines inside a divider block, each indented,
-     * followed by a blank line.
+     * followed by a blank line — or collects them, while capturing.
+     *
+     * <p>Every reply comes through here, which is what lets a whole reply be
+     * collected without each message having to know it is being collected. The
+     * dividers and the indent are left off a collected reply: they are what
+     * marks a block off from the rest of a console session, and a dialog box
+     * marks itself off.
      *
      * @param lines the lines to display, in order
      */
     private void reply(String... lines) {
+        if (captured != null) {
+            captured.addAll(List.of(lines));
+            return;
+        }
+
         System.out.println(DIVIDER);
         for (String line : lines) {
             System.out.println(INDENT + line);
