@@ -75,37 +75,42 @@ More:
   }
   ```
 
-* **Indent the cases of a `switch` one level in from the `switch`**, and give
-  each `case` without a `break` an explicit `// Fallthrough` comment:
+* **Align each `case` with the `switch` itself**, indenting only the statements
+  under it, and give each `case` without a `break` an explicit `// Fallthrough`
+  comment:
 
   ```java
   switch (condition) {
-      case ABC:
-          statements;
-          // Fallthrough
-      case DEF:
-          statements;
-          break;
-      default:
-          statements;
-          break;
+  case ABC:
+      statements;
+      // Fallthrough
+  case DEF:
+      statements;
+      break;
+  default:
+      statements;
+      break;
   }
   ```
+
+  This is the guide's own form, and it is not what most IDEs produce by default,
+  so it is worth setting the IDE to match rather than reindenting by hand.
+  Checkstyle enforces it through `caseIndent = 0`.
 
   An arrow `switch` is laid out the same way, and so is a `switch` used as an
   expression:
 
   ```java
   switch (condition) {
-      case ABC -> method("1");
-      case DEF -> method("2");
-      default -> method("0");
+  case ABC -> method("1");
+  case DEF -> method("2");
+  default -> method("0");
   }
 
   int size = switch (condition) {
-      case ABC -> 1;
-      case DEF -> 2;
-      default -> 0;
+  case ABC -> 1;
+  case DEF -> 2;
+  default -> 0;
   };
   ```
 * **Put a space around every operator, after every comma, and after every

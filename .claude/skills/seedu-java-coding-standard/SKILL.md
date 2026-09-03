@@ -59,15 +59,37 @@ it becomes a finding — each pattern over-reports by design, because a check th
 misses violations is worse than one that raises a few false alarms. Set
 `FILES` to the list from step 1 first.
 
+**Use `grep -P`, never `grep -nE`, for any pattern containing `\s`, `\w`, or
+`\b`.** This platform's `grep` does not honor those escapes in an ERE: it reads
+`\s` as a literal `s`, so `^\s+public` silently matches nothing and the check
+reports clean forever. Three of the patterns below were written with `-E` and
+found nothing for exactly that reason. The same trap has an awk half — see the
+`switch` check further down.
+
 ```bash
 grep -nP '\t' $FILES                                    # tabs; indentation is 4 spaces
 awk 'length > 110 { print FILENAME":"FNR" ("length" chars)" }' $FILES   # soft 110, hard 120
 grep -nP '[ \t]+$' $FILES                               # trailing whitespace
 grep -nE 'import .*\*;' $FILES                          # wildcard imports
-grep -nE '\b\w+ +\w+ *\[\] *[;=,)]' $FILES              # array specifier on the variable
-grep -nE '^\s+public\s+[A-Za-z<>\[\]]+\s+\w+\s*[;=]' $FILES   # public non-constant fields
-grep -nE '\b(if|for|while|switch|catch)\(' $FILES       # missing space after a reserved word
+grep -nP '\b\w+ +\w+ *\[\] *[;=,)]' $FILES              # array specifier on the variable
+grep -nP '^\s+public\s+(?!static\s+final\b)[A-Za-z_$][\w<>,\[\]. ]*\s+\w+\s*[;=]' $FILES   # public non-constant fields
+grep -nP '\b(if|for|while|switch|catch)\(' $FILES       # missing space after a reserved word
 grep -nE '[a-z][A-Z]{2,}' $FILES                        # uppercase acronym inside a name
+grep -nP 'void\s+set\w+\s*\(\s*boolean\s+(?!(is|has|was|can|should)[A-Z])\w+' $FILES   # boolean setter form
+```
+
+The last one covers the guide's "Setter methods for boolean variables must be of
+the form `void setFound(boolean isFound)`", which is a *must* in the guide's own
+wording and which the reading pass misses because the method looks ordinary.
+
+A line break placed after an operator rather than before it. The guide says
+"Break after a comma. Break before an operator", so a code line ending in `+`,
+`.`, `&&`, `||`, or a ternary `?`/`:` is a candidate. Comment lines are excluded
+because a sentence ending in a period is not a wrap, and `case`/`default` labels
+because a label's trailing colon is not an operator:
+
+```bash
+grep -nP '^(?!\s*(\*|//|/\*|case\b|default\b)).*[^&|+*/<>=!:?-]([+*/%]|&&|\|\||\.|\?|:|-)\s*$' $FILES
 ```
 
 Javadoc block tags, whose descriptions the conventions require to be
@@ -82,6 +104,24 @@ this one is a Gradle task rather than a grep:
 It is wired into `check`, so `./gradlew check` and `./gradlew build` run it too.
 Run it directly while editing, because it names every offending line at once
 and costs a second.
+
+The blank line the conventions require between a Javadoc description and its
+first block tag. Checkstyle's `RequireEmptyLineBeforeBlockTagGroup` covers this
+inside the project, so run this one when the skill is pointed at code that the
+build does not compile — a classmate's repository, or a pull request under
+review. Only the *first* tag is checked, since the line above a later tag is
+usually the wrapped tail of the tag before it:
+
+```bash
+awk '{ l = $0; gsub(/\r/, "", l) }
+     l ~ /\/\*\*/ { inDoc = 1; seenTag = 0; prevText = ""; next }
+     inDoc && l ~ /^[ \t]*\*[ \t]*@[a-z]/ {
+       if (!seenTag) { seenTag = 1
+         if (prevText != "") { print FILENAME":"FNR": no blank line before the tag group" } }
+       prevText = "tag"; next }
+     inDoc && l ~ /\*\// { inDoc = 0; next }
+     inDoc { c = l; sub(/^[ \t]*\*[ \t]?/, "", c); prevText = (c ~ /[^ \t]/) ? c : "" }' $FILES
+```
 
 Test method names, which the guide requires to be
 `featureUnderTest_testScenario_expectedBehavior`:
@@ -99,7 +139,7 @@ A method summary opening with the wrong form of the verb. The guide asks for
 progressive forms of the verbs this project actually uses:
 
 ```bash
-grep -nE '^\s*\*\s+(Return|Add|Send|Get|Set|Create|Print|Check|Read|Write|Mark|Say|Tell|Show|Build|Convert|Remove|Keep|Prepare|Start|Open|Move|Color|Give|Finish|Prevent|Refuse|Adding|Returning|Creating|Printing|Reading|Writing|Checking)\b' $FILES
+grep -nP '^\s*\*\s+(Return|Add|Send|Get|Set|Create|Print|Check|Read|Write|Mark|Say|Tell|Show|Build|Convert|Remove|Keep|Prepare|Start|Open|Move|Color|Give|Finish|Prevent|Refuse|Adding|Returning|Creating|Printing|Reading|Writing|Checking)\b' $FILES
 ```
 
 Constants, which the guide says should share a common prefix when they are
@@ -110,14 +150,22 @@ file to be read rather than reporting violations:
 grep -nE 'static final ' $FILES | sed 's/ *=.*//'
 ```
 
-Indentation inside a `switch`, which the standard puts one level in from the
-`switch` itself:
+Indentation inside a `switch`. The guide aligns each `case` with the `switch`
+itself and indents only the statements under it, so a `case` sitting one level
+in — which is what most IDEs produce — is the violation:
 
 ```bash
 awk '/switch *\(/ { s = match($0, /[^ ]/) - 1 }
-     /^ *(case|default)\b/ { c = match($0, /[^ ]/) - 1
-       if (c != s + 4) print FILENAME":"FNR": case indented "c", expected "s + 4 }' $FILES
+     /^ *case[ (]|^ *default *(:|->)/ { c = match($0, /[^ ]/) - 1
+       if (c != s) print FILENAME":"FNR": case at "c", switch at "s }' $FILES
 ```
+
+Two traps are baked into that pattern, both of which cost a silent pass before.
+**Do not write `\b` in an awk regex**: awk reads it as a backspace character,
+not a word boundary, so `/^ *(case|default)\b/` matches nothing at all and every
+file looks clean. Matching the punctuation that follows the label is what works
+here, and it also keeps `default` the interface-method modifier — as in
+`default boolean isExit()` — from being read as a `switch` label.
 
 Wrapped lines, which are indented 8 spaces past the line they continue:
 
@@ -140,6 +188,16 @@ on 156 tags. A rule left to attention is a rule that holds until attention
 lapses. So when a check here misses something a person catches, the fix is not
 to read more carefully next time — it is to add the check, and to prove it fails
 on the case that got through.
+
+**And prove the check itself fails on that case**, before trusting it. A pattern
+that is silently inert reports exactly what a passing pattern reports, so a
+clean run is only evidence when you have watched the check fire at least once.
+Three patterns here — public fields, reserved-word spacing, and the array
+specifier — sat inert for their whole life because `grep -nE` does not honor
+`\s`, `\w`, or `\b` on this platform, and the `switch` check sat inert because
+awk reads `\b` as a backspace. All four reported clean over a repository that
+was violating two of them thirteen times. Run a new or edited check against code
+you know is bad and confirm the expected line comes out.
 
 ### 3. Reading pass
 

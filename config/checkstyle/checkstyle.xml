@@ -341,8 +341,11 @@
       <property name="option" value="eol"/>
     </module>
 
+    <!-- caseIndent is 0 because the conventions align each case with the switch itself and
+         indent only the statements under it. Most IDEs indent the case instead, so this is
+         the one indentation setting worth configuring the IDE to match. -->
     <module name="Indentation">
-      <property name="caseIndent" value="4" />
+      <property name="caseIndent" value="0" />
       <property name="throwsIndent" value="8" />
     </module>
 

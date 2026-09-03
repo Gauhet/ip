@@ -65,19 +65,19 @@ public class Parser {
         String arguments = parts.length > 1 ? parts[1].trim() : "";
 
         return switch (keyword) {
-            case "bye" -> new ExitCommand();
-            case "list" -> new ListCommand();
-            case "todo" -> new AddCommand(parseToDo(arguments));
-            case "deadline" -> new AddCommand(parseDeadline(arguments));
-            case "event" -> new AddCommand(parseEvent(arguments));
-            case "mark" -> new MarkCommand(parseTaskIndex(arguments));
-            case "unmark" -> new UnmarkCommand(parseTaskIndex(arguments));
-            case "delete" -> new DeleteCommand(parseTaskIndex(arguments));
-            case "on" -> new OnCommand(parseOnDate(arguments));
-            case "find" -> new FindCommand(parseKeyword(arguments));
-            // Only the keyword is quoted back. Repeating the whole line would
-            // bury the one word that was not understood.
-            default -> throw new AlfredException("I'm afraid I don't know '" + keyword + "', sir.");
+        case "bye" -> new ExitCommand();
+        case "list" -> new ListCommand();
+        case "todo" -> new AddCommand(parseToDo(arguments));
+        case "deadline" -> new AddCommand(parseDeadline(arguments));
+        case "event" -> new AddCommand(parseEvent(arguments));
+        case "mark" -> new MarkCommand(parseTaskIndex(arguments));
+        case "unmark" -> new UnmarkCommand(parseTaskIndex(arguments));
+        case "delete" -> new DeleteCommand(parseTaskIndex(arguments));
+        case "on" -> new OnCommand(parseOnDate(arguments));
+        case "find" -> new FindCommand(parseKeyword(arguments));
+        // Only the keyword is quoted back. Repeating the whole line would
+        // bury the one word that was not understood.
+        default -> throw new AlfredException("I'm afraid I don't know '" + keyword + "', sir.");
         };
     }
 
