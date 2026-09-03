@@ -70,6 +70,46 @@ grep -nE '\b(if|for|while|switch|catch)\(' $FILES       # missing space after a 
 grep -nE '[a-z][A-Z]{2,}' $FILES                        # uppercase acronym inside a name
 ```
 
+Javadoc block tags, whose descriptions the conventions require to be
+punctuated. A description may wrap onto the lines below it and the period
+belongs at the end of the last one, which no single-line pattern can see, so
+this one is a Gradle task rather than a grep:
+
+```bash
+./gradlew checkJavadocTagPunctuation
+```
+
+It is wired into `check`, so `./gradlew check` and `./gradlew build` run it too.
+Run it directly while editing, because it names every offending line at once
+and costs a second.
+
+Test method names, which the guide requires to be
+`featureUnderTest_testScenario_expectedBehavior`:
+
+```bash
+awk '/@Test/ { expectTest = 1; next }
+     expectTest && /^\s*(public )?void [A-Za-z0-9_]+\(/ {
+       name = $0; sub(/^.*void /, "", name); sub(/\(.*$/, "", name)
+       if (name !~ /^[a-z][A-Za-z0-9]*_[A-Za-z0-9]+_[A-Za-z0-9]+$/) print FILENAME":"FNR": "name
+       expectTest = 0 }' $FILES
+```
+
+A method summary opening with the wrong form of the verb. The guide asks for
+`Returns`, not `Return` or `Returning`, so this looks for the bare and the
+progressive forms of the verbs this project actually uses:
+
+```bash
+grep -nE '^\s*\*\s+(Return|Add|Send|Get|Set|Create|Print|Check|Read|Write|Mark|Say|Tell|Show|Build|Convert|Remove|Keep|Prepare|Start|Open|Move|Color|Give|Finish|Prevent|Refuse|Adding|Returning|Creating|Printing|Reading|Writing|Checking)\b' $FILES
+```
+
+Constants, which the guide says should share a common prefix when they are
+associated. Which ones are associated is a judgment, so this lists them per
+file to be read rather than reporting violations:
+
+```bash
+grep -nE 'static final ' $FILES | sed 's/ *=.*//'
+```
+
 Indentation inside a `switch`, which the standard puts one level in from the
 `switch` itself:
 
@@ -92,6 +132,14 @@ awk '{ i = match($0, /[^ ]/) - 1
 A hit here is often a *nested* wrap — a break inside an argument that is itself
 on a wrapped line. Those are legitimate, and the guide's preference for
 higher-level breaks is what makes them read correctly.
+
+**Anything in `rules.md` that a pattern can see belongs above, not below.** The
+punctuation rule was in `rules.md` from the start and was left to the reading
+pass, where it was read past twice and reported clean; a peer reviewer found it
+on 156 tags. A rule left to attention is a rule that holds until attention
+lapses. So when a check here misses something a person catches, the fix is not
+to read more carefully next time — it is to add the check, and to prove it fails
+on the case that got through.
 
 ### 3. Reading pass
 

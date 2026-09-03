@@ -48,6 +48,8 @@ After writing or editing any `.java` or `.md` file, and before reporting that ch
 
 The skill fetches the Markdown and Google guides from their URLs on every run rather than working from an embedded copy, so it follows them as they stand rather than as they stood when it was written. If a guide cannot be fetched, it reports that the check did not run. Treat that as an unfinished check, not as a pass. The Java guide is the one exception: it is written out in the coding standard skill so it can be applied while typing, and that skill fetches the page whenever a rule is contested.
 
+Some of the Java rules are enforced by the build rather than by a skill, so that they hold whether or not anyone remembers to check. Checkstyle covers most of them, and the `checkJavadocTagPunctuation` task covers the one rule no Checkstyle module can express: that a `@param`, `@return`, or `@throws` description ends in punctuation, counting a description that wraps onto the lines below it. Both run as part of `./gradlew check`. A skill reports; the build refuses.
+
 Run the style check **before** the tests below. A style fix can change what the program prints, and the tests have to run against the code as it will be left, not as it was midway through.
 
 ## Unit tests

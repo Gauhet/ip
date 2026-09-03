@@ -403,6 +403,14 @@
     <!-- Checks that for block tags, indentation of continuation lines is at least 4 spaces. -->
     <module name="JavadocTagContinuationIndentation"/>
 
+    <!-- Checks that every block tag has a description at all. Whether that description ends in
+         punctuation is the checkJavadocTagPunctuation task's, since no Checkstyle module can see
+         a description that wraps onto the lines below it. -->
+    <module name="NonEmptyAtclauseDescription"/>
+
+    <!-- Checks for the blank line the conventions require between a description and its tags. -->
+    <module name="RequireEmptyLineBeforeBlockTagGroup"/>
+
     <!-- Checks the Javadoc's format for every class, enumeration and interface. -->
     <module name="JavadocType">
       <property name="allowMissingParamTags" value="true"/>
