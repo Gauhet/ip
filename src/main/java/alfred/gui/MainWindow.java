@@ -54,10 +54,6 @@ public class MainWindow extends AnchorPane {
     /**
      * Finishes setting up the window, once the loader has filled in its parts.
      *
-     * <p>This is where the two things that cannot be written into the FXML
-     * happen: the pane is told to follow the newest message down, and Alfred
-     * greets the user before anything is typed.
-     *
      * <p>The pane is scrolled to the end whenever the conversation grows taller,
      * rather than having its position bound to that height. A bound position
      * cannot be set by anything else, and scrolling is something else setting
@@ -67,8 +63,6 @@ public class MainWindow extends AnchorPane {
     @FXML
     public void initialize() {
         dialogContainer.heightProperty().addListener((observable) -> scrollPane.setVvalue(1.0));
-        dialogContainer.getChildren().add(DialogBox.getAlfredDialog(
-                "Hello! I'm AlfredTheButler. What can I do for you?", alfredImage));
     }
 
     /**
@@ -78,10 +72,16 @@ public class MainWindow extends AnchorPane {
      * creates the window and knows nothing of chatbots. Whoever loads it hands
      * one over afterwards.
      *
+     * <p>Alfred greets the user here rather than in {@link #initialize()},
+     * which runs while there is still no chatbot to ask. The greeting says what
+     * came of reading the save file, so it has to be his and not the window's.
+     *
      * @param alfred The chatbot to ask.
      */
     public void setAlfred(AlfredTheButler alfred) {
         this.alfred = alfred;
+        dialogContainer.getChildren().add(
+                DialogBox.getAlfredDialog(alfred.getGreeting(), alfredImage));
     }
 
     /**

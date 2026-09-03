@@ -11,8 +11,8 @@
  * those files cannot say. Each class is paired with the file of its own name.
  *
  * <p>The window asks {@link alfred.AlfredTheButler} for an answer to every
- * line the user sends, but the answer is a placeholder that echoes the line
- * back. The text version of the program is still the only one that carries a
- * command out.
+ * line the user sends, and shows what it gets back. The commands are the same
+ * ones the console version runs, and they save to the same file, so the two
+ * versions are two ways into one chatbot rather than two chatbots.
  */
 package alfred.gui;

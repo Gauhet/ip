@@ -20,6 +20,13 @@ import alfred.task.TaskList;
  * with are fields set up once instead of locals threaded through every call. It
  * also means a second chatbot, saving somewhere else, is another instance
  * rather than another program.
+ *
+ * <p>There are two ways in. {@link #run()} is the console one, which reads a
+ * line, answers it, and goes round again until told to stop. The window uses
+ * {@link #getGreeting()} and {@link #getResponse(String)} instead, one line at
+ * a time, because a window brings its own loop and cannot lend it out. Both
+ * reach the commands by the same path, so neither can do something the other
+ * cannot.
  */
 public class AlfredTheButler {
     /**
@@ -116,18 +123,59 @@ public class AlfredTheButler {
     }
 
     /**
+     * Returns Alfred's opening words, and reads back the tasks the last run
+     * left behind.
+     *
+     * <p>What {@link #run()} does before its loop, for a caller that has no
+     * loop: the window shows this as Alfred's first message. Loading is part of
+     * it because the answer says how it went — how many tasks came back, or
+     * that the file could not be read — and because a window that had not
+     * loaded would answer the first command against an empty list and save that
+     * over the tasks on disk.
+     *
+     * @return the greeting, and what came of reading the save file.
+     */
+    public String getGreeting() {
+        ui.startCapturing();
+        ui.showWelcome();
+        restoreTasks();
+        return ui.stopCapturing();
+    }
+
+    /**
      * Returns what Alfred says back to one line sent from the window.
      *
-     * <p>The line is echoed rather than obeyed. What this method is for is the
-     * shape of the exchange — the window hands over a line and gets an answer
-     * to show — and that shape is worth settling before the answer is a real
-     * one. Carrying a command out is still {@link #run()}'s, and joining the
-     * two is a later step.
+     * <p>The line is carried out exactly as a typed one is, and what would have
+     * been printed is handed back instead. The commands are reached the same
+     * way and mistakes are answered the same way, so the window and the console
+     * cannot come to disagree about what a command does.
+     *
+     * <p>What this does not do is end the session. {@link #run()} stops when a
+     * command says to; there is no loop here to stop, so {@code bye} is
+     * answered like any other command and the window is the user's to close.
      *
      * @param input The line the user typed.
+     * @return the reply, as the console would have printed it, one line per
+     *     line.
      */
     public String getResponse(String input) {
-        return "Alfred heard: " + input;
+        ui.startCapturing();
+        try {
+            // Trimmed here for the same reason the console trims what it
+            // reads: the parser is given a trimmed line, and a window hands
+            // over the text field exactly as it stands. Without this, a stray
+            // space before a command would leave it unrecognized in the window
+            // but not at the console.
+            Command command = Parser.parse(input.trim());
+            command.execute(tasks, ui, storage);
+        } catch (AlfredException e) {
+            ui.showError(e.getMessage());
+        } catch (RuntimeException e) {
+            // The same safety net the loop has, and for the same reason: a bug
+            // in one command costs that command rather than the session.
+            ui.showInternalError(e);
+        }
+        return ui.stopCapturing();
     }
 
     /**

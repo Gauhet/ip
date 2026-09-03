@@ -22,8 +22,9 @@ import javafx.stage.Stage;
  * over afterwards also leaves the window able to work with another chatbot,
  * such as one saving somewhere else in a test.
  *
- * <p>The answer the chatbot gives is a placeholder that echoes the line back,
- * so a command typed into the window is still not carried out.
+ * <p>The chatbot is the same one the console version runs, so a command typed
+ * into the window is carried out and saved exactly as a typed one is, and the
+ * two versions share a task list.
  */
 public class Main extends Application {
     /** The chatbot the window is given. */
