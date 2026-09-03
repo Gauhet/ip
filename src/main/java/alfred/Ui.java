@@ -13,26 +13,11 @@ import alfred.task.TaskList;
  * Everything the user sees and types: the banner, the reply blocks, and the
  * line-by-line reading of commands.
  *
- * <p>Gathering all of it here keeps the layout of a reply — the dividers, the
- * indent, the blank line after — in one place, so that the rest of the program
- * can say <em>what</em> to tell the user without also saying how it looks on
- * screen. Changing the shape of a reply is then one edit here rather than one
- * per message.
- *
- * <p>Reading belongs with writing for the same reason: both ends of the
- * conversation go through {@code System.in} and {@code System.out}, so a later
- * move to another kind of interface, such as a window, is a change to this
- * class alone.
- *
- * <p>The window is that other interface, and it is served by
- * {@link #startCapturing()} and {@link #stopCapturing()}: between the two, a
- * reply is collected and handed back rather than printed. Every message goes
- * through one method, so the choice is made once there instead of once per
- * message, and neither the commands nor the task list can tell which interface
- * they are answering.
- *
- * <p>This class holds a {@link Scanner} over standard input, so one instance is
- * made and used for a whole run rather than one per command.
+ * <p>The window is served by {@link #startCapturing()} and
+ * {@link #stopCapturing()}: between the two, a reply is collected and handed
+ * back rather than printed. Every message goes through {@link #reply}, so
+ * neither the commands nor the task list can tell which interface they are
+ * answering.
  */
 public class Ui {
     /** Horizontal rule that opens and closes every message block. */
@@ -61,32 +46,19 @@ public class Ui {
     /** Where the user's commands are read from, kept open for the whole run. */
     private final Scanner scanner = new Scanner(System.in);
 
-    /**
-     * The lines said since capturing began, or null while replies are being
-     * printed. A window has to be handed what was said so that it can put it in
-     * a dialog box, and the console has to have it printed. Collecting the lines
-     * instead of printing them is the whole of the difference, so it is the only
-     * thing this class does differently for the two.
-     */
+    /** The lines said since capturing began, or null while replies are being printed. */
     private List<String> captured;
 
     /**
      * Opens the console interface a run talks through.
      *
-     * <p>The scanner over standard input belongs to the object, so one of these
-     * is made for a whole run rather than one per command. It is never closed,
-     * because closing a scanner closes what it reads from, and standard input is
-     * not this class's to close.
+     * <p>The scanner is never closed, because that would close standard input.
      */
     public Ui() {
     }
 
     /**
      * Says whether there is another command to read.
-     *
-     * <p>Asked before every read, because input that has run out — a piped or
-     * redirected session, rather than a typed one — is a normal way for a run
-     * to end and not a failure.
      *
      * @return true if a line is waiting, false at the end of the input
      */
@@ -104,19 +76,14 @@ public class Ui {
         return scanner.nextLine().trim();
     }
 
-    /**
-     * Starts collecting what is said instead of printing it.
-     *
-     * <p>Paired with {@link #stopCapturing()}, which hands back what was
-     * collected and puts this back to printing.
-     */
+    /** Starts collecting what is said instead of printing it. */
     void startCapturing() {
         captured = new ArrayList<>();
     }
 
     /**
-     * Returns everything said since {@link #startCapturing()}, one line per
-     * line, and goes back to printing.
+     * Returns everything said since {@link #startCapturing()}, and goes back to
+     * printing.
      *
      * @return what was said, or an empty string if nothing was
      */
@@ -129,9 +96,8 @@ public class Ui {
     /**
      * Prints the banner and the welcome message.
      *
-     * <p>The banner is left out of a captured greeting. It is drawn out of
-     * characters lined up in columns, which needs the fixed-width font a
-     * console has and a window does not.
+     * <p>The banner is left out of a captured greeting: it needs a fixed-width
+     * font.
      */
     void showWelcome() {
         if (captured != null) {
@@ -184,10 +150,6 @@ public class Ui {
     /**
      * Reports a fault in the program itself, rather than in what was typed.
      *
-     * <p>The exception is shown because a fault that cannot be named cannot be
-     * reported, and the reassurance is added because the user has no way of
-     * knowing whether their tasks survived.
-     *
      * @param e the fault that escaped the command that caused it
      */
     void showInternalError(RuntimeException e) {
@@ -196,8 +158,8 @@ public class Ui {
     }
 
     /**
-     * Confirms that a task has been stored, showing the task itself so the
-     * user can see how it was understood.
+     * Confirms that a task has been stored, showing the task itself so the user
+     * can see how it was understood.
      *
      * @param task the task that was just added
      * @param taskCount how many tasks are stored now that it has been added
@@ -239,8 +201,8 @@ public class Ui {
     }
 
     /**
-     * Prints the stored tasks as a numbered list under a heading,
-     * numbered from 1.
+     * Prints the stored tasks as a numbered list under a heading, numbered
+     * from 1.
      *
      * @param tasks the tasks to show, in the order they are stored
      */
@@ -257,18 +219,8 @@ public class Ui {
     /**
      * Prints the tasks that fall on one day, in the order they are stored.
      *
-     * <p>Each task is numbered by its place in the whole list rather than by
-     * its place among the matches. That is what makes the number usable:
-     * {@code mark}, {@code unmark}, and {@code delete} count through the whole
-     * list, so a number shown here acts on the task it is printed beside.
-     * Numbering the matches from 1 would read more tidily and would be a trap,
-     * since {@code mark 2} would then act on some task the user is not looking
-     * at. The numbers can therefore have gaps, which is the visible sign that
-     * they mean something outside this list.
-     *
-     * <p>An empty result gets a sentence of its own rather than a heading with
-     * nothing under it, because "nothing on that day" is the answer to the
-     * question, not an empty container.
+     * <p>Numbered by place in the whole list, not among the matches, because
+     * {@code mark 2} acts on the whole list.
      *
      * @param tasks every stored task, in the order they are stored
      * @param date the day being asked about
@@ -288,13 +240,8 @@ public class Ui {
      * Prints the tasks whose description contains a keyword, in the order they
      * are stored.
      *
-     * <p>Numbered by place in the whole list, on the same terms and for the same
-     * reason as {@link #showTasksOn(TaskList, LocalDate)}: the number shown is
-     * the one {@code mark}, {@code unmark}, and {@code delete} will act on.
-     *
-     * <p>The keyword is not quoted back in the "nothing found" message, because
-     * it is the last thing the user typed and is still on the screen above the
-     * answer.
+     * <p>Numbered by place in the whole list, for the same reason as
+     * {@link #showTasksOn(TaskList, LocalDate)}.
      *
      * @param tasks every stored task, in the order they are stored
      * @param keyword the text being searched for
@@ -313,13 +260,6 @@ public class Ui {
      * Returns the display lines for the tasks a test accepts, each numbered by
      * its place in the whole list.
      *
-     * <p>Shared by the two commands that show part of the list, so that the
-     * numbering rule they both depend on is written once and cannot drift apart
-     * between them. The test is passed in as a {@link Predicate}, which is the
-     * standard way to hand a yes-or-no question to a method; writing the loop
-     * out again in each caller would work as well and is what this replaced,
-     * at the cost of two copies of the one line that has to be right.
-     *
      * @param tasks every stored task, in the order they are stored
      * @param isMatch the test a task has to pass to be shown
      * @return a mutable list of numbered lines, empty if nothing matched
@@ -335,14 +275,8 @@ public class Ui {
     }
 
     /**
-     * Prints one or more lines inside a divider block, each indented,
-     * followed by a blank line — or collects them, while capturing.
-     *
-     * <p>Every reply comes through here, which is what lets a whole reply be
-     * collected without each message having to know it is being collected. The
-     * dividers and the indent are left off a collected reply: they are what
-     * marks a block off from the rest of a console session, and a dialog box
-     * marks itself off.
+     * Prints one or more lines inside a divider block, each indented, followed
+     * by a blank line — or collects them, while capturing.
      *
      * @param lines the lines to display, in order
      */

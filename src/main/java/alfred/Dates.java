@@ -7,76 +7,47 @@ import java.util.Locale;
 import java.util.regex.Pattern;
 
 /**
- * Converts between a {@link LocalDate} and the two forms a date takes as text,
- * and explains a refusal in terms the user can act on.
+ * Converts between a {@link LocalDate} and the two forms a date takes as text.
  *
- * <p>The two forms answer to different readers. A date is <em>read</em> as
- * {@code yyyy-mm-dd}, the form the user types and the save file holds, chosen
- * because it reads back exactly. A date is <em>shown</em> as
- * {@code MMM dd yyyy}, because a person reading the list wants a month named
- * rather than numbered, and because a named month cannot be misread the way
- * {@code 10-11} can. Keeping a date as a {@code LocalDate} rather than as text
- * is what allows both at once.
- *
- * <p>Both live here, rather than beside the code that happens to need each, so
- * that which form belongs where is settled in one place. Reading is wanted by
- * the commands the user types and by the lines of the save file, and those two
- * coming to disagree about what counts as a date would show up as a task that
- * saves but will not load.
- *
- * <p>A refusal tells the two ways a date can be wrong apart, because the user
- * can do something different about each. Text that is not shaped like a date at
- * all was written in the wrong format, so the reply names the right one. Text
- * that is shaped like a date but names no real day is a wrong number rather
- * than a wrong format, and repeating the format would not help.
+ * <p>A date is read as {@code yyyy-mm-dd}, the form the user types and the save
+ * file holds, and shown as {@code MMM dd yyyy}, so that a named month cannot be
+ * misread the way {@code 10-11} can. Both live here so that the commands and
+ * the save file cannot disagree about what counts as a date.
  */
 public class Dates {
     /** The format a date is written in, spelled the way a person would write it. */
     private static final String FORMAT = "yyyy-mm-dd";
 
-    /** A date in that format, shown alongside it because an example is easier to copy than a pattern. */
+    /** A date in that format, easier to copy than a pattern. */
     private static final String EXAMPLE = "2019-10-15";
 
     /**
-     * The shape of the format: four digits, then two, then two, separated by
-     * hyphens.
+     * The shape of the format: four digits, then two, then two.
      *
      * <p>Matching says only that the text is shaped like a date, not that it
-     * names a day that exists. That is the point: {@code 2019-02-30} matches
-     * and {@code Sunday} does not, which is exactly the line between the two
-     * messages below.
+     * names a day that exists: {@code 2019-02-30} matches and {@code Sunday}
+     * does not. That is the line between the two messages below.
      */
     private static final Pattern SHAPE = Pattern.compile("\\d{4}-\\d{2}-\\d{2}");
 
     /**
-     * How a date is written when it is shown to the user, for example
-     * {@code Oct 15 2019}.
+     * How a date is shown to the user, for example {@code Oct 15 2019}.
      *
      * <p>The locale is pinned to English so the month name does not change with
-     * the computer the program runs on. Left to the default locale, the same
-     * task would show {@code Oct} on one machine and {@code okt} on another,
-     * and the text UI tests would pass or fail by machine rather than by
-     * behavior.
+     * the computer the program runs on.
      */
     private static final DateTimeFormatter DISPLAY_FORMAT =
             DateTimeFormatter.ofPattern("MMM dd yyyy", Locale.ENGLISH);
 
-    /**
-     * Prevents this class from being instantiated.
-     *
-     * <p>Converting a date needs nothing remembered between one conversion and
-     * the next, so an instance would carry no state and could answer no question
-     * the class cannot answer itself. Saying so with a private constructor is
-     * clearer than leaving a public one that nothing has a reason to call.
-     */
+    /** Prevents this class from being instantiated. */
     private Dates() {
     }
 
     /**
      * Writes a date the way it is shown to the user.
      *
-     * <p>This is not the form {@link #parse(String)} reads, and deliberately
-     * so. Nothing written by this method is ever saved or read back.
+     * <p>This is not the form {@link #parse(String)} reads. Nothing written by
+     * this method is ever saved or read back.
      *
      * @param date the day to write
      * @return the date in the reader's form, such as {@code Oct 15 2019}
@@ -101,8 +72,7 @@ public class Dates {
         try {
             return LocalDate.parse(text);
         } catch (DateTimeParseException e) {
-            // Shaped like a date, so the format is not what is wrong. What is
-            // left is the day itself: a 30th of February, or a 13th month.
+            // Shaped like a date, so the day itself is what is wrong.
             throw new AlfredException("There is no such date as '" + text
                     + "', sir. Do check the day and the month.");
         }

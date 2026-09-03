@@ -10,8 +10,8 @@ import alfred.task.TaskList;
  * Shows the tasks that fall on one day.
  *
  * <p>The day is kept as a {@link LocalDate} rather than as the text that was
- * typed, so that the question of what counts as a date is settled once, while
- * the line is being read, and not again here.
+ * typed, so that what counts as a date is settled once, while the line is being
+ * read.
  */
 public class OnCommand extends Command {
     /** The day being asked about. */

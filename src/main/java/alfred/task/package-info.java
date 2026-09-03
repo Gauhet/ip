@@ -8,14 +8,11 @@
  * {@link alfred.task.Event} spans a stretch of days.
  *
  * <p>Each kind answers for itself how it is shown, how it is written to the save
- * file, and whether it falls on a given day. That keeps those three answers next
- * to the dates they are made from, and means a fourth kind of task can be added
- * without hunting through the rest of the program for the places that would have
- * had to test which kind it is.
+ * file, and whether it falls on a given day, so that a fourth kind can be added
+ * without hunting through the program for places that test which kind it is.
  *
- * <p>{@link alfred.task.TaskList} holds the tasks in the order they were added,
- * which is the order they are shown and saved in. It is the only part of the
- * program that knows how many tasks there are, so it is where a task number
- * typed by the user is checked.
+ * <p>{@link alfred.task.TaskList} holds the tasks in the order they were added.
+ * It is the only part of the program that knows how many tasks there are, so it
+ * is where a task number typed by the user is checked.
  */
 package alfred.task;

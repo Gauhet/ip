@@ -19,10 +19,7 @@ public class ToDo extends Task {
     /**
      * {@inheritDoc}
      *
-     * <p>A todo carries no dates, so it adds nothing at the end: its line is the
-     * type letter and the two fields every task saves, and it is the shortest of
-     * the three kinds of line in the save file. Passing no extra fields at all is
-     * what a varargs parameter makes possible without an overload of its own.
+     * <p>A todo carries no dates, so it adds nothing at the end.
      */
     @Override
     public List<String> toFileFields() {

@@ -8,11 +8,11 @@
  * {@link alfred.command.Command#execute}.
  *
  * <p>Splitting the commands up this way is what keeps the command loop from
- * growing: it carries one out without knowing which it is, so a new command is a
- * new class here and a line in the parser, and the loop does not change.
+ * growing: it carries one out without knowing which it is.
  *
  * <p>A command that alters the list saves it, so that the file on disk matches
- * what the user has just been told. {@link alfred.command.ListCommand} and
- * {@link alfred.command.OnCommand} only show tasks, so they save nothing.
+ * what the user has just been told. The commands that only show tasks —
+ * {@link alfred.command.ListCommand}, {@link alfred.command.OnCommand}, and
+ * {@link alfred.command.FindCommand} — save nothing.
  */
 package alfred.command;

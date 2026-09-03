@@ -2,9 +2,8 @@
  * Alfred the Butler: a chatbot that keeps a list of tasks, taking one typed
  * command per line and saving the list to disk after every change.
  *
- * <p>{@link alfred.AlfredTheButler} holds the command loop and nothing else.
- * Each round of the conversation passes through four parts, and this package
- * holds three of them:
+ * <p>{@link alfred.AlfredTheButler} holds the command loop. Each round of the
+ * conversation passes through four parts, and this package holds three of them:
  *
  * <ul>
  *   <li>{@link alfred.Ui} reads the line and prints every reply, so the layout
@@ -13,7 +12,7 @@
  *       {@link alfred.command.Command}, refusing anything it cannot read
  *       before the task list has been touched.
  *   <li>{@link alfred.Storage} writes the list to a file and reads it back at
- *       startup, which is what makes a task outlive the run that added it.
+ *       startup.
  * </ul>
  *
  * <p>The fourth is the task list itself, in {@link alfred.task}.
@@ -21,6 +20,6 @@
  * <p>{@link alfred.Dates} sits alongside them because both the commands the
  * user types and the lines of the save file have to agree on what counts as a
  * date. {@link alfred.AlfredException} is what any of them raises to refuse
- * something and carry on: its message is shown to the user word for word.
+ * something and carry on.
  */
 package alfred;

@@ -21,23 +21,16 @@ import alfred.task.ToDo;
  * Makes sense of what the user typed: which command a line names, and what the
  * rest of that line means to it.
  *
- * <p>Everything here turns text into something the program can act on — a
- * {@link Command}, a {@link Task}, a list index, a date — and refuses text it
- * cannot, with a message written for the person who typed it. Nothing here
- * prints, stores, or changes anything: a command is built, not carried out,
- * which is what lets a line be refused before anything has happened to the
- * task list.
- *
- * <p>The methods are static because reading a line needs nothing remembered
- * between one line and the next. An object would be the answer if the parser
- * ever had to hold state, such as a command that spans several lines, and
- * turning these into instance methods would be the change to make then.
+ * <p>Everything here turns text into a {@link Command}, a {@link Task}, an
+ * index, or a date. Nothing here prints, stores, or changes anything, which is
+ * what lets a line be refused before anything has happened to the
+ * {@link TaskList}.
  */
 public class Parser {
     /**
      * Keyword that separates a deadline's description from its due time. The
      * surrounding spaces are not part of it, so that a missing description can
-     * be told apart from a missing keyword rather than looking the same.
+     * be told apart from a missing keyword.
      */
     private static final String SEPARATOR_BY = "/by";
 
@@ -47,23 +40,12 @@ public class Parser {
     /** Keyword that separates an event's start time from its end time. */
     private static final String SEPARATOR_TO = "/to";
 
-    /**
-     * Prevents this class from being instantiated, since reading a line needs
-     * nothing remembered between one line and the next. This is the line to
-     * delete if a command ever spans several lines and the parser has to start
-     * holding state.
-     */
+    /** Prevents this class from being instantiated. */
     private Parser() {
     }
 
     /**
-     * Reads a line of input as the command it asks for, ready to be carried
-     * out.
-     *
-     * <p>This is where a keyword becomes an object. Each arm builds the command
-     * that keyword names, reading the rest of the line the way that command
-     * needs it read, so everything a command requires is settled here and it
-     * can be carried out without the line it came from.
+     * Reads a line of input as the command it asks for, ready to be carried out.
      *
      * @param line what the user typed, already trimmed
      * @return the command the line asks for
@@ -77,7 +59,7 @@ public class Parser {
             throw new AlfredException("You'll have to give me something to work with, sir.");
         }
         // Everything up to the first space names the command; the rest
-        // is that command's own input, which only it knows how to read.
+        // is that command's own input.
         String[] parts = line.split(" ", 2);
         String keyword = parts[0];
         String arguments = parts.length > 1 ? parts[1].trim() : "";
@@ -117,11 +99,6 @@ public class Parser {
      * Builds a deadline from the {@code <description> /by <date>} part of a
      * {@code deadline} command.
      *
-     * <p>The date is read as a real date rather than kept as the words that
-     * were typed, so that the program knows which day is meant. A date that
-     * cannot be read is refused by {@link Dates} with a message of its
-     * own, which is why nothing here catches it.
-     *
      * @param arguments everything the user typed after the keyword
      * @return the deadline the arguments describe
      * @throws AlfredException if the description or the due date is missing,
@@ -135,9 +112,8 @@ public class Parser {
         }
         String description = arguments.substring(0, separator).trim();
         String by = arguments.substring(separator + SEPARATOR_BY.length()).trim();
-        // Checked for presence before being read, so that a date left out
-        // draws the complaint about the command rather than one about the
-        // format of an empty string.
+        // Checked for presence before being read, so that a date left out draws
+        // the complaint about the command rather than one about its format.
         if (description.isEmpty() || by.isEmpty()) {
             throw new AlfredException(complaint);
         }
@@ -147,9 +123,6 @@ public class Parser {
     /**
      * Builds an event from the {@code <description> /from <start> /to <end>}
      * part of an {@code event} command.
-     *
-     * <p>The start and the end are read as real dates, on the same terms as the
-     * due date of a deadline, and the pair is then checked for being in order.
      *
      * @param arguments everything the user typed after the keyword
      * @return the event the arguments describe
@@ -177,9 +150,8 @@ public class Parser {
         }
         LocalDate start = Dates.parse(from);
         LocalDate end = Dates.parse(to);
-        // Checked once both are real dates, since two dates that cannot be read
-        // cannot be compared. An event of a single day is allowed, so only a
-        // strictly earlier end is refused.
+        // Checked once both are real dates. An event of a single day is allowed,
+        // so only a strictly earlier end is refused.
         if (end.isBefore(start)) {
             throw new AlfredException("An event cannot end before it starts, sir.");
         }
@@ -189,9 +161,8 @@ public class Parser {
     /**
      * Reads the day an {@code on} command is asking about.
      *
-     * <p>A missing date is caught here rather than left to the date reader,
-     * which would quote back an empty string as the thing it did not recognize
-     * and say nothing about what was actually wrong.
+     * <p>A missing date is caught here, since {@link Dates} would quote back an
+     * empty string.
      *
      * @param arguments everything the user typed after {@code on}
      * @return the day being asked about
@@ -207,15 +178,8 @@ public class Parser {
     /**
      * Reads the keyword a {@code find} command is searching for.
      *
-     * <p>Everything after the keyword is taken as one piece of text rather than
-     * as a list of words, so that {@code find read book} searches for the phrase
-     * {@code read book}. Treating the words as alternatives would need a rule
-     * for whether a task has to contain all of them or any of them, which is a
-     * decision the user has no way to state on the command line.
-     *
-     * <p>An empty search is refused rather than answered, because every
-     * description contains the empty string, so the reply would be the whole
-     * list — an answer that looks like a working search and is not one.
+     * <p>Everything after the keyword is taken as one phrase. An empty search is
+     * refused, since every description contains the empty string.
      *
      * @param arguments everything the user typed after {@code find}
      * @return the text to search descriptions for
@@ -229,13 +193,11 @@ public class Parser {
     }
 
     /**
-     * Converts a task number typed by the user into a list index, since the
-     * user numbers tasks from 1 but the list is indexed from 0.
+     * Converts a task number typed by the user into a list index, since the user
+     * numbers tasks from 1 but the list is indexed from 0.
      *
      * <p>Only whether the text is a number is settled here. Whether it names a
-     * task is {@link TaskList}'s to answer, because that depends on how many
-     * tasks there are, and asking the parser to know that would mean handing it
-     * the list to read a piece of text.
+     * task is {@link TaskList}'s to answer.
      *
      * @param arguments everything typed after {@code mark}, {@code unmark}
      *        or {@code delete}

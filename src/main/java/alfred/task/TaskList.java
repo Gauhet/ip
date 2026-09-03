@@ -10,27 +10,11 @@ import alfred.Storage;
  * The tasks the user is keeping, in the order they were added, with the
  * operations that change that order or its contents.
  *
- * <p>Holding the list behind a class rather than passing a bare
- * {@code List<Task>} around is what lets the rest of the program ask for what
- * it wants — mark the third task, delete the first — instead of reaching
- * through the list to do it. The command loop no longer writes
- * {@code tasks.get(index).markDone()}, which is two steps into someone else's
- * data for one idea.
- *
- * <p>The operations that act on a stored task return that task, because every
- * one of them is followed by showing the user what was affected, and having to
- * fetch it again afterwards is how the wrong task ends up shown after a delete.
- *
- * <p>The three operations that act on a stored task check the index they are
- * given, because it comes from a number the user typed and a mistyped one
- * deserves a reply rather than a crash. Only this class can make that check:
- * it is the one that knows how many tasks there are.
- *
- * <p>{@link #get(int)} is the exception, and takes its index on trust. It is
- * how the list is walked for display, one index at a time up to {@link #size()},
- * so a bad index there would be a fault in this program rather than a mistyped
- * command — and making it refusable would put a refusal to handle in the middle
- * of every loop that prints the list.
+ * <p>The operations that act on a stored task return that task, because each is
+ * followed by showing the user what was affected. Those three also check the
+ * index they are given, since it comes from a number the user typed and only
+ * this class knows how many tasks there are. {@link #get(int)} is the exception
+ * and takes its index on trust, being how the list is walked for display.
  */
 public class TaskList {
     /** The tasks, in the order they were added, which is the order they are shown and saved in. */
@@ -38,13 +22,10 @@ public class TaskList {
 
     /**
      * Creates a list holding the tasks named, in the order they are named, or an
-     * empty list if none are named — which is what a first run starts from.
+     * empty list if none are named.
      *
-     * <p>One varargs constructor covers both, so {@code new TaskList()} and
-     * {@code new TaskList(first, second)} are the same constructor rather than
-     * two that have to be kept in step. That is worth having because the empty
-     * case is not a special case: an empty list is a list of no tasks, and
-     * writing it as one says so.
+     * <p>One varargs constructor covers both, rather than two that have to be
+     * kept in step.
      *
      * @param tasks the tasks to start with, in the order they are to be kept
      */
@@ -53,16 +34,11 @@ public class TaskList {
     }
 
     /**
-     * Creates a list holding the given tasks, in the order given, which is how
-     * a run starts from what the save file held.
+     * Creates a list holding the given tasks, in the order given, which is how a
+     * run starts from what the save file held.
      *
-     * <p>Kept alongside the varargs constructor because the tasks read back from
-     * the save file arrive as a list. Handing that list to the varargs form would
-     * mean turning it into an array first, purely so that this constructor could
-     * turn it back into a list.
-     *
-     * <p>The tasks are copied rather than kept as the list that was passed in,
-     * so that whoever supplied them cannot go on changing this list afterwards.
+     * <p>The tasks are copied, so that whoever supplied them cannot go on
+     * changing this list afterwards.
      *
      * @param tasks the tasks to start with, in the order they are to be kept
      */
@@ -151,9 +127,8 @@ public class TaskList {
     /**
      * Refuses an index that names no stored task.
      *
-     * <p>Checked before the list is asked, because the list would answer with
-     * an exception of its own, and one that reads as a fault in the program
-     * rather than as an answer to the person who typed the number.
+     * <p>Checked before the list is asked, because the list would answer with an
+     * exception that reads as a fault rather than as a reply to the user.
      *
      * @param index the index to check, counting from 0
      * @throws AlfredException if it falls outside the stored tasks
@@ -165,13 +140,9 @@ public class TaskList {
     }
 
     /**
-     * Returns the tasks as a plain list, for the sake of {@link Storage}, which
-     * writes them one to a line.
+     * Returns the tasks as a plain list, for the sake of {@link Storage}.
      *
-     * <p>The list is a copy, so that saving cannot change what is stored. That
-     * matters more than the copying costs: this is the one place the tasks
-     * leave the class, and handing out the real list would undo the point of
-     * keeping it private.
+     * <p>The list is a copy, so that saving cannot change what is stored.
      *
      * @return the tasks, in the order they are stored
      */

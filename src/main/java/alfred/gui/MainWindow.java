@@ -13,15 +13,10 @@ import javafx.scene.layout.VBox;
  * What the main window does, as against what it looks like.
  *
  * <p>The arrangement of the window is described in
- * {@code view/MainWindow.fxml}, and this class holds what happens in it: the
- * greeting it opens with, and what becomes of a line the user sends. The two
- * are joined by name — a control given an {@code fx:id} in the file is set on
- * the field of the same name here, and a handler named in the file is this
- * class's method of that name.
- *
- * <p>The fields are private and annotated {@code @FXML} rather than made
- * public, so that the window's parts stay the window's own and are still
- * reachable by the loader.
+ * {@code view/MainWindow.fxml}, and this class holds what happens in it. The two
+ * are joined by name: a control given an {@code fx:id} in the file is set on the
+ * field of the same name here, and a handler named in the file is this class's
+ * method of that name.
  */
 public class MainWindow extends AnchorPane {
     /** The scrolling view onto the conversation. */
@@ -54,11 +49,9 @@ public class MainWindow extends AnchorPane {
     /**
      * Finishes setting up the window, once the loader has filled in its parts.
      *
-     * <p>The pane is scrolled to the end whenever the conversation grows taller,
-     * rather than having its position bound to that height. A bound position
-     * cannot be set by anything else, and scrolling is something else setting
-     * it, so binding would leave the user unable to look back at what was said
-     * earlier.
+     * <p>The pane is scrolled to the end whenever the conversation grows taller.
+     * Binding its position to that height instead would leave the user unable to
+     * scroll back.
      */
     @FXML
     public void initialize() {
@@ -68,15 +61,10 @@ public class MainWindow extends AnchorPane {
     /**
      * Gives the window the chatbot it asks for an answer to each line.
      *
-     * <p>The chatbot arrives after the window is built, because the loader
-     * creates the window and knows nothing of chatbots. Whoever loads it hands
-     * one over afterwards.
+     * <p>Alfred greets the user here rather than in {@link #initialize()}, which
+     * runs while there is still no chatbot to ask.
      *
-     * <p>Alfred greets the user here rather than in {@link #initialize()},
-     * which runs while there is still no chatbot to ask. The greeting says what
-     * came of reading the save file, so it has to be his and not the window's.
-     *
-     * @param alfred The chatbot to ask.
+     * @param alfred the chatbot to ask
      */
     public void setAlfred(AlfredTheButler alfred) {
         this.alfred = alfred;

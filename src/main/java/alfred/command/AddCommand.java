@@ -11,10 +11,8 @@ import alfred.task.TaskList;
  * Stores a new task at the end of the list.
  *
  * <p>One class covers {@code todo}, {@code deadline}, and {@code event}, because
- * the three differ only in the kind of task they build, and that is settled by
- * {@link Parser} before the command is made. What happens afterwards — store
- * it, confirm it, save the list — is the same for all three, and saying it once
- * is what keeps it the same.
+ * the three differ only in the kind of task they build, and {@link Parser}
+ * settles that before the command is made.
  */
 public class AddCommand extends Command {
     /** The task to store, already built from what the user typed. */

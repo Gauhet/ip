@@ -9,8 +9,8 @@ import alfred.task.TaskList;
  * Marks one task as done.
  *
  * <p>Kept apart from {@link UnmarkCommand} rather than the two sharing a class
- * with a flag, because a flag would read as {@code new MarkCommand(index, true)}
- * at the point it is made, where {@code true} says nothing about what it means.
+ * with a flag, because {@code new MarkCommand(index, true)} says nothing about
+ * what the flag means at the point it is made.
  */
 public class MarkCommand extends Command {
     /** Which task to mark, counting from 0, as yet unchecked against the list. */

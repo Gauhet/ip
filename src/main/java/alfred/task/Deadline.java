@@ -28,10 +28,9 @@ public class Deadline extends Task {
      * {@inheritDoc}
      *
      * <p>The date is written in the {@code yyyy-mm-dd} form that
-     * {@link LocalDate#toString()} produces, which is the same form
+     * {@link LocalDate#toString()} produces and
      * {@link LocalDate#parse(CharSequence)} reads, so the field survives the
-     * round trip through the save file without a format having to be agreed
-     * separately at each end.
+     * round trip through the save file.
      */
     @Override
     public List<String> toFileFields() {
@@ -51,9 +50,8 @@ public class Deadline extends Task {
     /**
      * {@inheritDoc}
      *
-     * <p>The due date is shown in the reader's form, not the one it was typed
-     * or saved in, which is what having stored a real date rather than the
-     * user's words makes possible.
+     * <p>The due date is shown in the reader's form, not the one it was typed or
+     * saved in.
      */
     @Override
     public String toString() {

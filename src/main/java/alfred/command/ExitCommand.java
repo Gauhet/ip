@@ -9,17 +9,11 @@ import alfred.task.TaskList;
  * Says goodbye and ends the conversation.
  *
  * <p>Made by {@link Parser} for a {@code bye}, and by the command loop when the
- * input runs out. Those are the same thing to the user — a session that is
- * over — and treating them as one command is what keeps the parting message
- * from being printed in two places and drifting apart.
+ * input runs out. Treating those as one command keeps the parting message from
+ * being printed in two places and drifting apart.
  */
 public class ExitCommand extends Command {
-    /**
-     * Creates a command that will say goodbye and end the session.
-     *
-     * <p>Nothing is passed in, because the parting is the same however the
-     * session came to an end.
-     */
+    /** Creates a command that will say goodbye and end the session. */
     public ExitCommand() {
     }
 

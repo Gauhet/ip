@@ -7,18 +7,14 @@ import alfred.task.TaskList;
 /**
  * Shows every stored task, in the order they are stored.
  *
- * <p>Nothing is saved, because nothing has changed. A command that alters the
- * list saves it; this one has nothing to save, and that shows in what
- * {@link #execute(TaskList, Ui, Storage)} does rather than in a flag the loop
- * has to read.
+ * <p>Nothing is saved, because nothing has changed.
  */
 public class ListCommand extends Command {
     /**
      * Creates a command that will show the whole list.
      *
-     * <p>Nothing is passed in: which tasks to show is not settled when the
-     * command is made but when it is carried out, since the list arrives as an
-     * argument to {@link #execute(TaskList, Ui, Storage)}.
+     * <p>Nothing is passed in: the list arrives as an argument to
+     * {@link #execute(TaskList, Ui, Storage)}.
      */
     public ListCommand() {
     }

@@ -10,10 +10,7 @@ import alfred.Dates;
  * {@code [E][ ] project meeting (from: Dec 02 2019 to: Dec 03 2019)}.
  */
 public class Event extends Task {
-    /**
-     * The days the event starts and ends on. Real dates, so that they can be
-     * compared and reformatted.
-     */
+    /** The days the event starts and ends on. Real dates, so that they can be compared. */
     private final LocalDate from;
 
     private final LocalDate to;
@@ -34,10 +31,8 @@ public class Event extends Task {
     /**
      * {@inheritDoc}
      *
-     * <p>The start and the end each get their own field, rather than being run
-     * together into one, so that reading the line back does not have to split
-     * them apart again. Each is written in the {@code yyyy-mm-dd} form that
-     * {@link LocalDate#parse(CharSequence)} reads back.
+     * <p>The start and the end each get their own field, so that reading the
+     * line back does not have to split them apart again.
      */
     @Override
     public List<String> toFileFields() {
@@ -48,9 +43,7 @@ public class Event extends Task {
      * {@inheritDoc}
      *
      * <p>An event falls on every day it spans, its first and its last included,
-     * so that asking about a day in the middle of a long event finds it. Both
-     * ends count because an event that runs from Monday to Wednesday is one the
-     * user has on Monday.
+     * so that asking about a day in the middle of a long event finds it.
      */
     @Override
     public boolean occursOn(LocalDate date) {
@@ -60,8 +53,7 @@ public class Event extends Task {
     /**
      * {@inheritDoc}
      *
-     * <p>Both dates are shown in the reader's form, on the same terms as the
-     * due date of a deadline.
+     * <p>Both dates are shown in the reader's form.
      */
     @Override
     public String toString() {
