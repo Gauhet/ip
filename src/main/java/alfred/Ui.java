@@ -333,9 +333,6 @@ public class Ui {
         // The user reading "-1 tasks" would be the first sign of it.
         assert count >= 0 : "cannot describe " + count + " of " + noun;
 
-        if (count == 1) {
-            return count + " " + noun;
-        }
-        return count + " " + noun + "s";
+        return count + " " + noun + (count == 1 ? "" : "s");
     }
 }

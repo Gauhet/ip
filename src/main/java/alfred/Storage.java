@@ -46,6 +46,21 @@ public class Storage {
 
     private static final int FIELDS_EVENT = 5;
 
+    /** Where the type letter sits among a line's fields. */
+    private static final int INDEX_TYPE = 0;
+
+    /** Where the done-or-not digit sits. */
+    private static final int INDEX_STATUS = 1;
+
+    /** Where the description sits, the last field every type of task shares. */
+    private static final int INDEX_DESCRIPTION = 2;
+
+    /** Where a deadline's due date sits, and where an event's start date sits. */
+    private static final int INDEX_FIRST_DATE = 3;
+
+    /** Where an event's end date sits. No other type reaches this far. */
+    private static final int INDEX_SECOND_DATE = 4;
+
     /**
      * What one call to {@link Storage#load()} found: the tasks it could read,
      * and how many lines it had to give up on.
@@ -187,8 +202,10 @@ public class Storage {
      * @return the field as it is written to the file.
      */
     private static String escape(String field) {
-        return field.replace(String.valueOf(ESCAPE_CHAR), "" + ESCAPE_CHAR + ESCAPE_CHAR)
-                .replace(String.valueOf(SEPARATOR_CHAR), "" + ESCAPE_CHAR + SEPARATOR_CHAR);
+        String mark = String.valueOf(ESCAPE_CHAR);
+        String separator = String.valueOf(SEPARATOR_CHAR);
+        return field.replace(mark, mark + mark)
+                .replace(separator, mark + separator);
     }
 
     /**
@@ -238,36 +255,103 @@ public class Storage {
         // lets the type be read without a length check first.
         assert !fields.isEmpty() : "splitFields returns at least one field";
 
-        String type = fields.get(0);
-        int expectedFields = switch (type) {
-        case "T" -> FIELDS_TODO;
-        case "D" -> FIELDS_DEADLINE;
-        case "E" -> FIELDS_EVENT;
+        String type = fields.get(INDEX_TYPE);
+        Task task = switch (type) {
+        case "T" -> parseToDo(fields);
+        case "D" -> parseDeadline(fields);
+        case "E" -> parseEvent(fields);
         default -> throw new AlfredException("Unknown task type: " + type);
         };
-        if (fields.size() != expectedFields) {
-            throw new AlfredException("A " + type + " line needs " + expectedFields + " fields");
-        }
+        applyStatus(task, fields.get(INDEX_STATUS));
+        return task;
+    }
 
-        String description = fields.get(2);
+    /**
+     * Builds the todo that one save line describes.
+     *
+     * @param fields the fields of a line whose type letter is {@code T}.
+     * @return the todo those fields describe.
+     * @throws AlfredException if the line holds the wrong number of fields, or
+     *         its description is empty.
+     */
+    private static ToDo parseToDo(List<String> fields) throws AlfredException {
+        checkFieldCount(fields, FIELDS_TODO);
+        return new ToDo(readDescription(fields));
+    }
+
+    /**
+     * Builds the deadline that one save line describes.
+     *
+     * @param fields the fields of a line whose type letter is {@code D}.
+     * @return the deadline those fields describe.
+     * @throws AlfredException if the line holds the wrong number of fields, its
+     *         description is empty, or its date cannot be read.
+     */
+    private static Deadline parseDeadline(List<String> fields) throws AlfredException {
+        checkFieldCount(fields, FIELDS_DEADLINE);
+        return new Deadline(readDescription(fields), Dates.parse(fields.get(INDEX_FIRST_DATE)));
+    }
+
+    /**
+     * Builds the event that one save line describes.
+     *
+     * @param fields the fields of a line whose type letter is {@code E}.
+     * @return the event those fields describe.
+     * @throws AlfredException if the line holds the wrong number of fields, its
+     *         description is empty, or either of its dates cannot be read.
+     */
+    private static Event parseEvent(List<String> fields) throws AlfredException {
+        checkFieldCount(fields, FIELDS_EVENT);
+        return new Event(readDescription(fields), Dates.parse(fields.get(INDEX_FIRST_DATE)),
+                Dates.parse(fields.get(INDEX_SECOND_DATE)));
+    }
+
+    /**
+     * Refuses a line that does not hold exactly the fields its type calls for.
+     *
+     * @param fields the fields the line was split into.
+     * @param expectedFields how many fields the line's type letter calls for.
+     * @throws AlfredException if the line holds any other number of them.
+     */
+    private static void checkFieldCount(List<String> fields, int expectedFields)
+            throws AlfredException {
+        if (fields.size() != expectedFields) {
+            throw new AlfredException("A " + fields.get(INDEX_TYPE) + " line needs "
+                    + expectedFields + " fields");
+        }
+    }
+
+    /**
+     * Returns the description a save line carries, which every type of task has.
+     *
+     * @param fields the fields the line was split into.
+     * @return the description the line gives.
+     * @throws AlfredException if the description is empty.
+     */
+    private static String readDescription(List<String> fields) throws AlfredException {
+        String description = fields.get(INDEX_DESCRIPTION);
         if (description.isEmpty()) {
             throw new AlfredException("A task needs a description");
         }
-        Task task = switch (type) {
-        case "T" -> new ToDo(description);
-        case "D" -> new Deadline(description, Dates.parse(fields.get(3)));
-        case "E" -> new Event(description, Dates.parse(fields.get(3)), Dates.parse(fields.get(4)));
-        default -> throw new AlfredException("Unknown task type: " + type);
-        };
+        return description;
+    }
 
-        // Checked rather than compared against "1" alone, so that anything else
-        // is treated as damage instead of quietly meaning "not done".
-        String status = fields.get(1);
+    /**
+     * Marks a task done or not done, as the status field of its save line says.
+     *
+     * <p>The field is checked rather than compared against {@code 1} alone, so
+     * that anything else is treated as damage instead of quietly meaning "not
+     * done".
+     *
+     * @param task the task the rest of the line described.
+     * @param status the status field of that line.
+     * @throws AlfredException if the status is neither {@code 0} nor {@code 1}.
+     */
+    private static void applyStatus(Task task, String status) throws AlfredException {
         if (status.equals("1")) {
             task.markDone();
         } else if (!status.equals("0")) {
             throw new AlfredException("A status must be 0 or 1, not " + status);
         }
-        return task;
     }
 }

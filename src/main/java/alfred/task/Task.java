@@ -109,10 +109,6 @@ public abstract class Task {
      */
     @Override
     public String toString() {
-        if (isDone) {
-            return "[X] " + name;
-        } else {
-            return "[ ] " + name;
-        }
+        return (isDone ? "[X] " : "[ ] ") + name;
     }
 }
