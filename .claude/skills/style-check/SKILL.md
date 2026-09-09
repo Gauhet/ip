@@ -88,7 +88,7 @@ failing to read the guide is worse than reporting nothing.
 
 ### 3. Mechanical pass
 
-These commands find *candidates* for the rules that a regex can see. Every hit
+These commands find _candidates_ for the rules that a regex can see. Every hit
 still has to be read against the fetched guide before it becomes a finding —
 each of these over-reports by design, because a check that misses violations is
 worse than one that raises a few false alarms.

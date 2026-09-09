@@ -41,7 +41,7 @@ More:
   static final int COLOR_BLUE = 3;
   ```
 
-  A shared *suffix*, as in `RED_COLOR` and `GREEN_COLOR`, does not satisfy this
+  A shared _suffix_, as in `RED_COLOR` and `GREEN_COLOR`, does not satisfy this
   rule.
 * **Name a test method `featureUnderTest_testScenario_expectedBehavior()`**, as
   in `sortList_emptyList_exceptionThrown()` or
@@ -59,7 +59,7 @@ More:
           + "into two parts.");
   ```
 
-* **Break a line where it reads best**: after a comma, and *before* an
+* **Break a line where it reads best**: after a comma, and _before_ an
   operator, including `.`, `&`, and `|`. Keep a method or constructor name
   attached to its opening parenthesis. Prefer a break at the highest level of
   the expression to one buried inside it.

@@ -25,7 +25,7 @@ case rather than needing one of its own.
 
 A **two-run case** is the exception, and the only way to test that tasks survive
 a restart. It has three fenced blocks instead of two: two inputs, run one after
-the other against the *same* save file, and one expected output holding both
+the other against the _same_ save file, and one expected output holding both
 runs' console output end to end. The file is cleared before the case, not
 between its two runs.
 

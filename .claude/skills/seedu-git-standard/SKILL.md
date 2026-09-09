@@ -117,7 +117,7 @@ The rules that matter most are the ones no pattern can check:
   mechanical rule can still be uninformative. `Update files` breaks nothing and
   tells the reader nothing.
 * **Does the body explain what and why, rather than how?** The how is in the
-  diff. A reader goes to the body for the reasoning that is *not* in the diff.
+  diff. A reader goes to the body for the reasoning that is _not_ in the diff.
 * **Can a reader judge the change without reading it?** That is the standard
   the guide sets for a body. If it takes so much explaining that the body runs
   long, the commit wants splitting into finer-grained ones.

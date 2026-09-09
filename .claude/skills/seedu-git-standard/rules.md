@@ -65,7 +65,7 @@ self-explanatory one does not.
 * **Separate paragraphs with blank lines**, and **use bullet points** where a
   list reads better than prose.
 * **Explain what and why, not how.** The how is in the diff. Write enough that
-  a reader can judge whether the change is right *without* reading the diff. If
+  a reader can judge whether the change is right _without_ reading the diff. If
   that takes more explaining than a body can hold, the commit is too big — split
   it into finer-grained commits instead of writing a longer message.
 * **Do not repeat what the code comments already say.**

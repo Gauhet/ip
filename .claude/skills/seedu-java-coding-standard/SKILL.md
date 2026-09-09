@@ -54,7 +54,7 @@ able to tell them apart.
 
 ### 2. Mechanical pass
 
-These find *candidates*. Every hit still has to be read against the rule before
+These find _candidates_. Every hit still has to be read against the rule before
 it becomes a finding — each pattern over-reports by design, because a check that
 misses violations is worse than one that raises a few false alarms. Set
 `FILES` to the list from step 1 first.
@@ -79,7 +79,7 @@ grep -nP 'void\s+set\w+\s*\(\s*boolean\s+(?!(is|has|was|can|should)[A-Z])\w+' $F
 ```
 
 The last one covers the guide's "Setter methods for boolean variables must be of
-the form `void setFound(boolean isFound)`", which is a *must* in the guide's own
+the form `void setFound(boolean isFound)`", which is a _must_ in the guide's own
 wording and which the reading pass misses because the method looks ordinary.
 
 A line break placed after an operator rather than before it. The guide says
@@ -109,7 +109,7 @@ The blank line the conventions require between a Javadoc description and its
 first block tag. Checkstyle's `RequireEmptyLineBeforeBlockTagGroup` covers this
 inside the project, so run this one when the skill is pointed at code that the
 build does not compile — a classmate's repository, or a pull request under
-review. Only the *first* tag is checked, since the line above a later tag is
+review. Only the _first_ tag is checked, since the line above a later tag is
 usually the wrapped tail of the tag before it:
 
 ```bash
@@ -177,7 +177,7 @@ awk '{ i = match($0, /[^ ]/) - 1
        prev = $0; p = i }' $FILES
 ```
 
-A hit here is often a *nested* wrap — a break inside an argument that is itself
+A hit here is often a _nested_ wrap — a break inside an argument that is itself
 on a wrapped line. Those are legitimate, and the guide's preference for
 higher-level breaks is what makes them read correctly.
 
