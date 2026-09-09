@@ -45,6 +45,21 @@ public class Storage {
 
     private static final int FIELDS_EVENT = 5;
 
+    /** Where the type letter sits among a line's fields. */
+    private static final int INDEX_TYPE = 0;
+
+    /** Where the done-or-not digit sits. */
+    private static final int INDEX_STATUS = 1;
+
+    /** Where the description sits, the last field every type of task shares. */
+    private static final int INDEX_DESCRIPTION = 2;
+
+    /** Where a deadline's due date sits, and where an event's start date sits. */
+    private static final int INDEX_FIRST_DATE = 3;
+
+    /** Where an event's end date sits. No other type reaches this far. */
+    private static final int INDEX_SECOND_DATE = 4;
+
     /**
      * What one call to {@link Storage#load()} found: the tasks it could read,
      * and how many lines it had to give up on.
@@ -224,14 +239,14 @@ public class Storage {
      */
     private static Task parseTask(String line) throws AlfredException {
         List<String> fields = splitFields(line);
-        String type = fields.get(0);
+        String type = fields.get(INDEX_TYPE);
         Task task = switch (type) {
         case "T" -> parseToDo(fields);
         case "D" -> parseDeadline(fields);
         case "E" -> parseEvent(fields);
         default -> throw new AlfredException("Unknown task type: " + type);
         };
-        applyStatus(task, fields.get(1));
+        applyStatus(task, fields.get(INDEX_STATUS));
         return task;
     }
 
@@ -258,7 +273,7 @@ public class Storage {
      */
     private static Deadline parseDeadline(List<String> fields) throws AlfredException {
         checkFieldCount(fields, FIELDS_DEADLINE);
-        return new Deadline(readDescription(fields), Dates.parse(fields.get(3)));
+        return new Deadline(readDescription(fields), Dates.parse(fields.get(INDEX_FIRST_DATE)));
     }
 
     /**
@@ -271,8 +286,8 @@ public class Storage {
      */
     private static Event parseEvent(List<String> fields) throws AlfredException {
         checkFieldCount(fields, FIELDS_EVENT);
-        return new Event(readDescription(fields), Dates.parse(fields.get(3)),
-                Dates.parse(fields.get(4)));
+        return new Event(readDescription(fields), Dates.parse(fields.get(INDEX_FIRST_DATE)),
+                Dates.parse(fields.get(INDEX_SECOND_DATE)));
     }
 
     /**
@@ -285,7 +300,7 @@ public class Storage {
     private static void checkFieldCount(List<String> fields, int expectedFields)
             throws AlfredException {
         if (fields.size() != expectedFields) {
-            throw new AlfredException("A " + fields.get(0) + " line needs "
+            throw new AlfredException("A " + fields.get(INDEX_TYPE) + " line needs "
                     + expectedFields + " fields");
         }
     }
@@ -298,7 +313,7 @@ public class Storage {
      * @throws AlfredException if the description is empty.
      */
     private static String readDescription(List<String> fields) throws AlfredException {
-        String description = fields.get(2);
+        String description = fields.get(INDEX_DESCRIPTION);
         if (description.isEmpty()) {
             throw new AlfredException("A task needs a description");
         }
