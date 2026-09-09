@@ -222,13 +222,11 @@ public class Ui {
      * @param tasks the tasks to show, in the order they are stored.
      */
     public void showList(TaskList tasks) {
-        // One line for the heading, then one per task.
-        String[] lines = new String[tasks.size() + 1];
-        lines[0] = "Here are the tasks in your list:";
-        for (int i = 0; i < tasks.size(); i++) {
-            lines[i + 1] = (i + 1) + "." + tasks.get(i);
-        }
-        reply(lines);
+        // Every task matches, so the whole list is numbered by the same helper
+        // that numbers the filtered ones, and the numbering is written once.
+        List<String> lines = numberMatches(tasks, task -> true);
+        lines.add(0, "Here are the tasks in your list:");
+        reply(lines.toArray(new String[0]));
     }
 
     /**
@@ -327,9 +325,6 @@ public class Ui {
         // The user reading "-1 tasks" would be the first sign of it.
         assert count >= 0 : "cannot describe " + count + " of " + noun;
 
-        if (count == 1) {
-            return count + " " + noun;
-        }
-        return count + " " + noun + "s";
+        return count + " " + noun + (count == 1 ? "" : "s");
     }
 }

@@ -62,20 +62,6 @@ public class DialogBox extends HBox {
     }
 
     /**
-     * Moves this dialog box to the left of the conversation, avatar first.
-     *
-     * <p>The bubble is restyled as well, because the corner it leaves square is
-     * the one nearest its owner, and that corner moves with the box.
-     */
-    private void flip() {
-        ObservableList<Node> reversedChildren = FXCollections.observableArrayList(this.getChildren());
-        Collections.reverse(reversedChildren);
-        this.getChildren().setAll(reversedChildren);
-        this.setAlignment(Pos.TOP_LEFT);
-        dialog.getStyleClass().add("reply-label");
-    }
-
-    /**
      * Returns a dialog box for something the user said, on the left of the
      * conversation.
      *
@@ -87,38 +73,6 @@ public class DialogBox extends HBox {
         DialogBox box = new DialogBox(message, avatar);
         box.flip();
         return box;
-    }
-
-    /**
-     * Colors the bubble by the kind of command the reply answers.
-     *
-     * <p>Marking and unmarking share a color, being two halves of the same act.
-     * A reply with no command behind it is left alone.
-     *
-     * @param commandType the name of the command's class, or null if the line
-     *     named no command.
-     */
-    private void changeDialogStyle(String commandType) {
-        if (commandType == null) {
-            return;
-        }
-
-        switch (commandType) {
-        case "AddCommand":
-            dialog.getStyleClass().add("add-label");
-            break;
-        case "MarkCommand":
-            dialog.getStyleClass().add("marked-label");
-            break;
-        case "UnmarkCommand":
-            dialog.getStyleClass().add("marked-label");
-            break;
-        case "DeleteCommand":
-            dialog.getStyleClass().add("delete-label");
-            break;
-        default:
-            // Do nothing
-        }
     }
 
     /**
@@ -146,5 +100,43 @@ public class DialogBox extends HBox {
         DialogBox box = new DialogBox(message, avatar);
         box.changeDialogStyle(commandType);
         return box;
+    }
+
+    /**
+     * Moves this dialog box to the left of the conversation, avatar first.
+     *
+     * <p>The bubble is restyled as well, because the corner it leaves square is
+     * the one nearest its owner, and that corner moves with the box.
+     */
+    private void flip() {
+        ObservableList<Node> reversedChildren = FXCollections.observableArrayList(this.getChildren());
+        Collections.reverse(reversedChildren);
+        this.getChildren().setAll(reversedChildren);
+        this.setAlignment(Pos.TOP_LEFT);
+        dialog.getStyleClass().add("reply-label");
+    }
+
+    /**
+     * Colors the bubble by the kind of command the reply answers.
+     *
+     * <p>Marking and unmarking share a color, being two halves of the same act.
+     * A reply with no command behind it is left alone.
+     *
+     * @param commandType the name of the command's class, or null if the line
+     *     named no command.
+     */
+    private void changeDialogStyle(String commandType) {
+        if (commandType == null) {
+            return;
+        }
+
+        switch (commandType) {
+        case "AddCommand" -> dialog.getStyleClass().add("add-label");
+        case "MarkCommand", "UnmarkCommand" -> dialog.getStyleClass().add("marked-label");
+        case "DeleteCommand" -> dialog.getStyleClass().add("delete-label");
+        default -> {
+            // Any other command leaves the bubble its plain color.
+        }
+        }
     }
 }
