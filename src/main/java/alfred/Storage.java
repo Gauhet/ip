@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import alfred.task.Deadline;
 import alfred.task.Event;
@@ -79,10 +80,9 @@ public class Storage {
      * @throws AlfredException if the file cannot be written.
      */
     public void save(List<Task> tasks) throws AlfredException {
-        List<String> lines = new ArrayList<>();
-        for (Task task : tasks) {
-            lines.add(joinFields(task.toFileFields()));
-        }
+        List<String> lines = tasks.stream()
+                .map(task -> joinFields(task.toFileFields()))
+                .toList();
         try {
             Path folder = file.getParent();
             // Null when the path is a bare filename, naming no folder to create.
@@ -123,6 +123,9 @@ public class Storage {
             throw new AlfredException("I could not read your saved tasks, sir: " + describe(e));
         }
 
+        // Left as a loop rather than a stream: a stream would have to carry the
+        // count of skipped lines in a mutable box, and its lambda could not throw
+        // the checked exception that a bad line is reported with.
         int skippedLines = 0;
         for (String line : lines) {
             if (line.isBlank()) {
@@ -162,11 +165,9 @@ public class Storage {
      * @return the line to write to the file.
      */
     private static String joinFields(List<String> fields) {
-        List<String> escapedFields = new ArrayList<>();
-        for (String field : fields) {
-            escapedFields.add(escape(field));
-        }
-        return String.join(SEPARATOR, escapedFields);
+        return fields.stream()
+                .map(Storage::escape)
+                .collect(Collectors.joining(SEPARATOR));
     }
 
     /**

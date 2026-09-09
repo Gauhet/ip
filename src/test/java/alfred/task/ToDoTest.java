@@ -2,6 +2,7 @@ package alfred.task;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
@@ -94,6 +95,13 @@ public class ToDoTest {
     @Test
     public void toFileFields_notDone_typeStatusAndDescription() {
         assertEquals(List.of("T", "0", "read book"), new ToDo("read book").toFileFields());
+    }
+
+    @Test
+    public void toFileFields_anyTask_fieldsCannotBeChanged() {
+        List<String> fields = new ToDo("read book").toFileFields();
+
+        assertThrows(UnsupportedOperationException.class, () -> fields.add("extra"));
     }
 
     @Test

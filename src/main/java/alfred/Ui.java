@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.function.Predicate;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import alfred.task.Task;
 import alfred.task.TaskList;
@@ -207,13 +209,7 @@ public class Ui {
      * @param tasks the tasks to show, in the order they are stored.
      */
     public void showList(TaskList tasks) {
-        // One line for the heading, then one per task.
-        String[] lines = new String[tasks.size() + 1];
-        lines[0] = "Here are the tasks in your list:";
-        for (int i = 0; i < tasks.size(); i++) {
-            lines[i + 1] = (i + 1) + "." + tasks.get(i);
-        }
-        reply(lines);
+        replyNumbered("Here are the tasks in your list:", numberTasks(tasks, task -> true));
     }
 
     /**
@@ -227,13 +223,12 @@ public class Ui {
      */
     public void showTasksOn(TaskList tasks, LocalDate date) {
         String when = Dates.format(date);
-        List<String> lines = numberMatches(tasks, task -> task.occursOn(date));
+        List<String> lines = numberTasks(tasks, task -> task.occursOn(date));
         if (lines.isEmpty()) {
             reply("You have nothing on " + when + ", sir.");
             return;
         }
-        lines.add(0, "Here is what you have on " + when + ":");
-        reply(lines.toArray(new String[0]));
+        replyNumbered("Here is what you have on " + when + ":", lines);
     }
 
     /**
@@ -247,31 +242,42 @@ public class Ui {
      * @param keyword the text being searched for.
      */
     public void showMatchingTasks(TaskList tasks, String keyword) {
-        List<String> lines = numberMatches(tasks, task -> task.matches(keyword));
+        List<String> lines = numberTasks(tasks, task -> task.matches(keyword));
         if (lines.isEmpty()) {
             reply("I found no matching tasks, sir.");
             return;
         }
-        lines.add(0, "Here are the matching tasks in your list:");
-        reply(lines.toArray(new String[0]));
+        replyNumbered("Here are the matching tasks in your list:", lines);
     }
 
     /**
      * Returns the display lines for the tasks a test accepts, each numbered by
      * its place in the whole list.
      *
+     * <p>The stream runs over the positions rather than over the tasks, because
+     * a task's number is where it sits in the whole list, which a stream of the
+     * tasks themselves would have lost. A test that accepts every task numbers
+     * the whole list.
+     *
      * @param tasks every stored task, in the order they are stored.
-     * @param isMatch the test a task has to pass to be shown.
-     * @return a mutable list of numbered lines, empty if nothing matched.
+     * @param isShown the test a task has to pass to be shown.
+     * @return the numbered lines, in list order, and empty if nothing matched.
      */
-    private static List<String> numberMatches(TaskList tasks, Predicate<Task> isMatch) {
-        List<String> lines = new ArrayList<>();
-        for (int i = 0; i < tasks.size(); i++) {
-            if (isMatch.test(tasks.get(i))) {
-                lines.add((i + 1) + "." + tasks.get(i));
-            }
-        }
-        return lines;
+    private static List<String> numberTasks(TaskList tasks, Predicate<Task> isShown) {
+        return IntStream.range(0, tasks.size())
+                .filter(i -> isShown.test(tasks.get(i)))
+                .mapToObj(i -> (i + 1) + "." + tasks.get(i))
+                .toList();
+    }
+
+    /**
+     * Prints a heading and the lines belonging under it as one block.
+     *
+     * @param heading the line that introduces the ones below it.
+     * @param lines the lines to show under it, in the order they are to appear.
+     */
+    private void replyNumbered(String heading, List<String> lines) {
+        reply(Stream.concat(Stream.of(heading), lines.stream()).toArray(String[]::new));
     }
 
     /**
