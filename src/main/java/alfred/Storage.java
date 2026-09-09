@@ -193,8 +193,10 @@ public class Storage {
      * @return the field as it is written to the file.
      */
     private static String escape(String field) {
-        return field.replace(String.valueOf(ESCAPE_CHAR), "" + ESCAPE_CHAR + ESCAPE_CHAR)
-                .replace(String.valueOf(SEPARATOR_CHAR), "" + ESCAPE_CHAR + SEPARATOR_CHAR);
+        String mark = String.valueOf(ESCAPE_CHAR);
+        String separator = String.valueOf(SEPARATOR_CHAR);
+        return field.replace(mark, mark + mark)
+                .replace(separator, mark + separator);
     }
 
     /**
