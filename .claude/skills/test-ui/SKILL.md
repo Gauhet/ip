@@ -31,7 +31,7 @@ program does with a file it did not write.
 
 Each case starts from a **fresh program**, and from an empty save file unless it
 supplied one, so cases never share task state. Within a two-run case the save
-file is *not* cleared between the two runs — carrying it over is the whole point
+file is _not_ cleared between the two runs — carrying it over is the whole point
 of the case.
 
 Read the plan's own "Rules for writing a test case" section before adding cases.
@@ -251,21 +251,31 @@ or the expected output is wrong, and deciding which is the user's call.
 
 When every case passes, show the console session so it can be read like a real
 run. Piping input means the commands are not echoed, so put them back: every
-reply is wrapped in a pair of divider lines, so after each *closing* divider
+reply is wrapped in a pair of divider lines, so after each _closing_ divider
 insert the next command, prefixed with `> ` as if it had been typed at the
 prompt. Blocks pair up 1:1 with input lines after the greeting.
 
-A block is a response to a command, *except* for the blocks the program prints
-before it reads anything: the greeting, and the startup message it prints when
-it has restored tasks or could not read the save file. Those have to be passed
-over, or every command lands one block early:
+A block is a response to a command, _except_ for the blocks the program prints
+before it reads anything: the greeting, and the startup messages it prints when
+it has restored tasks, when it has skipped damaged lines, and when it could not
+read the save file at all. Those have to be passed over, or every command lands
+one block early. There can be more than one of them, so they are counted rather
+than recognized by their wording:
 
 ```bash
-STARTUP_MSG="I've brought back|I could not read your saved tasks"
-
 transcript() {   # $1 = actual output file, $2 = input file
-  extra=0
-  grep -qE "$STARTUP_MSG" "$1" && extra=1
+  blocks=$(($(grep -cE '^ *_{20,}$' "$1") / 2))
+  commands=$(awk 'END { print NR }' "$2")
+
+  # Every command is answered by exactly one block, and the greeting is one
+  # more. Whatever is left over was printed before the first command was read.
+  extra=$((blocks - commands - 1))
+  if [ "$extra" -lt 0 ]; then
+    echo "transcript: $blocks blocks answer $commands commands; not interleaving" >&2
+    cat "$1"
+    return 1
+  fi
+
   awk -v inputs="$2" -v extra="$extra" '
     { print }
     /^ *_{20,}$/ {
@@ -279,9 +289,13 @@ transcript() {   # $1 = actual output file, $2 = input file
 transcript "$WORK/tc1.r1.actual" "$WORK/tc1.input"
 ```
 
-`STARTUP_MSG` matches the wording the program uses today. If those messages are
-reworded, update it, or the interleaving silently goes back to being one block
-out on any run that loads tasks.
+Counting is what keeps this working when a message is reworded. An earlier
+version looked for the startup messages by their text and allowed for only one
+of them, so TC18 — which restores tasks _and_ reports damaged lines — came out
+a block early, with `> bye` printed in the middle of a reply. Arithmetic needs
+no list of wordings to keep up to date, and a run whose blocks and commands
+cannot be reconciled now says so and prints the raw output instead of a
+plausible wrong one.
 
 **For a two-run case, transcribe each run separately** against its own input
 file, and show the two one after the other with a line saying the program was
