@@ -166,7 +166,15 @@ public class Storage {
         for (String field : fields) {
             escapedFields.add(escape(field));
         }
-        return String.join(SEPARATOR, escapedFields);
+        String line = String.join(SEPARATOR, escapedFields);
+
+        // The escaping is only worth anything if the line reads back as the
+        // fields it was built from, and escape() and splitFields() have to be
+        // changed together to keep that true. Saying so here is what would
+        // catch a change to one of them that forgot the other.
+        assert splitFields(line).equals(fields) : "line does not read back as its fields: " + line;
+
+        return line;
     }
 
     /**
@@ -224,6 +232,11 @@ public class Storage {
      */
     private static Task parseTask(String line) throws AlfredException {
         List<String> fields = splitFields(line);
+        // splitFields adds the field it is building when the line runs out, so
+        // it hands back at least one field even for an empty line. That is what
+        // lets the type be read without a length check first.
+        assert !fields.isEmpty() : "splitFields returns at least one field";
+
         String type = fields.get(0);
         int expectedFields = switch (type) {
         case "T" -> FIELDS_TODO;

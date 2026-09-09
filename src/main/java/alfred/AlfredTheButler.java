@@ -51,6 +51,12 @@ public class AlfredTheButler {
      * @param filePath where to keep the tasks, such as {@code data/alfred.txt}.
      */
     public AlfredTheButler(String filePath) {
+        // The program picks the save file, never the user, so a missing or
+        // blank one is a fault here. It would otherwise go unnoticed until the
+        // first command tried to save and failed for a reason that named no
+        // file.
+        assert filePath != null && !filePath.isBlank() : "a run needs a save file";
+
         ui = new Ui();
         storage = new Storage(filePath);
         tasks = new TaskList();
