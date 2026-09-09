@@ -78,6 +78,11 @@ public class Ui {
 
     /** Starts collecting what is said instead of printing it. */
     void startCapturing() {
+        // One reply is collected at a time, and stopCapturing() is what hands it
+        // back and clears it. Starting a second time would silently throw away
+        // whatever the first had collected.
+        assert captured == null : "already capturing";
+
         captured = new ArrayList<>();
     }
 
@@ -88,6 +93,11 @@ public class Ui {
      * @return what was said, or an empty string if nothing was.
      */
     String stopCapturing() {
+        // The two window methods wrap every command in a startCapturing() and a
+        // stopCapturing(). Without the first, this would fail with a null
+        // pointer, well away from the caller that left it out.
+        assert captured != null : "stopCapturing without startCapturing";
+
         String said = String.join("\n", captured);
         captured = null;
         return said;
@@ -165,6 +175,11 @@ public class Ui {
      * @param taskCount how many tasks are stored now that it has been added.
      */
     public void showAdded(Task task, int taskCount) {
+        // The count is the size of the list once the task is in it, so it
+        // counts at least that task. A count taken before the add would tell
+        // the user they have one task fewer than they do.
+        assert taskCount > 0 : "the list holds at least the task just added";
+
         reply("Got it. I've added this task:",
                 SUB_INDENT + task,
                 "Now you have " + describeCount(taskCount, "task") + " in the list.");
@@ -279,6 +294,10 @@ public class Ui {
      * @param lines the lines to display, in order.
      */
     private void reply(String... lines) {
+        // Every caller has something to say. A block with no lines would print
+        // as two dividers with nothing between them, which reads as a fault.
+        assert lines.length > 0 : "a reply needs at least one line";
+
         if (captured != null) {
             captured.addAll(List.of(lines));
             return;
@@ -301,6 +320,11 @@ public class Ui {
      * @return the count and the noun, ready to drop into a sentence.
      */
     private static String describeCount(int count, String noun) {
+        // Every count reaching here is the size of a list or a tally of lines,
+        // so a negative one means the arithmetic went wrong somewhere earlier.
+        // The user reading "-1 tasks" would be the first sign of it.
+        assert count >= 0 : "cannot describe " + count + " of " + noun;
+
         return count + " " + noun + (count == 1 ? "" : "s");
     }
 }

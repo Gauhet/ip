@@ -92,6 +92,11 @@ public abstract class Task {
      * @return a mutable list holding the whole line's fields, in order.
      */
     protected List<String> buildFileFields(String type, String... extraFields) {
+        // Storage tells one kind of task from another by this single letter, so
+        // a longer one would go into a line that could never be read back. Only
+        // the subclasses call this, so a wrong letter is a fault here.
+        assert type.length() == 1 : "a save line's type is one letter, not '" + type + "'";
+
         List<String> fields = new ArrayList<>();
         fields.add(type);
         fields.add(isDone ? "1" : "0");
