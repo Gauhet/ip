@@ -71,6 +71,13 @@ public class TaskList {
      * @return the task stored there.
      */
     public Task get(int index) {
+        // The operations that act on a stored task check the index, because it
+        // comes from a number the user typed. This one is how the list is
+        // walked for display, so its index comes from a loop over size(): an
+        // index outside the list is a fault here, not something to complain to
+        // the user about.
+        assert index >= 0 && index < tasks.size() : "no task at index " + index;
+
         return tasks.get(index);
     }
 

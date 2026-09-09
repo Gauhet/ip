@@ -160,7 +160,7 @@ way that swallows individual results or keeps going after a failure.
    r=0
    for in in $inputs; do
      r=$((r + 1))
-     java -cp "$WORK/build" alfred.AlfredTheButler < "$in" > "$WORK/tc1.r$r.actual" 2>&1
+     java -ea -cp "$WORK/build" alfred.AlfredTheButler < "$in" > "$WORK/tc1.r$r.actual" 2>&1
      cat "$WORK/tc1.r$r.actual" >> "$WORK/tc1.actual"
    done
    ```
@@ -171,6 +171,13 @@ way that swallows individual results or keeps going after a failure.
    Give each run a short timeout (10s is plenty). If it times out, treat it as a
    failure: it usually means the input did not end with `bye`, so the program is
    still waiting for a command that will never come.
+
+   `-ea` turns on the assertions in the program, which `java` leaves off unless
+   you ask for them. The assertions state what the code takes for granted, so a
+   run without them tests less than it looks like it does: a broken assumption
+   surfaces as a wrong reply further on, or not at all. With them on, an
+   `AssertionError` and its stack trace land in the output, and the case fails
+   where the assumption broke.
 1. Normalize both files and diff them. Normalizing strips carriage returns,
    trailing whitespace, and blank lines at the end of the file — differences
    that come from the platform, not from the program:
@@ -208,7 +215,7 @@ for n in $(seq 1 "$CASES"); do
   r=0
   for in in $inputs; do
     r=$((r + 1))
-    timeout 10 java -cp "$WORK/build" alfred.AlfredTheButler < "$in" > "$WORK/tc$n.r$r.actual" 2>&1
+    timeout 10 java -ea -cp "$WORK/build" alfred.AlfredTheButler < "$in" > "$WORK/tc$n.r$r.actual" 2>&1
     cat "$WORK/tc$n.r$r.actual" >> "$WORK/tc$n.actual"
   done
   norm "$expected"          > "$WORK/tc$n.e.norm"

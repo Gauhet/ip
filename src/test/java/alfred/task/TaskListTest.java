@@ -18,7 +18,7 @@ import alfred.AlfredException;
 /**
  * Tests {@link TaskList}, the list the whole program works through.
  *
- * <p>Two things here are worth more than the rest.
+ * <p>Three things here are worth more than the rest.
  *
  * <p>The first is the index check. It stands between a number the user typed and
  * a list that would throw an unchecked exception of its own, so every operation
@@ -31,6 +31,10 @@ import alfred.AlfredException;
  * to change what is stored. None of those promises is visible in ordinary use,
  * and each would be quietly broken by keeping or returning what was passed, so
  * each gets a test.
+ *
+ * <p>The third is the assertion in {@link TaskList#get(int)}. An assertion that
+ * is never tried is indistinguishable from one that has been switched off, so
+ * the one test that expects an {@link AssertionError} stands for all of them.
  */
 public class TaskListTest {
     private static final String NO_SUCH_TASK = "There is no such task, sir.";
@@ -41,6 +45,16 @@ public class TaskListTest {
     @BeforeEach
     public void setUp() {
         tasks = new TaskList(new ToDo("first"), new ToDo("second"), new ToDo("third"));
+    }
+
+    @Test
+    public void get_indexPastEndOfList_assertionFails() {
+        // get() takes its index on trust, so an index outside the list is a
+        // fault in the caller rather than something to tell the user about.
+        // This case also fails if assertions are switched off, which is the
+        // only way to tell a live assertion from an inert one: without them the
+        // call comes back with an IndexOutOfBoundsException instead.
+        assertThrows(AssertionError.class, () -> tasks.get(3));
     }
 
     @Test
