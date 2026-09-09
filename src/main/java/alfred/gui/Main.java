@@ -18,6 +18,12 @@ import javafx.stage.Stage;
  * the console version runs, so the two share a task list.
  */
 public class Main extends Application {
+    /** The shortest the window may be drawn before the conversation stops being usable. */
+    private static final int MIN_WINDOW_HEIGHT = 220;
+
+    /** The narrowest it may be drawn before the text field stops being usable. */
+    private static final int MIN_WINDOW_WIDTH = 417;
+
     /** The chatbot the window is given. */
     private final AlfredTheButler alfred = new AlfredTheButler();
 
@@ -35,11 +41,10 @@ public class Main extends Application {
             fxmlLoader.<MainWindow>getController().setAlfred(alfred);
 
             // The controls follow the edges they are anchored to, so the window
-            // can be resized; the smallest sizes it allows are the ones below
-            // which the conversation and the text field stop being usable.
+            // can be resized, down to the smallest size it still reads at.
             stage.setTitle("AlfredTheButler");
-            stage.setMinHeight(220);
-            stage.setMinWidth(417);
+            stage.setMinHeight(MIN_WINDOW_HEIGHT);
+            stage.setMinWidth(MIN_WINDOW_WIDTH);
 
             stage.show();
         } catch (IOException e) {

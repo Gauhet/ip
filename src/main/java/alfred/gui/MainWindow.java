@@ -19,6 +19,9 @@ import javafx.scene.layout.VBox;
  * method of that name.
  */
 public class MainWindow extends AnchorPane {
+    /** The scroll position that shows the foot of the conversation. */
+    private static final double SCROLL_TO_BOTTOM = 1.0;
+
     /** The scrolling view onto the conversation. */
     @FXML
     private ScrollPane scrollPane;
@@ -55,7 +58,8 @@ public class MainWindow extends AnchorPane {
      */
     @FXML
     public void initialize() {
-        dialogContainer.heightProperty().addListener((observable) -> scrollPane.setVvalue(1.0));
+        dialogContainer.heightProperty()
+                .addListener((observable) -> scrollPane.setVvalue(SCROLL_TO_BOTTOM));
     }
 
     /**
