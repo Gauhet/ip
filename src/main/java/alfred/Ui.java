@@ -301,9 +301,6 @@ public class Ui {
      * @return the count and the noun, ready to drop into a sentence.
      */
     private static String describeCount(int count, String noun) {
-        if (count == 1) {
-            return count + " " + noun;
-        }
-        return count + " " + noun + "s";
+        return count + " " + noun + (count == 1 ? "" : "s");
     }
 }
