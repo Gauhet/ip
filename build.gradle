@@ -46,6 +46,10 @@ checkstyle {
 test {
     useJUnitPlatform()
 
+    // Stated rather than left to Gradle's default, so that the assertions in
+    // src/main/java are known to be live while the tests run.
+    enableAssertions = true
+
     testLogging {
         events 'passed', 'skipped', 'failed'
 
@@ -140,4 +144,8 @@ shadowJar {
 
 run {
     standardInput = System.in
+
+    // A JavaExec task leaves assertions off unless asked, which would make
+    // every assertion in the program inert when it is started this way.
+    enableAssertions = true
 }

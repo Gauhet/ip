@@ -53,6 +53,12 @@ public class Parser {
      *         is missing something the command it names needs.
      */
     static Command parse(String line) throws AlfredException {
+        // Both callers trim before handing the line over, and the keyword is
+        // read as everything up to the first space. A leading space would make
+        // that keyword the empty string, and the user would be told that '' is
+        // not a command, which points nowhere near the caller that forgot.
+        assert line.equals(line.trim()) : "parse expects a trimmed line, not '" + line + "'";
+
         // Worth its own message: saying the command was not recognized
         // would be misleading when none was typed.
         if (line.isEmpty()) {
