@@ -73,6 +73,62 @@ public class AlfredTheButlerTest {
     }
 
     @Test
+    public void getResponse_listOfSeveralTasks_numberedFromOne() {
+        alfred.getResponse("todo polish the silver");
+        alfred.getResponse("todo walk the dog");
+
+        assertEquals("Here are the tasks in your list:\n"
+                + "1.[T][ ] polish the silver\n"
+                + "2.[T][ ] walk the dog",
+                alfred.getResponse("list"));
+    }
+
+    @Test
+    public void getResponse_listWhenNothingIsStored_headingOnly() {
+        assertEquals("Here are the tasks in your list:", alfred.getResponse("list"));
+    }
+
+    @Test
+    public void getResponse_findMatchingSomeTasks_numberedByPlaceInWholeList() {
+        alfred.getResponse("todo polish the silver");
+        alfred.getResponse("todo walk the dog");
+        alfred.getResponse("todo polish the boots");
+
+        // 1 and 3, not 1 and 2: the numbers are the ones `mark` and `delete` take.
+        assertEquals("Here are the matching tasks in your list:\n"
+                + "1.[T][ ] polish the silver\n"
+                + "3.[T][ ] polish the boots",
+                alfred.getResponse("find polish"));
+    }
+
+    @Test
+    public void getResponse_findMatchingNothing_noMatchesReported() {
+        alfred.getResponse("todo polish the silver");
+
+        assertEquals("I found no matching tasks, sir.", alfred.getResponse("find umbrella"));
+    }
+
+    @Test
+    public void getResponse_onDayWithTasks_numberedByPlaceInWholeList() {
+        alfred.getResponse("todo polish the silver");
+        alfred.getResponse("deadline return book /by 2019-10-15");
+        alfred.getResponse("todo walk the dog");
+        alfred.getResponse("event gala /from 2019-10-14 /to 2019-10-16");
+
+        assertEquals("Here is what you have on Oct 15 2019:\n"
+                + "2.[D][ ] return book (by: Oct 15 2019)\n"
+                + "4.[E][ ] gala (from: Oct 14 2019 to: Oct 16 2019)",
+                alfred.getResponse("on 2019-10-15"));
+    }
+
+    @Test
+    public void getResponse_onDayWithNoTasks_nothingOnThatDayReported() {
+        alfred.getResponse("todo polish the silver");
+
+        assertEquals("You have nothing on Oct 15 2019, sir.", alfred.getResponse("on 2019-10-15"));
+    }
+
+    @Test
     public void getResponse_markCommand_taskMarkedDone() {
         alfred.getResponse("todo polish the silver");
 

@@ -1,8 +1,9 @@
 package alfred.task;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 import alfred.Storage;
 
@@ -89,7 +90,7 @@ public abstract class Task {
      * @param type the letter naming the kind of task, such as {@code D}.
      * @param extraFields the fields this kind adds after the description, in the
      *        order they are saved, and none for a kind that adds none.
-     * @return a mutable list holding the whole line's fields, in order.
+     * @return an unmodifiable list holding the whole line's fields, in order.
      */
     protected List<String> buildFileFields(String type, String... extraFields) {
         // Storage tells one kind of task from another by this single letter, so
@@ -97,12 +98,8 @@ public abstract class Task {
         // the subclasses call this, so a wrong letter is a fault here.
         assert type.length() == 1 : "a save line's type is one letter, not '" + type + "'";
 
-        List<String> fields = new ArrayList<>();
-        fields.add(type);
-        fields.add(isDone ? "1" : "0");
-        fields.add(name);
-        fields.addAll(List.of(extraFields));
-        return fields;
+        return Stream.concat(Stream.of(type, isDone ? "1" : "0", name), Arrays.stream(extraFields))
+                .toList();
     }
 
     /**
