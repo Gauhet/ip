@@ -8,6 +8,7 @@ import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import alfred.task.Priority;
 import alfred.task.Task;
 import alfred.task.TaskList;
 
@@ -215,6 +216,18 @@ public class Ui {
      */
     public void showUnmarked(Task task) {
         reply("OK, I've marked this task as not done yet:", SUB_INDENT + task);
+    }
+
+    /**
+     * Confirms that a task's priority has changed, showing it with its new box.
+     *
+     * @param task the task whose priority was set or cleared.
+     */
+    public void showPrioritySet(Task task) {
+        String message = task.getPriority() == Priority.NONE
+                ? "Very good. I've taken the priority off this task:"
+                : "Very good. I've set this task's priority:";
+        reply(message, SUB_INDENT + task);
     }
 
     /**

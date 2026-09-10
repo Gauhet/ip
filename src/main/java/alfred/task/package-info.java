@@ -2,7 +2,8 @@
  * The tasks themselves, and the list they are kept in.
  *
  * <p>{@link alfred.task.Task} holds what every kind of task shares — a
- * description and whether it is done — and the three kinds differ in the dates
+ * description, whether it is done, and how much it matters, which is one of
+ * {@link alfred.task.Priority} — and the three kinds differ in the dates
  * they carry: {@link alfred.task.ToDo} has none,
  * {@link alfred.task.Deadline} has a day it is due, and
  * {@link alfred.task.Event} spans a stretch of days.

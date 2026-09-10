@@ -134,6 +134,7 @@ public class DialogBox extends HBox {
         case "AddCommand" -> dialog.getStyleClass().add("add-label");
         case "MarkCommand", "UnmarkCommand" -> dialog.getStyleClass().add("marked-label");
         case "DeleteCommand" -> dialog.getStyleClass().add("delete-label");
+        case "PriorityCommand" -> dialog.getStyleClass().add("priority-label");
         default -> {
             // Any other command leaves the bubble its plain color.
         }

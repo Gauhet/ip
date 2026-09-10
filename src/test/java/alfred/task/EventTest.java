@@ -89,6 +89,22 @@ public class EventTest {
         assertEquals("1", event.toFileFields().get(1));
     }
 
+    @Test
+    public void toFileFields_prioritySet_levelAfterBothDates() {
+        Event event = createThreeDayEvent();
+        event.setPriority(Priority.LOW);
+        assertEquals(List.of("E", "0", "project meeting", "2019-12-02", "2019-12-04", "LOW"),
+                event.toFileFields());
+    }
+
+    @Test
+    public void toString_prioritySet_boxBeforeTheDates() {
+        Event event = createThreeDayEvent();
+        event.setPriority(Priority.HIGH);
+        assertEquals("[E][ ][HIGH] project meeting (from: Dec 02 2019 to: Dec 04 2019)",
+                event.toString());
+    }
+
     /**
      * Returns an event running from December 2 to December 4, the fixture the
      * range tests are built around.

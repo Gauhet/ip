@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import alfred.task.Deadline;
 import alfred.task.Event;
+import alfred.task.Priority;
 import alfred.task.Task;
 import alfred.task.ToDo;
 
@@ -20,7 +21,7 @@ import alfred.task.ToDo;
  * <pre>
  * T | 1 | read book
  * D | 0 | return book | 2019-10-15
- * E | 0 | project meeting | 2019-12-02 | 2019-12-03
+ * E | 0 | project meeting | 2019-12-02 | 2019-12-03 | MEDIUM
  * </pre>
  *
  * <p>The first field is the type letter, the second is 1 for a task that is
@@ -28,6 +29,10 @@ import alfred.task.ToDo;
  * after that belong to the type, each written as {@code yyyy-mm-dd}. A
  * description may itself contain the separator, as in {@code todo a | b}, so
  * that character is escaped on the way out and restored on the way in.
+ *
+ * <p>A task with a priority carries it in one last field, after the dates. A
+ * task without one has no such field, so a file written before this program
+ * knew about priorities is still read.
  */
 public class Storage {
     /** What goes between two fields of a line, with a space on each side. */
@@ -39,7 +44,7 @@ public class Storage {
     /** Marks the character after it as part of a field rather than as a separator. */
     private static final char ESCAPE_CHAR = '\\';
 
-    /** How many fields a line has, by type letter, counting the type letter itself. */
+    /** How many fields a line has, by type letter, not counting a priority. */
     private static final int FIELDS_TODO = 3;
 
     private static final int FIELDS_DEADLINE = 4;
@@ -271,12 +276,11 @@ public class Storage {
      *
      * @param fields the fields of a line whose type letter is {@code T}.
      * @return the todo those fields describe.
-     * @throws AlfredException if the line holds the wrong number of fields, or
-     *         its description is empty.
+     * @throws AlfredException if the line cannot be read as a todo.
      */
-    private static ToDo parseToDo(List<String> fields) throws AlfredException {
+    private static Task parseToDo(List<String> fields) throws AlfredException {
         checkFieldCount(fields, FIELDS_TODO);
-        return new ToDo(readDescription(fields));
+        return withPriority(new ToDo(readDescription(fields)), fields, FIELDS_TODO);
     }
 
     /**
@@ -284,12 +288,12 @@ public class Storage {
      *
      * @param fields the fields of a line whose type letter is {@code D}.
      * @return the deadline those fields describe.
-     * @throws AlfredException if the line holds the wrong number of fields, its
-     *         description is empty, or its date cannot be read.
+     * @throws AlfredException if the line cannot be read as a deadline.
      */
-    private static Deadline parseDeadline(List<String> fields) throws AlfredException {
+    private static Task parseDeadline(List<String> fields) throws AlfredException {
         checkFieldCount(fields, FIELDS_DEADLINE);
-        return new Deadline(readDescription(fields), Dates.parse(fields.get(INDEX_FIRST_DATE)));
+        return withPriority(new Deadline(readDescription(fields),
+                Dates.parse(fields.get(INDEX_FIRST_DATE))), fields, FIELDS_DEADLINE);
     }
 
     /**
@@ -297,28 +301,47 @@ public class Storage {
      *
      * @param fields the fields of a line whose type letter is {@code E}.
      * @return the event those fields describe.
-     * @throws AlfredException if the line holds the wrong number of fields, its
-     *         description is empty, or either of its dates cannot be read.
+     * @throws AlfredException if the line cannot be read as an event.
      */
-    private static Event parseEvent(List<String> fields) throws AlfredException {
+    private static Task parseEvent(List<String> fields) throws AlfredException {
         checkFieldCount(fields, FIELDS_EVENT);
-        return new Event(readDescription(fields), Dates.parse(fields.get(INDEX_FIRST_DATE)),
-                Dates.parse(fields.get(INDEX_SECOND_DATE)));
+        return withPriority(new Event(readDescription(fields),
+                Dates.parse(fields.get(INDEX_FIRST_DATE)),
+                Dates.parse(fields.get(INDEX_SECOND_DATE))), fields, FIELDS_EVENT);
     }
 
     /**
-     * Refuses a line that does not hold exactly the fields its type calls for.
+     * Refuses a line that does not hold the fields its type calls for, with or
+     * without the one a priority adds at the end.
      *
      * @param fields the fields the line was split into.
-     * @param expectedFields how many fields the line's type letter calls for.
+     * @param baseFields how many fields the type calls for without a priority.
      * @throws AlfredException if the line holds any other number of them.
      */
-    private static void checkFieldCount(List<String> fields, int expectedFields)
+    private static void checkFieldCount(List<String> fields, int baseFields)
             throws AlfredException {
-        if (fields.size() != expectedFields) {
+        if (fields.size() != baseFields && fields.size() != baseFields + 1) {
             throw new AlfredException("A " + fields.get(INDEX_TYPE) + " line needs "
-                    + expectedFields + " fields");
+                    + baseFields + " fields, or " + (baseFields + 1) + " with a priority");
         }
+    }
+
+    /**
+     * Returns a task carrying the priority its save line gives it, or the task
+     * unchanged if the line has no such field.
+     *
+     * @param task the task the rest of the line described.
+     * @param fields the fields the line was split into.
+     * @param baseFields how many fields the type carries before a priority.
+     * @return the same task.
+     * @throws AlfredException if the extra field names no level.
+     */
+    private static Task withPriority(Task task, List<String> fields, int baseFields)
+            throws AlfredException {
+        if (fields.size() > baseFields) {
+            task.setPriority(Priority.parse(fields.get(baseFields)));
+        }
+        return task;
     }
 
     /**

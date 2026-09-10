@@ -9,15 +9,19 @@ import alfred.Storage;
 
 /**
  * A task the user has asked Alfred to remember, together with whether it has
- * been completed. Each kind of task is a subclass that puts its own type box,
- * such as {@code [T]}, in front of the display form defined here.
+ * been completed and how much it matters. Each kind of task is a subclass that
+ * puts its own type box, such as {@code [T]}, in front of the display form
+ * defined here.
  */
 public abstract class Task {
     /** What the user has to do, in the words they described it in. */
     private final String name;
 
-    /** Whether the task has been completed, the one thing about it that changes. */
+    /** Whether the task has been completed. */
     private boolean isDone;
+
+    /** How much the task matters. */
+    private Priority priority = Priority.NONE;
 
     /**
      * Creates a task that starts out not done.
@@ -66,10 +70,18 @@ public abstract class Task {
         isDone = false;
     }
 
+    public void setPriority(Priority priority) {
+        this.priority = priority;
+    }
+
+    public Priority getPriority() {
+        return priority;
+    }
+
     /**
      * Returns this task's fields, in the order they are saved: the type letter,
-     * the status, the description, and then whatever the kind of task carries of
-     * its own.
+     * the status, the description, whatever the kind of task carries of its own,
+     * and last of all the priority, if it has one.
      *
      * <p>The fields are returned separately rather than joined into a line, so
      * that only {@link Storage} knows what separates them.
@@ -81,11 +93,14 @@ public abstract class Task {
     /**
      * Returns the fields of one save line: the type letter, then the status and
      * the description that every task saves, then any fields this kind adds of
-     * its own. The status is a digit rather than a box, because the file is read
-     * by the program rather than by a person.
+     * its own, then the priority. The status is a digit rather than a box,
+     * because the file is read by the program rather than by a person.
      *
      * <p>The extra fields are varargs because each kind has a different number
      * of them: none for a todo, one for a deadline, two for an event.
+     *
+     * <p>The priority goes last and is left out when there is none, so a list
+     * without priorities saves as the file earlier versions wrote.
      *
      * @param type the letter naming the kind of task, such as {@code D}.
      * @param extraFields the fields this kind adds after the description, in the
@@ -98,17 +113,22 @@ public abstract class Task {
         // the subclasses call this, so a wrong letter is a fault here.
         assert type.length() == 1 : "a save line's type is one letter, not '" + type + "'";
 
-        return Stream.concat(Stream.of(type, isDone ? "1" : "0", name), Arrays.stream(extraFields))
-                .toList();
+        Stream<String> fields = Stream.concat(Stream.of(type, isDone ? "1" : "0", name),
+                Arrays.stream(extraFields));
+        if (priority != Priority.NONE) {
+            fields = Stream.concat(fields, Stream.of(priority.name()));
+        }
+        return fields.toList();
     }
 
     /**
-     * Returns the status box and description, for example {@code [X] read book}.
+     * Returns the status box, the priority box if the task has one, and the
+     * description, for example {@code [X][HIGH] read book}.
      *
      * @return the display form of this task, without any type box.
      */
     @Override
     public String toString() {
-        return (isDone ? "[X] " : "[ ] ") + name;
+        return (isDone ? "[X]" : "[ ]") + priority.box() + " " + name;
     }
 }

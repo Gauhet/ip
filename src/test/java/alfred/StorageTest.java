@@ -15,6 +15,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 import alfred.task.Deadline;
 import alfred.task.Event;
+import alfred.task.Priority;
 import alfred.task.Task;
 import alfred.task.ToDo;
 
@@ -165,7 +166,7 @@ public class StorageTest {
 
     @Test
     public void load_tooManyFields_lineSkipped() throws AlfredException, IOException {
-        assertLineSkipped("T | 0 | read book | 2019-10-15");
+        assertLineSkipped("T | 0 | read book | HIGH | extra");
     }
 
     @Test
@@ -189,6 +190,48 @@ public class StorageTest {
         // Caught as an AlfredException rather than escaping as an unchecked one,
         // which is what keeps the rest of the file readable.
         assertLineSkipped("D | 0 | return book | 2019-02-30");
+    }
+
+    @Test
+    public void save_prioritySet_levelWrittenLast() throws AlfredException, IOException {
+        ToDo todo = new ToDo("submit report");
+        todo.setPriority(Priority.HIGH);
+        Event event = new Event("project meeting", DEC_2, DEC_3);
+        event.setPriority(Priority.MEDIUM);
+        storage.save(List.of(todo, new ToDo("read book"), event));
+        assertEquals(List.of("T | 0 | submit report | HIGH",
+                        "T | 0 | read book",
+                        "E | 0 | project meeting | 2019-12-02 | 2019-12-03 | MEDIUM"),
+                Files.readAllLines(file));
+    }
+
+    @Test
+    public void saveThenLoad_prioritySet_priorityRestored() throws AlfredException {
+        ToDo todo = new ToDo("submit report");
+        todo.setPriority(Priority.LOW);
+        storage.save(List.of(todo));
+        Storage.LoadResult result = storage.load();
+        assertEquals(0, result.skippedLines());
+        assertEquals("[T][ ][LOW] submit report", result.tasks().get(0).toString());
+    }
+
+    @Test
+    public void load_fileWrittenBeforePrioritiesExisted_everyTaskRestoredWithNone()
+            throws AlfredException, IOException {
+        Files.write(file, List.of("T | 1 | read book",
+                "D | 0 | return book | 2019-10-15",
+                "E | 0 | project meeting | 2019-12-02 | 2019-12-03"));
+        Storage.LoadResult result = storage.load();
+        assertEquals(0, result.skippedLines());
+        assertEquals(List.of("[T][X] read book",
+                        "[D][ ] return book (by: Oct 15 2019)",
+                        "[E][ ] project meeting (from: Dec 02 2019 to: Dec 03 2019)"),
+                describeAll(result.tasks()));
+    }
+
+    @Test
+    public void load_priorityNamingNoLevel_lineSkipped() throws AlfredException, IOException {
+        assertLineSkipped("T | 0 | read book | urgent");
     }
 
     @Test

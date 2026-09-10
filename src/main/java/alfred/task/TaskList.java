@@ -132,6 +132,22 @@ public class TaskList {
     }
 
     /**
+     * Sets how much the task at one position matters, {@link Priority#NONE}
+     * taking its priority off again.
+     *
+     * @param index which task, counting from 0.
+     * @param priority the level to give it.
+     * @return the task, now carrying its new priority.
+     * @throws AlfredException if no task is stored at that index.
+     */
+    public Task setPriority(int index, Priority priority) throws AlfredException {
+        checkIndex(index);
+        Task task = tasks.get(index);
+        task.setPriority(priority);
+        return task;
+    }
+
+    /**
      * Refuses an index that names no stored task.
      *
      * <p>Checked before the list is asked, because the list would answer with an

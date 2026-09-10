@@ -1993,6 +1993,227 @@ bye
 
 ---
 
+## TC26: `priority` sets a level and `list` shows it
+
+**Aim:** `priority <number> <level>` gives one task a level and `list` shows
+that box between the status box and the description.
+
+The level goes on the second task, so a command acting on the wrong one would
+show up, and the first task keeps no box at all — a task nobody has prioritized
+displays exactly as it did before this feature existed.
+
+**Input:**
+
+```
+todo read book
+todo submit report
+priority 2 high
+list
+bye
+```
+
+**Expected output:**
+
+```
+    ____________________________________________________________
+            _     _      _____  ____   _____  ____
+           / \   | |    |  ___||  _ \ | ____||  _ \
+          / _ \  | |    | |_   | |_) ||  _|  | | | |
+         / ___ \ | |___ |  _|  |  _ < | |___ | |_| |
+        /_/   \_\|_____||_|    |_| \_\|_____||____/
+                    P E N N Y W O R T H
+
+      Butler to the Wayne family  --  At your service
+     Hello! I'm AlfredTheButler
+     What can I do for you?
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Got it. I've added this task:
+       [T][ ] read book
+     Now you have 1 task in the list.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Got it. I've added this task:
+       [T][ ] submit report
+     Now you have 2 tasks in the list.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Very good. I've set this task's priority:
+       [T][ ][HIGH] submit report
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Here are the tasks in your list:
+     1.[T][ ] read book
+     2.[T][ ][HIGH] submit report
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Bye. Hope to see you again soon!
+    ____________________________________________________________
+
+```
+
+---
+
+## TC27: A priority can be changed and taken off again
+
+**Aim:** A second `priority` on the same task replaces the level rather than
+adding to it, and `priority <number> none` takes the priority off again.
+
+`list` runs after the change and after the removal, so the level is read back
+from the stored task rather than only from the confirmation printed at the time.
+
+**Input:**
+
+```
+todo submit report
+priority 1 low
+priority 1 high
+list
+priority 1 none
+list
+bye
+```
+
+**Expected output:**
+
+```
+    ____________________________________________________________
+            _     _      _____  ____   _____  ____
+           / \   | |    |  ___||  _ \ | ____||  _ \
+          / _ \  | |    | |_   | |_) ||  _|  | | | |
+         / ___ \ | |___ |  _|  |  _ < | |___ | |_| |
+        /_/   \_\|_____||_|    |_| \_\|_____||____/
+                    P E N N Y W O R T H
+
+      Butler to the Wayne family  --  At your service
+     Hello! I'm AlfredTheButler
+     What can I do for you?
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Got it. I've added this task:
+       [T][ ] submit report
+     Now you have 1 task in the list.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Very good. I've set this task's priority:
+       [T][ ][LOW] submit report
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Very good. I've set this task's priority:
+       [T][ ][HIGH] submit report
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Here are the tasks in your list:
+     1.[T][ ][HIGH] submit report
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Very good. I've taken the priority off this task:
+       [T][ ] submit report
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Here are the tasks in your list:
+     1.[T][ ] submit report
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Bye. Hope to see you again soon!
+    ____________________________________________________________
+
+```
+
+---
+
+## TC28: `priority` checks both of its parts
+
+**Aim:** The command is refused when either part is missing, when the number is
+not a number, when the level is not a level, and when the number names no task —
+each with the message for that fault, and each leaving the list alone.
+
+The five refusals come in the order the program checks them: a missing part, a
+number that is not a number, a level that is not a level, and last a well-formed
+command whose number names no task, which only the task list can say. The
+closing `list` is the assertion that matters most — after five refusals the one
+stored task is untouched and still carries no priority.
+
+**Input:**
+
+```
+todo read book
+priority
+priority 1
+priority two high
+priority 1 urgent
+priority 9 high
+list
+bye
+```
+
+**Expected output:**
+
+```
+    ____________________________________________________________
+            _     _      _____  ____   _____  ____
+           / \   | |    |  ___||  _ \ | ____||  _ \
+          / _ \  | |    | |_   | |_) ||  _|  | | | |
+         / ___ \ | |___ |  _|  |  _ < | |___ | |_| |
+        /_/   \_\|_____||_|    |_| \_\|_____||____/
+                    P E N N Y W O R T H
+
+      Butler to the Wayne family  --  At your service
+     Hello! I'm AlfredTheButler
+     What can I do for you?
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Got it. I've added this task:
+       [T][ ] read book
+     Now you have 1 task in the list.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     The priority command needs a task number and a level, sir.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     The priority command needs a task number and a level, sir.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     That is not a task number, sir.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     I know high, medium, low, and none as priorities, sir.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     There is no such task, sir.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Here are the tasks in your list:
+     1.[T][ ] read book
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Bye. Hope to see you again soon!
+    ____________________________________________________________
+
+```
+
+---
+
 ## Known gaps (not yet covered)
 
 No invalid command crashes the program any more. Blank input, an unknown
@@ -2012,6 +2233,11 @@ covered by TC22, and the ways that question can be malformed by TC23.
 
 Searching descriptions for a keyword is covered by TC24, and a missing keyword,
 a keyword that matches nothing, and a keyword of several words by TC25.
+
+Attaching a priority to a task is covered by TC26, changing one and taking it
+off again by TC27, and the ways the command can be malformed by TC28. That a
+task without a priority displays as it did before priorities existed is covered
+by every case before TC26, none of which needed changing.
 
 One gap is a limit of the program rather than of the tests. Only `yyyy-mm-dd` is
 accepted, so `2/12/2019` is refused rather than understood, and a time of day
@@ -2036,3 +2262,7 @@ The rest are limits of the tests rather than of the program.
   aside before the first overwrite would close this properly.
 * The safety net that catches an unexpected fault inside a command is not
   covered, since reaching it needs a bug to exist.
+* A priority surviving a restart, and a save file written before priorities
+  existed still loading, are covered by `StorageTest` rather than here. Both are
+  properties of one round trip through the file, which a unit test states in
+  five lines and a case here would state in two full console transcripts.
