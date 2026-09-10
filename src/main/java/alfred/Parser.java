@@ -10,9 +10,11 @@ import alfred.command.FindCommand;
 import alfred.command.ListCommand;
 import alfred.command.MarkCommand;
 import alfred.command.OnCommand;
+import alfred.command.PriorityCommand;
 import alfred.command.UnmarkCommand;
 import alfred.task.Deadline;
 import alfred.task.Event;
+import alfred.task.Priority;
 import alfred.task.Task;
 import alfred.task.TaskList;
 import alfred.task.ToDo;
@@ -79,6 +81,7 @@ public class Parser {
         case "mark" -> new MarkCommand(parseTaskIndex(arguments));
         case "unmark" -> new UnmarkCommand(parseTaskIndex(arguments));
         case "delete" -> new DeleteCommand(parseTaskIndex(arguments));
+        case "priority" -> parsePriority(arguments);
         case "on" -> new OnCommand(parseOnDate(arguments));
         case "find" -> new FindCommand(parseKeyword(arguments));
         // Only the keyword is quoted back. Repeating the whole line would
@@ -162,6 +165,25 @@ public class Parser {
             throw new AlfredException("An event cannot end before it starts, sir.");
         }
         return new Event(description, start, end);
+    }
+
+    /**
+     * Builds the command a {@code priority <number> <level>} line asks for.
+     *
+     * <p>Whether the number names a task is {@link TaskList}'s to answer, as it
+     * is for {@code mark}.
+     *
+     * @param arguments everything the user typed after {@code priority}.
+     * @return the command the arguments describe.
+     * @throws AlfredException if either part is missing, if the number is not a
+     *         number, or if the level names no level.
+     */
+    private static Command parsePriority(String arguments) throws AlfredException {
+        String[] parts = arguments.split(" ", 2);
+        if (parts.length < 2) {
+            throw new AlfredException("The priority command needs a task number and a level, sir.");
+        }
+        return new PriorityCommand(parseTaskIndex(parts[0]), Priority.parse(parts[1].trim()));
     }
 
     /**

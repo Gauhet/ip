@@ -71,9 +71,9 @@ public class AlfredTheButler {
      * Greets the user, then handles one command per line until {@code bye} or
      * the end of the input: {@code list}, {@code find <keyword>},
      * {@code on <date>}, {@code mark <number>}, {@code unmark <number>},
-     * {@code delete <number>}, and the three that add a task, {@code todo},
-     * {@code deadline}, and {@code event}. Any other word is refused rather
-     * than guessed at.
+     * {@code delete <number>}, {@code priority <number> <level>}, and the three
+     * that add a task, {@code todo}, {@code deadline}, and {@code event}. Any
+     * other word is refused rather than guessed at.
      *
      * <p>Commands run inside a {@code try} so that a mistake in what was typed
      * becomes an ordinary reply.

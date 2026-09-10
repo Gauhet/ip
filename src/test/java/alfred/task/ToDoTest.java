@@ -110,4 +110,18 @@ public class ToDoTest {
         todo.markDone();
         assertEquals(List.of("T", "1", "read book"), todo.toFileFields());
     }
+
+    @Test
+    public void toString_prioritySet_boxBetweenStatusAndDescription() {
+        ToDo todo = new ToDo("read book");
+        todo.setPriority(Priority.HIGH);
+        assertEquals("[T][ ][HIGH] read book", todo.toString());
+    }
+
+    @Test
+    public void toFileFields_prioritySet_levelAfterDescription() {
+        ToDo todo = new ToDo("read book");
+        todo.setPriority(Priority.MEDIUM);
+        assertEquals(List.of("T", "0", "read book", "MEDIUM"), todo.toFileFields());
+    }
 }

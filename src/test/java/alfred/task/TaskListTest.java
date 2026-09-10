@@ -165,6 +165,38 @@ public class TaskListTest {
     }
 
     @Test
+    public void setPriority_validIndex_storedTaskPrioritizedAndReturned() throws AlfredException {
+        Task prioritized = tasks.setPriority(1, Priority.HIGH);
+        assertSame(tasks.get(1), prioritized);
+        assertEquals("[T][ ][HIGH] second", tasks.get(1).toString());
+        assertEquals("[T][ ] first", tasks.get(0).toString());
+    }
+
+    @Test
+    public void setPriority_taskAlreadyPrioritized_levelReplaced() throws AlfredException {
+        tasks.setPriority(0, Priority.HIGH);
+        tasks.setPriority(0, Priority.LOW);
+        assertEquals("[T][ ][LOW] first", tasks.get(0).toString());
+    }
+
+    @Test
+    public void setPriority_none_priorityTakenOff() throws AlfredException {
+        tasks.setPriority(0, Priority.MEDIUM);
+        tasks.setPriority(0, Priority.NONE);
+        assertEquals("[T][ ] first", tasks.get(0).toString());
+    }
+
+    @Test
+    public void setPriority_indexBelowRange_exceptionThrown() {
+        assertRefused(() -> tasks.setPriority(-1, Priority.HIGH));
+    }
+
+    @Test
+    public void setPriority_indexJustPastEnd_exceptionThrown() {
+        assertRefused(() -> tasks.setPriority(3, Priority.HIGH));
+    }
+
+    @Test
     public void newList_sourceArrayChangedAfterwards_storedTasksUnaffected() {
         // An array passed to a varargs parameter is the caller's own array, not
         // one the call made, so the copying the class promises has to cover it.

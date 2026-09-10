@@ -20,6 +20,7 @@ import alfred.command.FindCommand;
 import alfred.command.ListCommand;
 import alfred.command.MarkCommand;
 import alfred.command.OnCommand;
+import alfred.command.PriorityCommand;
 import alfred.command.UnmarkCommand;
 import alfred.task.TaskList;
 
@@ -52,6 +53,11 @@ public class ParserTest {
             "An event needs a description, a /from date, and a /to date, sir.";
 
     private static final String NOT_A_NUMBER = "That is not a task number, sir.";
+
+    private static final String NOT_A_LEVEL = "I know high, medium, low, and none as priorities, sir.";
+
+    private static final String PRIORITY_COMPLAINT =
+            "The priority command needs a task number and a level, sir.";
 
     /** The list a parsed command is carried out against, fresh for every test. */
     private TaskList tasks;
@@ -128,6 +134,11 @@ public class ParserTest {
     }
 
     @Test
+    public void parse_priority_priorityCommandReturned() throws AlfredException {
+        assertInstanceOf(PriorityCommand.class, Parser.parse("priority 1 high"));
+    }
+
+    @Test
     public void parse_todoWithDescription_todoAdded() throws AlfredException {
         run("todo read book");
         assertEquals(1, tasks.size());
@@ -185,6 +196,23 @@ public class ParserTest {
         run("todo read book");
         run("mark 1");
         run("unmark 1");
+        assertEquals("[T][ ] read book", tasks.get(0).toString());
+    }
+
+    @Test
+    public void parse_prioritySecondTask_secondTaskPrioritized() throws AlfredException {
+        run("todo first");
+        run("todo second");
+        run("priority 2 high");
+        assertEquals("[T][ ] first", tasks.get(0).toString());
+        assertEquals("[T][ ][HIGH] second", tasks.get(1).toString());
+    }
+
+    @Test
+    public void parse_priorityNone_priorityTakenOff() throws AlfredException {
+        run("todo read book");
+        run("priority 1 low");
+        run("priority 1 none");
         assertEquals("[T][ ] read book", tasks.get(0).toString());
     }
 
@@ -300,6 +328,36 @@ public class ParserTest {
     @Test
     public void parse_deleteWithNonNumber_exceptionThrown() {
         assertRefused("delete two", NOT_A_NUMBER);
+    }
+
+    @Test
+    public void parse_priorityWithoutAnything_exceptionThrown() {
+        assertRefused("priority", PRIORITY_COMPLAINT);
+    }
+
+    @Test
+    public void parse_priorityWithoutLevel_exceptionThrown() {
+        assertRefused("priority 1", PRIORITY_COMPLAINT);
+    }
+
+    @Test
+    public void parse_priorityWithoutNumber_exceptionThrown() {
+        assertRefused("priority high", PRIORITY_COMPLAINT);
+    }
+
+    @Test
+    public void parse_priorityWithNonNumber_exceptionThrown() {
+        assertRefused("priority two high", NOT_A_NUMBER);
+    }
+
+    @Test
+    public void parse_priorityWithUnknownLevel_levelRefusalSurfaces() {
+        assertRefused("priority 1 urgent", NOT_A_LEVEL);
+    }
+
+    @Test
+    public void parse_priorityWithWordsAfterTheLevel_exceptionThrown() {
+        assertRefused("priority 1 high please", NOT_A_LEVEL);
     }
 
     /**
