@@ -43,6 +43,12 @@ public class AlfredTheButler {
     private String commandType;
 
     /**
+     * Whether the last reply was a refusal or a fault rather than an answer.
+     * Kept so that the window can show an error in a way that catches the eye.
+     */
+    private boolean isLastResponseError;
+
+    /**
      * Sets up a run that keeps its tasks in one named file.
      *
      * <p>Nothing is read here: loading has something to say to the user, and it
@@ -139,16 +145,31 @@ public class AlfredTheButler {
             Command command = Parser.parse(input.trim());
             command.execute(tasks, ui, storage);
             commandType = command.getClass().getSimpleName();
+            isLastResponseError = false;
         } catch (AlfredException e) {
             // Forgotten rather than left as it was, so that a refusal is not
             // colored as though the command before it had just run again.
             commandType = null;
+            isLastResponseError = true;
             ui.showError(e.getMessage());
         } catch (RuntimeException e) {
             commandType = null;
+            isLastResponseError = true;
             ui.showInternalError(e);
         }
         return ui.stopCapturing();
+    }
+
+    /**
+     * Returns whether the last reply from {@link #getResponse(String)} was an
+     * error rather than an answer: a line that was refused, or a fault in the
+     * program while carrying it out.
+     *
+     * @return true if the last reply was an error, and false otherwise, including
+     *     before any line has been answered.
+     */
+    public boolean isLastResponseError() {
+        return isLastResponseError;
     }
 
     /**

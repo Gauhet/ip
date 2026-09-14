@@ -3,6 +3,7 @@ package alfred;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.file.Path;
 
@@ -183,6 +184,39 @@ public class AlfredTheButlerTest {
 
         alfred.getResponse("mark 9");
         assertNull(alfred.getCommandType());
+    }
+
+    @Test
+    public void isLastResponseError_beforeAnyCommand_false() {
+        assertFalse(alfred.isLastResponseError());
+    }
+
+    @Test
+    public void isLastResponseError_commandCarriedOut_false() {
+        alfred.getResponse("todo polish the silver");
+        assertFalse(alfred.isLastResponseError());
+    }
+
+    @Test
+    public void isLastResponseError_unknownCommand_true() {
+        alfred.getResponse("blah");
+        assertTrue(alfred.isLastResponseError());
+    }
+
+    @Test
+    public void isLastResponseError_noSuchTask_true() {
+        alfred.getResponse("todo polish the silver");
+
+        alfred.getResponse("mark 9");
+        assertTrue(alfred.isLastResponseError());
+    }
+
+    @Test
+    public void isLastResponseError_commandAfterAnError_falseAgain() {
+        alfred.getResponse("blah");
+
+        alfred.getResponse("todo polish the silver");
+        assertFalse(alfred.isLastResponseError());
     }
 
     @Test
