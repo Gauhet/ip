@@ -29,11 +29,17 @@ Prerequisites: JDK 25, update IntelliJ to the most recent version.
                        P E N N Y W O R T H
 
          Butler to the Wayne family  --  At your service
-   Hello! I'm AlfredTheButler
-   What can I do for you?
-   ____________________________________________________________
-   Bye. Hope to see you again soon!
-   ____________________________________________________________
+        Good day, sir. Alfred Pennyworth, at your disposal.
+        What may I do for you?
+       ____________________________________________________________
+   ```
+
+   Alfred then waits for a command. Type `bye` to end the session:
+
+   ```
+       ____________________________________________________________
+        Very good, sir. I shall be here when you need me.
+       ____________________________________________________________
    ```
 
 ## Creating and running the JAR file
@@ -63,3 +69,9 @@ The build script uses the [Gradle Shadow plugin](https://gradleup.com/shadow/) t
    Either way, the program saves your task list to a `data` folder inside the folder you run the command from, so run it from the folder where you want that data kept.
 
 **Warning:** Keep the `src\main\java` folder as the root folder for Java files (i.e., don't rename those folders or move Java files to another folder outside of this folder path), as this is the default location some tools (e.g., Gradle) expect to find Java files.
+
+## Acknowledgments
+
+* The project started from the [NUS-CS2103-AY2627-S1/ip](https://github.com/NUS-CS2103-AY2627-S1/ip) starter template, which supplied the Gradle build, the Checkstyle configuration, and the layout of this README.
+* The window is adapted from the [SE-EDU JavaFX tutorial](https://se-education.org/guides/tutorials/javaFx.html): `Launcher`, `Main`, `MainWindow`, and `DialogBox` in `src/main/java/alfred/gui`, and the FXML files in `src/main/resources/view`, follow its structure. The styling and the layout of the dialog boxes are this project's own.
+* Parts of the code, the tests, and the documentation were written with the help of [Claude Code](https://claude.com/claude-code), an AI coding assistant from Anthropic, working from the instructions in `AGENTS.md`.
