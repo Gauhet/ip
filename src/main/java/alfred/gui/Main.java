@@ -6,7 +6,7 @@ import alfred.AlfredTheButler;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 /**
@@ -19,10 +19,10 @@ import javafx.stage.Stage;
  */
 public class Main extends Application {
     /** The shortest the window may be drawn before the conversation stops being usable. */
-    private static final int MIN_WINDOW_HEIGHT = 220;
+    private static final int MIN_WINDOW_HEIGHT = 240;
 
     /** The narrowest it may be drawn before the text field stops being usable. */
-    private static final int MIN_WINDOW_WIDTH = 417;
+    private static final int MIN_WINDOW_WIDTH = 360;
 
     /** The chatbot the window is given. */
     private final AlfredTheButler alfred = new AlfredTheButler();
@@ -36,17 +36,22 @@ public class Main extends Application {
     public void start(Stage stage) {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/view/MainWindow.fxml"));
-            AnchorPane mainLayout = fxmlLoader.load();
+            VBox mainLayout = fxmlLoader.load();
             stage.setScene(new Scene(mainLayout));
-            fxmlLoader.<MainWindow>getController().setAlfred(alfred);
+            MainWindow mainWindow = fxmlLoader.getController();
+            mainWindow.setAlfred(alfred);
 
-            // The controls follow the edges they are anchored to, so the window
-            // can be resized, down to the smallest size it still reads at.
+            // The conversation grows to fill whatever room the window has, so
+            // the window can be resized, down to the smallest size it still
+            // reads at.
             stage.setTitle("AlfredTheButler");
             stage.setMinHeight(MIN_WINDOW_HEIGHT);
             stage.setMinWidth(MIN_WINDOW_WIDTH);
 
             stage.show();
+            // Asked for after the window is shown, because focus cannot land on
+            // a control that is not yet on the screen.
+            mainWindow.focusInput();
         } catch (IOException e) {
             // The layout ships with the program, so a failure to read it is a
             // fault in the program and not something the user could act on.
