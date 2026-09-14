@@ -22,7 +22,7 @@ public class Dates {
     private static final String DATE_INPUT_EXAMPLE = "2019-10-15";
 
     /**
-     * The shape of that format: four digits, then two, then two.
+     * Matches text of that shape: four digits, then two, then two.
      *
      * <p>Matching says only that the text is shaped like a date, not that it
      * names a day that exists: {@code 2019-02-30} matches and {@code Sunday}
@@ -31,7 +31,7 @@ public class Dates {
     private static final Pattern DATE_INPUT_SHAPE = Pattern.compile("\\d{4}-\\d{2}-\\d{2}");
 
     /**
-     * The format a date is shown in, for example {@code Oct 15 2019}.
+     * Formats a date the way it is shown, for example {@code Oct 15 2019}.
      *
      * <p>The locale is pinned to English so the month name does not change with
      * the computer the program runs on.

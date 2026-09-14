@@ -31,21 +31,21 @@ import alfred.task.ToDo;
  */
 public class Parser {
     /**
-     * Keyword that separates a deadline's description from its due time. The
-     * surrounding spaces are not part of it, so that a missing description can
-     * be told apart from a missing keyword.
+     * Separates a deadline's description from its due time. The surrounding
+     * spaces are not part of it, so that a missing description can be told
+     * apart from a missing keyword.
      */
     private static final String SEPARATOR_BY = "/by";
 
-    /** Keyword that separates an event's description from its start time. */
+    /** Separates an event's description from its start time. */
     private static final String SEPARATOR_FROM = "/from";
 
-    /** Keyword that separates an event's start time from its end time. */
+    /** Separates an event's start time from its end time. */
     private static final String SEPARATOR_TO = "/to";
 
     /**
-     * A run of one or more whitespace characters, tabs included. Every such
-     * run in a line is squeezed to one space before the line is read.
+     * Matches a run of one or more whitespace characters, tabs included. Every
+     * such run in a line is squeezed to one space before the line is read.
      */
     private static final Pattern WHITESPACE = Pattern.compile("\\s+");
 

@@ -9,7 +9,7 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
 
 /**
- * What the main window does, as against what it looks like.
+ * Controls what the main window does, as against what it looks like.
  *
  * <p>The arrangement of the window is described in
  * {@code view/MainWindow.fxml}, and this class holds what happens in it. The two

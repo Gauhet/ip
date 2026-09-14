@@ -1,6 +1,6 @@
 /**
- * Alfred the Butler: a chatbot that keeps a list of tasks, taking one typed
- * command per line and saving the list to disk after every change.
+ * Provides Alfred the Butler, a chatbot that keeps a list of tasks, taking one
+ * typed command per line and saving the list to disk after every change.
  *
  * <p>{@link alfred.AlfredTheButler} holds the command loop. Each round of the
  * conversation passes through four parts, and this package holds three of them:

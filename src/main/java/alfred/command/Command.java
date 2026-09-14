@@ -7,7 +7,7 @@ import alfred.Ui;
 import alfred.task.TaskList;
 
 /**
- * Something the user has asked for, ready to be carried out.
+ * Represents something the user has asked for, ready to be carried out.
  *
  * <p>A command is made by {@link Parser} and holds whatever the line supplied.
  * What it acts on — the task list, the screen, the save file — arrives as

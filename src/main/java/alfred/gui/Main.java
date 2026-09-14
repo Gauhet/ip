@@ -10,7 +10,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 /**
- * The graphical version of Alfred, as a JavaFX application.
+ * Runs the graphical version of Alfred as a JavaFX application.
  *
  * <p>This class reads the layout, puts it on the stage, and hands the window the
  * chatbot to ask. The chatbot is made here because the window is made by the

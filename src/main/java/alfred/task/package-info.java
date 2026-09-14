@@ -1,5 +1,5 @@
 /**
- * The tasks themselves, and the list they are kept in.
+ * Holds the tasks themselves, and the list they are kept in.
  *
  * <p>{@link alfred.task.Task} holds what every kind of task shares — a
  * description, whether it is done, and how much it matters, which is one of

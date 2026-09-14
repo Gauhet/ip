@@ -12,7 +12,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.shape.Circle;
 
 /**
- * One message in the conversation.
+ * Shows one message in the conversation.
  *
  * <p>What a dialog box looks like is described in {@code view/DialogBox.fxml}.
  * This class is left with which words a box is given, which side it sits on,

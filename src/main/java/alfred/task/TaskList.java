@@ -7,8 +7,8 @@ import alfred.AlfredException;
 import alfred.Storage;
 
 /**
- * The tasks the user is keeping, in the order they were added, with the
- * operations that change that order or its contents.
+ * Keeps the user's tasks in the order they were added, with the operations
+ * that change that order or its contents.
  *
  * <p>The operations that act on a stored task return that task, because each is
  * followed by showing the user what was affected. Those three also check the

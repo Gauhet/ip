@@ -71,9 +71,9 @@ public class Storage {
     private static final String BACKUP_SUFFIX = ".bak";
 
     /**
-     * What one call to {@link Storage#load()} found: the tasks it could read,
-     * how many lines it had to give up on, and where it kept a copy of the
-     * file if it gave up on any.
+     * Holds what one call to {@link Storage#load()} found: the tasks it could
+     * read, how many lines it had to give up on, and where it kept a copy of
+     * the file if it gave up on any.
      *
      * @param tasks the tasks that were read, in the order they were saved.
      * @param skippedLines how many lines could not be understood.

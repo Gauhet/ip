@@ -14,8 +14,8 @@ import alfred.task.Task;
 import alfred.task.TaskList;
 
 /**
- * Everything the user sees and types: the banner, the reply blocks, and the
- * line-by-line reading of commands.
+ * Handles everything the user sees and types: the banner, the reply blocks,
+ * and the line-by-line reading of commands.
  *
  * <p>The window is served by {@link #startCapturing()} and
  * {@link #stopCapturing()}: between the two, a reply is collected and handed

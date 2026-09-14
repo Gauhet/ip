@@ -3,8 +3,8 @@ package alfred.task;
 import alfred.AlfredException;
 
 /**
- * How much a task matters, or {@link #NONE} for one the user has said nothing
- * about.
+ * Ranks how much a task matters, with {@link #NONE} for one the user has said
+ * nothing about.
  */
 public enum Priority {
     HIGH,

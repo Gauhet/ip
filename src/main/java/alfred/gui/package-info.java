@@ -1,5 +1,5 @@
 /**
- * The graphical version of Alfred, built with JavaFX.
+ * Provides the graphical version of Alfred, built with JavaFX.
  *
  * <p>{@link alfred.gui.Launcher} starts the application,
  * {@link alfred.gui.Main} puts the window on the screen,

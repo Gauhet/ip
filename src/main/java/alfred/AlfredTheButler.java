@@ -5,9 +5,9 @@ import alfred.command.ExitCommand;
 import alfred.task.TaskList;
 
 /**
- * Alfred the Butler: a personal chatbot that keeps a list of tasks, taking one
- * command per line until the user says {@code bye} or the input runs out. The
- * list is saved to disk after every change and read back at startup.
+ * Runs Alfred the Butler, a personal chatbot that keeps a list of tasks, taking
+ * one command per line until the user says {@code bye} or the input runs out.
+ * The list is saved to disk after every change and read back at startup.
  *
  * <p>This class holds the command loop and nothing else that can be given a
  * home of its own: {@link Ui} owns what the user sees and types, {@link Parser}
@@ -20,9 +20,9 @@ import alfred.task.TaskList;
  */
 public class AlfredTheButler {
     /**
-     * Where a normal run keeps its tasks. Named here rather than inside
-     * {@link Storage}, so that the class that does the saving does not also
-     * decide where to save.
+     * Names the file a normal run keeps its tasks in. Kept here rather than
+     * inside {@link Storage}, so that the class that does the saving does not
+     * also decide where to save.
      */
     private static final String SAVE_FILE = "data/alfred.txt";
 
@@ -36,15 +36,16 @@ public class AlfredTheButler {
     private TaskList tasks;
 
     /**
-     * The kind of the command last carried out, named by its class, or null
-     * before any has been. Kept so that the window can color a reply by the
-     * kind of command it answers.
+     * Records the kind of the command last carried out, named by its class, or
+     * null before any has been. Kept so that the window can color a reply by
+     * the kind of command it answers.
      */
     private String commandType;
 
     /**
-     * Whether the last reply was a refusal or a fault rather than an answer.
-     * Kept so that the window can show an error in a way that catches the eye.
+     * Records whether the last reply was a refusal or a fault rather than an
+     * answer. Kept so that the window can show an error in a way that catches
+     * the eye.
      */
     private boolean isLastResponseError;
 

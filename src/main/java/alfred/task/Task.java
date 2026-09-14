@@ -8,10 +8,10 @@ import java.util.stream.Stream;
 import alfred.Storage;
 
 /**
- * A task the user has asked Alfred to remember, together with whether it has
- * been completed and how much it matters. Each kind of task is a subclass that
- * puts its own type box, such as {@code [T]}, in front of the display form
- * defined here.
+ * Represents a task the user has asked Alfred to remember, together with
+ * whether it has been completed and how much it matters. Each kind of task is
+ * a subclass that puts its own type box, such as {@code [T]}, in front of the
+ * display form defined here.
  */
 public abstract class Task {
     /** What the user has to do, in the words they described it in. */

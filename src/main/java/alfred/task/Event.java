@@ -6,7 +6,7 @@ import java.util.List;
 import alfred.Dates;
 
 /**
- * A task that spans a stretch of days, for example
+ * Represents a task that spans a stretch of days, for example
  * {@code [E][ ] project meeting (from: Dec 02 2019 to: Dec 03 2019)}.
  */
 public class Event extends Task {

@@ -3,7 +3,7 @@ package alfred.gui;
 import javafx.application.Application;
 
 /**
- * The entry point of the graphical version of Alfred.
+ * Starts the graphical version of Alfred.
  *
  * <p>A class that extends {@link Application} cannot be the main class of a JAR
  * that bundles JavaFX inside it: the runtime refuses to start when its own

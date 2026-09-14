@@ -3,7 +3,8 @@ package alfred.task;
 import java.util.List;
 
 /**
- * A task with no date attached to it, for example {@code [T][ ] borrow book}.
+ * Represents a task with no date attached to it, for example
+ * {@code [T][ ] borrow book}.
  */
 public class ToDo extends Task {
 

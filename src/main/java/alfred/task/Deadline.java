@@ -6,7 +6,7 @@ import java.util.List;
 import alfred.Dates;
 
 /**
- * A task that has to be finished by a stated date, for example
+ * Represents a task that has to be finished by a stated date, for example
  * {@code [D][ ] return book (by: Oct 15 2019)}.
  */
 public class Deadline extends Task {

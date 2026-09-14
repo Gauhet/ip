@@ -1,6 +1,6 @@
 /**
- * One class for each thing the user can ask for, all of them subclasses of
- * {@link alfred.command.Command}.
+ * Holds one class for each thing the user can ask for, all of them subclasses
+ * of {@link alfred.command.Command}.
  *
  * <p>A command is built by {@link alfred.Parser} once the line asking for it has
  * been understood, and holds whatever that line supplied. What it acts on — the
