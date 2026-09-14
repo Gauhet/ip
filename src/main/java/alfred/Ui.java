@@ -1,5 +1,6 @@
 package alfred;
 
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -147,14 +148,27 @@ public class Ui {
     }
 
     /**
-     * Warns that part of the save file could not be understood.
+     * Warns that part of the save file could not be understood, and says
+     * whether a copy of it was kept.
+     *
+     * <p>Only the name of the copy is given, not its whole path, because it
+     * sits beside the save file and a path would be written differently on
+     * different systems.
      *
      * @param skippedLines how many lines were left out.
+     * @param backup where a copy of the file was kept, or null if none could
+     *        be.
      */
-    void showSkippedLines(int skippedLines) {
-        reply("I could not make sense of " + describeCount(skippedLines, "line")
-                        + " in your saved tasks, sir.",
-                "I have left them out, and they will be gone once the list changes.");
+    void showSkippedLines(int skippedLines, Path backup) {
+        String warning = "I could not make sense of " + describeCount(skippedLines, "line")
+                + " in your saved tasks, sir.";
+        if (backup == null) {
+            reply(warning, "I have left them out, and they will be gone once the list changes,",
+                    "as I could not keep a copy of the file.");
+            return;
+        }
+        reply(warning, "I have left them out, but kept a copy of the file beside it as "
+                + backup.getFileName() + ".");
     }
 
     /**

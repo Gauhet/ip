@@ -1247,7 +1247,8 @@ bye
 
 **Aim:** A save file with bad lines in it still gives up its good ones. Each
 readable task is restored, the unreadable lines are counted and reported, and
-the user is told the lines will be lost, since nothing keeps a copy of them.
+the user is told where a copy of the file was kept, since the next save rewrites
+the file from the tasks that were read and drops the lines that were not.
 
 The seeded file covers every way a line can be wrong: an unknown type letter,
 too few fields, a missing date field, a status that is neither 0 nor 1, and a
@@ -1268,6 +1269,10 @@ Each has to cost its own line and no more. The exception `LocalDate.parse`
 throws is unchecked, so passed along as it came it would escape the loading loop
 and cost the whole file; `Dates` turns it into the checked one the loop
 watches for.
+
+The copy is named in the reply but not checked here, because a case can only
+read the console. That the copy exists, and that it holds the damaged lines
+after the file has been rewritten without them, is asserted by `StorageTest`.
 
 **Save file:**
 
@@ -1311,7 +1316,7 @@ bye
 
     ____________________________________________________________
      I could not make sense of 6 lines in your saved tasks, sir.
-     I have left them out, and they will be gone once the list changes.
+     I have left them out, but kept a copy of the file beside it as alfred.txt.bak.
     ____________________________________________________________
 
     ____________________________________________________________
@@ -2214,6 +2219,79 @@ bye
 
 ---
 
+## TC29: Spacing mistakes, repeated keywords, and repeated tasks are refused
+
+**Aim:** The three new ways a line can be wrong each get a message of their
+own, and none of them touches the list. Extra spaces anywhere in a line are
+forgiven, so the first todo is stored with single spaces. A keyword given twice
+is refused by name, and `/to` ahead of `/from` is refused for its order, rather
+than either being read as part of a date and refused as an unreadable one. A
+task already on the list is refused naming its number, whatever its case.
+
+One line of each is enough here. The finer points — tabs, `a/by` staying in a
+description, a deadline on another day being a different task, and the copy
+kept of a damaged save file — are properties of one method each, and
+`ParserTest`, `DeadlineTest`, `EventTest`, and `StorageTest` state them in a
+few lines apiece. The closing `list` is the assertion: one task, spelled with
+single spaces.
+
+**Input:**
+
+```
+   todo   read    book   
+deadline return book /by 2019-10-15 /by 2019-10-16
+event meeting /to 2019-12-03 /from 2019-12-02
+todo Read Book
+list
+bye
+```
+
+**Expected output:**
+
+```
+    ____________________________________________________________
+            _     _      _____  ____   _____  ____
+           / \   | |    |  ___||  _ \ | ____||  _ \
+          / _ \  | |    | |_   | |_) ||  _|  | | | |
+         / ___ \ | |___ |  _|  |  _ < | |___ | |_| |
+        /_/   \_\|_____||_|    |_| \_\|_____||____/
+                    P E N N Y W O R T H
+
+      Butler to the Wayne family  --  At your service
+     Good day, sir. Alfred Pennyworth, at your disposal.
+     What may I do for you?
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Very good, sir. I've added this task:
+       [T][ ] read book
+     That makes 1 task on your list.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     You've given /by more than once, sir. Once will do.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     The /from date has to come before the /to date, sir.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     You already have that task, sir, as number 1.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Here are the tasks on your list, sir:
+     1.[T][ ] read book
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Very good, sir. I shall be here when you need me.
+    ____________________________________________________________
+```
+
+---
+
 ## Known gaps (not yet covered)
 
 No invalid command crashes the program any more. Blank input, an unknown
@@ -2239,6 +2317,11 @@ off again by TC27, and the ways the command can be malformed by TC28. That a
 task without a priority displays as it did before priorities existed is covered
 by every case before TC26, none of which needed changing.
 
+Spacing mistakes, a keyword given twice or in the wrong order, and a task added
+twice are covered by TC29, one line each. Tabs are forgiven the same way as
+spaces, but that is checked by `ParserTest` rather than here, because a tab in
+a fenced block is invisible on the page and easily replaced by an editor.
+
 One gap is a limit of the program rather than of the tests. Only `yyyy-mm-dd` is
 accepted, so `2/12/2019` is refused rather than understood, and a time of day
 such as `1800` has nowhere to go, since a task holds a `LocalDate` and not a
@@ -2256,10 +2339,15 @@ The rest are limits of the tests rather than of the program.
   case covers it. A **Save file** block can only put text in the file; it cannot
   make the file unreadable. A failing save is untestable for the same reason.
   Both were checked by hand.
-* Damaged lines are reported and skipped, but nothing keeps a copy of them, so
-  they are gone from the file as soon as the list next changes. TC18 asserts the
-  warning that says so, which is the whole of the mitigation. Copying the file
-  aside before the first overwrite would close this properly.
+* Damaged lines are reported and skipped, and the file is copied aside before
+  the next save can drop them. TC18 asserts the reply that names the copy, but
+  not the copy itself, and no case reaches the reply for a copy that could not
+  be made: a **Save file** block cannot make the folder unwritable. That the
+  copy exists and holds the damaged lines is asserted by `StorageTest`.
+* A save file that holds the same task twice is loaded whole, since only
+  additions are checked for a repeat. No case covers it, because the only
+  visible effect is a list with two identical lines, which every other case
+  already shows is how `list` prints what it holds.
 * The safety net that catches an unexpected fault inside a command is not
   covered, since reaching it needs a bug to exist.
 * A priority surviving a restart, and a save file written before priorities

@@ -1,6 +1,8 @@
 package alfred;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
@@ -248,6 +250,26 @@ public class StorageTest {
         Storage.LoadResult result = storage.load();
         assertTrue(result.tasks().isEmpty());
         assertEquals(3, result.skippedLines());
+    }
+
+    @Test
+    public void load_damagedLineThenSave_copyStillHoldsDamagedLine() throws AlfredException, IOException {
+        Files.write(file, List.of("T | 0 | read book", "X | 0 | broken"));
+        Storage.LoadResult result = storage.load();
+        storage.save(result.tasks());
+        // The save rewrote the file from the one task it could read, so the
+        // damaged line survives only in the copy, which sits beside the file.
+        assertEquals(file.resolveSibling("tasks.txt.bak"), result.backup());
+        assertEquals(List.of("T | 0 | read book"), Files.readAllLines(file));
+        assertEquals(List.of("T | 0 | read book", "X | 0 | broken"), Files.readAllLines(result.backup()));
+    }
+
+    @Test
+    public void load_everyLineReadable_noCopyMade() throws AlfredException, IOException {
+        Files.write(file, List.of("T | 0 | read book"));
+        Storage.LoadResult result = storage.load();
+        assertNull(result.backup());
+        assertFalse(Files.exists(file.resolveSibling("tasks.txt.bak")));
     }
 
     /**

@@ -64,6 +64,18 @@ public class EventTest {
     }
 
     @Test
+    public void isSameTask_sameDescriptionAndDates_true() {
+        assertTrue(createThreeDayEvent().isSameTask(new Event("project meeting", DEC_2, DEC_4)));
+    }
+
+    @Test
+    public void isSameTask_differentEnd_false() {
+        // Both ends are compared, so an event that shares a start but not an
+        // end is not mistaken for the same one.
+        assertFalse(createThreeDayEvent().isSameTask(new Event("project meeting", DEC_2, DEC_5)));
+    }
+
+    @Test
     public void toString_notDone_datesShownInReadersForm() {
         assertEquals("[E][ ] project meeting (from: Dec 02 2019 to: Dec 04 2019)",
                 createThreeDayEvent().toString());

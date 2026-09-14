@@ -73,6 +73,17 @@ public class ToDoTest {
     }
 
     @Test
+    public void isSameTask_sameDescriptionDifferentCase_true() {
+        assertTrue(new ToDo("read book").isSameTask(new ToDo("Read Book")));
+    }
+
+    @Test
+    public void isSameTask_deadlineWithSameDescription_false() {
+        // A different kind of task is a different task, whatever it is called.
+        assertFalse(new ToDo("read book").isSameTask(new Deadline("read book", LocalDate.of(2019, 10, 15))));
+    }
+
+    @Test
     public void toString_newTask_statusBoxEmpty() {
         assertEquals("[T][ ] read book", new ToDo("read book").toString());
     }

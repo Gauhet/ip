@@ -56,6 +56,18 @@ public class DeadlineTest {
     }
 
     @Test
+    public void isSameTask_sameDescriptionAndDate_true() {
+        assertTrue(createDeadline().isSameTask(new Deadline("return book", OCT_15)));
+    }
+
+    @Test
+    public void isSameTask_sameDescriptionDifferentDate_false() {
+        // The same errand due on another day is another task, so the date is
+        // part of the comparison and not only the description.
+        assertFalse(createDeadline().isSameTask(new Deadline("return book", OCT_16)));
+    }
+
+    @Test
     public void toString_notDone_dueDateShownInReadersForm() {
         assertEquals("[D][ ] return book (by: Oct 15 2019)", createDeadline().toString());
     }

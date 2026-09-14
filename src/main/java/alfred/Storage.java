@@ -3,6 +3,7 @@ package alfred;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -66,14 +67,21 @@ public class Storage {
     /** Where an event's end date sits. No other type reaches this far. */
     private static final int INDEX_SECOND_DATE = 4;
 
+    /** What is added to the save file's name to name the copy kept of a damaged one. */
+    private static final String BACKUP_SUFFIX = ".bak";
+
     /**
      * What one call to {@link Storage#load()} found: the tasks it could read,
-     * and how many lines it had to give up on.
+     * how many lines it had to give up on, and where it kept a copy of the
+     * file if it gave up on any.
      *
      * @param tasks the tasks that were read, in the order they were saved.
      * @param skippedLines how many lines could not be understood.
+     * @param backup where the file was copied to before any of it could be
+     *        lost, or null if no line was skipped or the copy could not be
+     *        made.
      */
-    record LoadResult(List<Task> tasks, int skippedLines) { }
+    record LoadResult(List<Task> tasks, int skippedLines, Path backup) { }
 
     /** Where the tasks are kept, as given to the constructor. */
     private final Path file;
@@ -119,19 +127,23 @@ public class Storage {
      * Reads the saved tasks back, in the order they were written.
      *
      * <p>A missing file is what the first ever run sees, and is not a problem.
-     * A bad line is skipped rather than abandoning the whole file.
+     * A bad line is skipped rather than abandoning the whole file, and a file
+     * with any such line in it is copied aside first, because the next save
+     * rewrites the file from the tasks that were read and the skipped lines
+     * would be gone for good.
      *
      * <p>Skipping works by catching {@link AlfredException}, so everything that
      * can refuse a line has to raise that one and not an unchecked exception.
      * {@link Dates#parse(String)} is the case to watch.
      *
-     * @return the tasks that could be read, and how many lines were skipped.
+     * @return the tasks that could be read, how many lines were skipped, and
+     *         where the file was copied to if any were.
      * @throws AlfredException if the file exists but cannot be read at all.
      */
     LoadResult load() throws AlfredException {
         List<Task> tasks = new ArrayList<>();
         if (!Files.exists(file)) {
-            return new LoadResult(tasks, 0);
+            return new LoadResult(tasks, 0, null);
         }
 
         List<String> lines;
@@ -157,7 +169,30 @@ public class Storage {
                 skippedLines++;
             }
         }
-        return new LoadResult(tasks, skippedLines);
+        Path backup = skippedLines > 0 ? copyAside() : null;
+        return new LoadResult(tasks, skippedLines, backup);
+    }
+
+    /**
+     * Copies the save file to a backup beside it, so that lines this program
+     * could not read are not lost when it next writes the file.
+     *
+     * <p>An earlier backup is overwritten. It was a copy of the same file, and
+     * one that has since been rewritten cleanly makes no new backup, so the
+     * copy on disk is always of the most recently damaged file.
+     *
+     * @return where the copy was made, or null if the copy could not be made.
+     *         Failing to keep a copy is reported rather than thrown, because
+     *         the tasks that were read are still worth starting with.
+     */
+    private Path copyAside() {
+        Path backup = file.resolveSibling(file.getFileName() + BACKUP_SUFFIX);
+        try {
+            Files.copy(file, backup, StandardCopyOption.REPLACE_EXISTING);
+            return backup;
+        } catch (IOException e) {
+            return null;
+        }
     }
 
     /**

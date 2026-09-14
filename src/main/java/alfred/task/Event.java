@@ -42,6 +42,20 @@ public class Event extends Task {
     /**
      * {@inheritDoc}
      *
+     * <p>Two events are the same task only if they start and end on the same
+     * days.
+     */
+    @Override
+    public boolean isSameTask(Task other) {
+        // The cast is safe: the parent has already checked that the other task
+        // is of this class.
+        Event otherEvent = (Event) other;
+        return super.isSameTask(other) && from.equals(otherEvent.from) && to.equals(otherEvent.to);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
      * <p>An event falls on every day it spans, its first and its last included,
      * so that asking about a day in the middle of a long event finds it.
      */

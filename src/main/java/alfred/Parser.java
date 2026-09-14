@@ -1,6 +1,7 @@
 package alfred;
 
 import java.time.LocalDate;
+import java.util.regex.Pattern;
 
 import alfred.command.AddCommand;
 import alfred.command.Command;
@@ -42,6 +43,12 @@ public class Parser {
     /** Keyword that separates an event's start time from its end time. */
     private static final String SEPARATOR_TO = "/to";
 
+    /**
+     * A run of one or more whitespace characters, tabs included. Every such
+     * run in a line is squeezed to one space before the line is read.
+     */
+    private static final Pattern WHITESPACE = Pattern.compile("\\s+");
+
     /** Prevents this class from being instantiated. */
     private Parser() {
     }
@@ -49,28 +56,30 @@ public class Parser {
     /**
      * Reads a line of input as the command it asks for, ready to be carried out.
      *
-     * @param line what the user typed, already trimmed.
+     * <p>Spacing is forgiven before anything is read: spaces and tabs around
+     * the line are dropped, and any run of them inside it counts as one space.
+     * So {@code mark  1} marks a task, and a description typed with two spaces
+     * in it is stored with one.
+     *
+     * @param line what the user typed.
      * @return the command the line asks for.
      * @throws AlfredException if the line is empty, names no known command, or
      *         is missing something the command it names needs.
      */
     static Command parse(String line) throws AlfredException {
-        // Both callers trim before handing the line over, and the keyword is
-        // read as everything up to the first space. A leading space would make
-        // that keyword the empty string, and the user would be told that '' is
-        // not a command, which points nowhere near the caller that forgot.
-        assert line.equals(line.trim()) : "parse expects a trimmed line, not '" + line + "'";
+        String normalized = normalizeSpacing(line);
 
         // Worth its own message: saying the command was not recognized
         // would be misleading when none was typed.
-        if (line.isEmpty()) {
+        if (normalized.isEmpty()) {
             throw new AlfredException("You'll have to give me something to work with, sir.");
         }
         // Everything up to the first space names the command; the rest
-        // is that command's own input.
-        String[] parts = line.split(" ", 2);
+        // is that command's own input. Normalizing has already seen to it
+        // that the first space is a single one.
+        String[] parts = normalized.split(" ", 2);
         String keyword = parts[0];
-        String arguments = parts.length > 1 ? parts[1].trim() : "";
+        String arguments = parts.length > 1 ? parts[1] : "";
 
         return switch (keyword) {
         case "bye" -> new ExitCommand();
@@ -111,16 +120,14 @@ public class Parser {
      * @param arguments everything the user typed after the keyword.
      * @return the deadline the arguments describe.
      * @throws AlfredException if the description or the due date is missing,
-     *         or the due date cannot be read.
+     *         if {@code /by} is given more than once, or if the due date cannot
+     *         be read.
      */
     private static Deadline parseDeadline(String arguments) throws AlfredException {
         String complaint = "A deadline needs a description and a /by date, sir.";
-        int separator = arguments.indexOf(SEPARATOR_BY);
-        if (separator == -1) {
-            throw new AlfredException(complaint);
-        }
-        String description = arguments.substring(0, separator).trim();
-        String by = arguments.substring(separator + SEPARATOR_BY.length()).trim();
+        String[] parts = splitAt(arguments, SEPARATOR_BY, complaint);
+        String description = parts[0];
+        String by = parts[1];
         // Checked for presence before being read, so that a date left out draws
         // the complaint about the command rather than one about its format.
         if (description.isEmpty() || by.isEmpty()) {
@@ -136,24 +143,24 @@ public class Parser {
      * @param arguments everything the user typed after the keyword.
      * @return the event the arguments describe.
      * @throws AlfredException if the description, the start, or the end is
-     *         missing, if either date cannot be read, or if the event ends
-     *         before it starts.
+     *         missing, if {@code /from} or {@code /to} is given more than once
+     *         or in the wrong order, if either date cannot be read, or if the
+     *         event ends before it starts.
      */
     private static Event parseEvent(String arguments) throws AlfredException {
         String complaint = "An event needs a description, a /from date, and a /to date, sir.";
-        int fromSeparator = arguments.indexOf(SEPARATOR_FROM);
-        if (fromSeparator == -1) {
-            throw new AlfredException(complaint);
+        String[] fromParts = splitAt(arguments, SEPARATOR_FROM, complaint);
+        String description = fromParts[0];
+        // The end date is looked for after /from, so that a /to inside the
+        // description is not mistaken for the one that starts it. A /to that
+        // sits only before /from is the two keywords in the wrong order, which
+        // deserves better than being told the /to is missing.
+        if (!containsKeyword(fromParts[1], SEPARATOR_TO) && containsKeyword(description, SEPARATOR_TO)) {
+            throw new AlfredException("The /from date has to come before the /to date, sir.");
         }
-        // Looked for after /from, so that a /to inside the description
-        // is not mistaken for the one that starts the end date.
-        int toSeparator = arguments.indexOf(SEPARATOR_TO, fromSeparator + SEPARATOR_FROM.length());
-        if (toSeparator == -1) {
-            throw new AlfredException(complaint);
-        }
-        String description = arguments.substring(0, fromSeparator).trim();
-        String from = arguments.substring(fromSeparator + SEPARATOR_FROM.length(), toSeparator).trim();
-        String to = arguments.substring(toSeparator + SEPARATOR_TO.length()).trim();
+        String[] toParts = splitAt(fromParts[1], SEPARATOR_TO, complaint);
+        String from = toParts[0];
+        String to = toParts[1];
         if (description.isEmpty() || from.isEmpty() || to.isEmpty()) {
             throw new AlfredException(complaint);
         }
@@ -183,7 +190,7 @@ public class Parser {
         if (parts.length < 2) {
             throw new AlfredException("The priority command needs a task number and a level, sir.");
         }
-        return new PriorityCommand(parseTaskIndex(parts[0]), Priority.parse(parts[1].trim()));
+        return new PriorityCommand(parseTaskIndex(parts[0]), Priority.parse(parts[1]));
     }
 
     /**
@@ -240,5 +247,74 @@ public class Parser {
         } catch (NumberFormatException e) {
             throw new AlfredException("That is not a task number, sir.");
         }
+    }
+
+    /**
+     * Squeezes the spacing of a line: whitespace at either end is dropped, and
+     * every run of it inside the line becomes one space.
+     *
+     * <p>Done once, up front, so that nothing after it has to allow for a tab
+     * where a space was expected or for two spaces where one was.
+     *
+     * @param line what the user typed.
+     * @return the same words, separated by single spaces.
+     */
+    private static String normalizeSpacing(String line) {
+        return WHITESPACE.matcher(line.strip()).replaceAll(" ");
+    }
+
+    /**
+     * Splits text into the part before a keyword and the part after it, each
+     * with its spacing trimmed.
+     *
+     * <p>The keyword counts only as a word of its own, so {@code a/by} in a
+     * description is not read as the separator. The two failures have
+     * different messages: a keyword that is not there draws the caller's
+     * complaint about the command, and one that is there more than once is
+     * named, since the user would otherwise be told that a date such as
+     * {@code 2019-10-15 /by 2019-10-16} cannot be read.
+     *
+     * @param text the arguments to split.
+     * @param keyword the separator to split at, such as {@code /by}.
+     * @param complaint what to say if the keyword is not there.
+     * @return the part before the keyword and the part after it, either of
+     *         which may be empty.
+     * @throws AlfredException if the keyword is missing or repeated.
+     */
+    private static String[] splitAt(String text, String keyword, String complaint)
+            throws AlfredException {
+        // A limit of -1 keeps an empty last part, so that a keyword with nothing
+        // after it still splits into two parts and the caller sees an empty
+        // second one, rather than this method deciding what to say about it.
+        String[] parts = keywordPattern(keyword).split(text, -1);
+        if (parts.length < 2) {
+            throw new AlfredException(complaint);
+        }
+        if (parts.length > 2) {
+            throw new AlfredException("You've given " + keyword + " more than once, sir. Once will do.");
+        }
+        return new String[] {parts[0].trim(), parts[1].trim()};
+    }
+
+    /**
+     * Tells whether text holds a keyword as a word of its own.
+     *
+     * @param text the text to look in.
+     * @param keyword the separator to look for, such as {@code /to}.
+     * @return true if the keyword is there, on its own.
+     */
+    private static boolean containsKeyword(String text, String keyword) {
+        return keywordPattern(keyword).matcher(text).find();
+    }
+
+    /**
+     * Returns a pattern matching a keyword only where it stands as a word of its
+     * own: at the start or the end of the text, or with whitespace on both sides.
+     *
+     * @param keyword the separator to match, such as {@code /from}.
+     * @return the pattern that finds it.
+     */
+    private static Pattern keywordPattern(String keyword) {
+        return Pattern.compile("(?<!\\S)" + Pattern.quote(keyword) + "(?!\\S)");
     }
 }
