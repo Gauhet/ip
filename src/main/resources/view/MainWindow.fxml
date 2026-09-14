@@ -35,7 +35,7 @@
             <children>
                 <TextField fx:id="userInput"
                            onAction="#handleUserInput"
-                           promptText="Type a command, such as list"
+                           promptText="How may I be of service, sir? Try list"
                            HBox.hgrow="ALWAYS" />
                 <Button fx:id="sendButton"
                         defaultButton="false"

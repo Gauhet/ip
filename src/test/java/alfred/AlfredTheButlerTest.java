@@ -41,7 +41,8 @@ public class AlfredTheButlerTest {
 
     @Test
     public void getGreeting_noSaveFile_greetsWithoutMentioningTasks() {
-        assertEquals("Hello! I'm AlfredTheButler\nWhat can I do for you?", alfred.getGreeting());
+        assertEquals("Good day, sir. Alfred Pennyworth, at your disposal.\nWhat may I do for you?",
+                alfred.getGreeting());
     }
 
     @Test
@@ -50,17 +51,17 @@ public class AlfredTheButlerTest {
         alfred.getResponse("todo walk the dog");
 
         AlfredTheButler nextRun = new AlfredTheButler(saveFile);
-        assertEquals("Hello! I'm AlfredTheButler\n"
-                + "What can I do for you?\n"
+        assertEquals("Good day, sir. Alfred Pennyworth, at your disposal.\n"
+                + "What may I do for you?\n"
                 + "I've brought back 2 tasks from last time, sir.",
                 nextRun.getGreeting());
     }
 
     @Test
     public void getResponse_todoCommand_taskAddedAndConfirmed() {
-        assertEquals("Got it. I've added this task:\n"
+        assertEquals("Very good, sir. I've added this task:\n"
                 + "  [T][ ] polish the silver\n"
-                + "Now you have 1 task in the list.",
+                + "That makes 1 task on your list.",
                 alfred.getResponse("todo polish the silver"));
     }
 
@@ -68,7 +69,7 @@ public class AlfredTheButlerTest {
     public void getResponse_listAfterAdding_taskListed() {
         alfred.getResponse("todo polish the silver");
 
-        assertEquals("Here are the tasks in your list:\n"
+        assertEquals("Here are the tasks on your list, sir:\n"
                 + "1.[T][ ] polish the silver",
                 alfred.getResponse("list"));
     }
@@ -78,7 +79,7 @@ public class AlfredTheButlerTest {
         alfred.getResponse("todo polish the silver");
         alfred.getResponse("todo walk the dog");
 
-        assertEquals("Here are the tasks in your list:\n"
+        assertEquals("Here are the tasks on your list, sir:\n"
                 + "1.[T][ ] polish the silver\n"
                 + "2.[T][ ] walk the dog",
                 alfred.getResponse("list"));
@@ -86,7 +87,7 @@ public class AlfredTheButlerTest {
 
     @Test
     public void getResponse_listWhenNothingIsStored_headingOnly() {
-        assertEquals("Here are the tasks in your list:", alfred.getResponse("list"));
+        assertEquals("Here are the tasks on your list, sir:", alfred.getResponse("list"));
     }
 
     @Test
@@ -96,7 +97,7 @@ public class AlfredTheButlerTest {
         alfred.getResponse("todo polish the boots");
 
         // 1 and 3, not 1 and 2: the numbers are the ones `mark` and `delete` take.
-        assertEquals("Here are the matching tasks in your list:\n"
+        assertEquals("Here are the matching tasks on your list, sir:\n"
                 + "1.[T][ ] polish the silver\n"
                 + "3.[T][ ] polish the boots",
                 alfred.getResponse("find polish"));
@@ -133,7 +134,7 @@ public class AlfredTheButlerTest {
     public void getResponse_markCommand_taskMarkedDone() {
         alfred.getResponse("todo polish the silver");
 
-        assertEquals("Nice! I've marked this task as done:\n"
+        assertEquals("Splendid, sir. I've marked this task as done:\n"
                 + "  [T][X] polish the silver",
                 alfred.getResponse("mark 1"));
     }
@@ -143,7 +144,7 @@ public class AlfredTheButlerTest {
         String reply = alfred.getResponse("polish the silver");
 
         assertFalse(reply.isEmpty(), "an unknown command should be answered");
-        assertEquals("Here are the tasks in your list:", alfred.getResponse("list").split("\n")[0]);
+        assertEquals("Here are the tasks on your list, sir:", alfred.getResponse("list").split("\n")[0]);
     }
 
     @Test
@@ -153,7 +154,7 @@ public class AlfredTheButlerTest {
 
     @Test
     public void getResponse_spacesAroundCommand_commandStillRecognized() {
-        assertEquals("Here are the tasks in your list:", alfred.getResponse("   list   "));
+        assertEquals("Here are the tasks on your list, sir:", alfred.getResponse("   list   "));
     }
 
     @Test
@@ -221,7 +222,7 @@ public class AlfredTheButlerTest {
 
     @Test
     public void getResponse_byeCommand_farewellReturned() {
-        assertEquals("Bye. Hope to see you again soon!", alfred.getResponse("bye"));
+        assertEquals("Very good, sir. I shall be here when you need me.", alfred.getResponse("bye"));
     }
 
     @Test
