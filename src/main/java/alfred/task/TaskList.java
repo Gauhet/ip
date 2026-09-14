@@ -82,11 +82,25 @@ public class TaskList {
     }
 
     /**
-     * Adds a task to the end of the list.
+     * Adds a task to the end of the list, unless the same task is already on
+     * it.
+     *
+     * <p>Only additions are checked. The tasks a list is created with are
+     * taken as they are, so a save file edited by hand to hold a task twice
+     * still loads in full rather than losing one of them.
      *
      * @param task the task to store.
+     * @throws AlfredException if the list already holds the same task, as
+     *         {@link Task#isSameTask(Task)} judges it.
      */
-    public void add(Task task) {
+    public void add(Task task) throws AlfredException {
+        // Walked by index rather than searched, because the refusal names the
+        // number the user would see next to the task they already have.
+        for (int i = 0; i < tasks.size(); i++) {
+            if (tasks.get(i).isSameTask(task)) {
+                throw new AlfredException("You already have that task, sir, as number " + (i + 1) + ".");
+            }
+        }
         tasks.add(task);
     }
 

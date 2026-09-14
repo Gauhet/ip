@@ -40,6 +40,18 @@ public class Deadline extends Task {
     /**
      * {@inheritDoc}
      *
+     * <p>Two deadlines are the same task only if they are due on the same day.
+     */
+    @Override
+    public boolean isSameTask(Task other) {
+        // The cast is safe: the parent has already checked that the other task
+        // is of this class.
+        return super.isSameTask(other) && by.equals(((Deadline) other).by);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
      * <p>A deadline falls on the single day it is due.
      */
     @Override

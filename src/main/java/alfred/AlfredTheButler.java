@@ -199,7 +199,7 @@ public class AlfredTheButler {
             // Warned about separately, and even when nothing else was restored,
             // because the damaged lines are dropped as soon as the list changes.
             if (loadResult.skippedLines() > 0) {
-                ui.showSkippedLines(loadResult.skippedLines());
+                ui.showSkippedLines(loadResult.skippedLines(), loadResult.backup());
             }
         } catch (AlfredException e) {
             ui.showError(e.getMessage());

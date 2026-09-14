@@ -60,6 +60,22 @@ public abstract class Task {
         return name.toLowerCase().contains(keyword.toLowerCase());
     }
 
+    /**
+     * Tells whether another task is the same task as this one: one of the same
+     * kind, with the same description, spelled the same way apart from case.
+     *
+     * <p>Being done, or carrying a priority, does not make a task a different
+     * one, so neither is compared. The kinds that carry dates add those to the
+     * comparison, since {@code return book} due on two different days is two
+     * tasks.
+     *
+     * @param other the task to compare with.
+     * @return true if the two describe the same task.
+     */
+    public boolean isSameTask(Task other) {
+        return getClass() == other.getClass() && name.equalsIgnoreCase(other.name);
+    }
+
     /** Marks this task as completed. */
     public void markDone() {
         isDone = true;

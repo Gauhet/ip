@@ -73,10 +73,34 @@ public class TaskListTest {
     }
 
     @Test
-    public void add_listAlreadyHoldingTasks_taskStoredAtTheEnd() {
+    public void add_listAlreadyHoldingTasks_taskStoredAtTheEnd() throws AlfredException {
         tasks.add(new ToDo("fourth"));
         assertEquals(4, tasks.size());
         assertEquals("[T][ ] fourth", tasks.get(3).toString());
+    }
+
+    @Test
+    public void add_sameTaskAlreadyStored_refusedNamingItsNumber() {
+        // The number is the one the user sees, counting from 1, so the second
+        // stored task is number 2.
+        AlfredException e = assertThrows(AlfredException.class, () -> tasks.add(new ToDo("second")));
+        assertEquals("You already have that task, sir, as number 2.", e.getMessage());
+        assertEquals(3, tasks.size());
+    }
+
+    @Test
+    public void add_sameDescriptionAsDoneTask_stillRefused() throws AlfredException {
+        // Being done does not make it a different task; the user can unmark it.
+        tasks.markDone(1);
+        assertThrows(AlfredException.class, () -> tasks.add(new ToDo("second")));
+    }
+
+    @Test
+    public void newList_sameTaskTwice_bothKept() {
+        // Only additions are checked, so a save file holding a task twice
+        // still loads whole rather than quietly losing one of them.
+        TaskList twice = new TaskList(new ToDo("read book"), new ToDo("read book"));
+        assertEquals(2, twice.size());
     }
 
     @Test

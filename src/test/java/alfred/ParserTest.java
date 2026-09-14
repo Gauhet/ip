@@ -59,6 +59,8 @@ public class ParserTest {
     private static final String PRIORITY_COMPLAINT =
             "The priority command needs a task number and a level, sir.";
 
+    private static final String FROM_BEFORE_TO = "The /from date has to come before the /to date, sir.";
+
     /** The list a parsed command is carried out against, fresh for every test. */
     private TaskList tasks;
 
@@ -149,6 +151,29 @@ public class ParserTest {
     public void parse_extraSpacesBeforeDescription_descriptionTrimmed() throws AlfredException {
         run("todo    read book");
         assertEquals("[T][ ] read book", tasks.get(0).toString());
+    }
+
+    @Test
+    public void parse_tabsAndRunsOfSpaces_lineReadAsIfSingleSpaced() throws AlfredException {
+        // The window hands over its text field as it stands, and a tab between
+        // the keyword and the rest would otherwise make the keyword
+        // "mark<tab>1", which names no command. Every command's parts have to
+        // be found through the extra spacing, and a description stored with
+        // single spaces.
+        run("   todo\tread    book   ");
+        run("deadline   return book   /by   2019-10-15");
+        run("mark\t1");
+        run("priority   2   high");
+        assertEquals("[T][X] read book", tasks.get(0).toString());
+        assertEquals("[D][ ][HIGH] return book (by: Oct 15 2019)", tasks.get(1).toString());
+    }
+
+    @Test
+    public void parse_separatorInsideAnotherWord_descriptionKeptWhole() throws AlfredException {
+        // Only /by standing as a word of its own separates the two parts, so a
+        // description can contain the three characters without being cut.
+        run("deadline fix a/by bug /by 2019-10-15");
+        assertEquals("[D][ ] fix a/by bug (by: Oct 15 2019)", tasks.get(0).toString());
     }
 
     @Test
@@ -266,6 +291,22 @@ public class ParserTest {
         // date rather than about the shape of the command.
         assertRefused("deadline return book /by Sunday",
                 "I don't know 'Sunday' as a date, sir. Do use yyyy-mm-dd, as in 2019-10-15.");
+    }
+
+    @Test
+    public void parse_deadlineWithByTwice_exceptionThrown() {
+        // Without this check the second /by would become part of the date,
+        // and the user would be told that a date they never typed is unreadable.
+        // The event keywords go through the same check, so one case stands
+        // for all three.
+        assertRefused("deadline return book /by 2019-10-15 /by 2019-10-16",
+                "You've given /by more than once, sir. Once will do.");
+    }
+
+    @Test
+    public void parse_eventWithToBeforeFrom_orderExplained() {
+        // Both keywords are there, so "the /to is missing" would be untrue.
+        assertRefused("event meeting /to 2019-12-03 /from 2019-12-02", FROM_BEFORE_TO);
     }
 
     @Test
