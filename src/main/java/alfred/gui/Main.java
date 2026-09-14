@@ -44,7 +44,7 @@ public class Main extends Application {
             // The conversation grows to fill whatever room the window has, so
             // the window can be resized, down to the smallest size it still
             // reads at.
-            stage.setTitle("AlfredTheButler");
+            stage.setTitle("Alfred Pennyworth");
             stage.setMinHeight(MIN_WINDOW_HEIGHT);
             stage.setMinWidth(MIN_WINDOW_WIDTH);
 

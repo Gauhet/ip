@@ -1,58 +1,62 @@
 /*
- * The window as a whole. A plain, light ground rather than a picture, so that
- * every pixel behind the text is there to make the text readable.
+ * The window as a whole, dressed for Alfred: a dark evening ground with gold
+ * accents, in a serif face, so that the window looks like the butler sounds.
+ * The dark ground is plain rather than a picture, so that every pixel behind
+ * the text is there to make the text readable.
  */
 .root {
-    -fx-background-color: #f2f4f7;
-    -fx-font-family: "Segoe UI", "Helvetica Neue", "Arial", sans-serif;
+    -fx-background-color: #1e2230;
+    -fx-font-family: "Georgia", "Palatino Linotype", "Book Antiqua", serif;
     -fx-font-size: 14px;
 }
 
-/* The bar the user types in, set off from the conversation above it. */
+/* The bar the user types in, set off from the conversation above it by a thin rule. */
 #inputBar {
-    -fx-background-color: #ffffff;
-    -fx-border-color: #dde2e8 transparent transparent transparent;
+    -fx-background-color: #272c3c;
+    -fx-border-color: #3a4056 transparent transparent transparent;
     -fx-border-width: 1px 0 0 0;
 }
 
 .text-field {
-    -fx-background-color: #f2f4f7;
+    -fx-background-color: #1e2230;
     -fx-background-radius: 18px;
-    -fx-border-color: transparent;
+    -fx-border-color: #3a4056;
     -fx-border-radius: 18px;
     -fx-border-width: 1px;
     -fx-padding: 8px 14px 8px 14px;
-    -fx-prompt-text-fill: #8a93a0;
+    -fx-text-fill: #f1ebdc;
+    -fx-prompt-text-fill: #8b8fa0;
 }
 
 .text-field:focused {
-    -fx-background-color: #ffffff;
-    -fx-border-color: #3b6fe0;
+    -fx-border-color: #c9a84c;
 }
 
 /*
- * The button changes color on hover and press, but never size, so that it
- * does not jump under the pointer.
+ * The button is the household gold, the same color as the user's own lines.
+ * It changes color on hover and press, but never size, so that it does not
+ * jump under the pointer.
  */
 .button {
-    -fx-background-color: #3b6fe0;
+    -fx-background-color: #c9a84c;
     -fx-background-radius: 18px;
-    -fx-text-fill: #ffffff;
+    -fx-text-fill: #1e2230;
     -fx-font-weight: bold;
     -fx-padding: 8px 18px 8px 18px;
     -fx-cursor: hand;
 }
 
 .button:hover {
-    -fx-background-color: #2f5ec4;
+    -fx-background-color: #b8963f;
 }
 
 .button:pressed {
-    -fx-background-color: #244da3;
+    -fx-background-color: #a2842f;
 }
 
 .button:disabled {
-    -fx-background-color: #b8c4d8;
+    -fx-background-color: #4a4f60;
+    -fx-text-fill: #8b8fa0;
     -fx-opacity: 1.0;
 }
 
@@ -72,7 +76,7 @@
 }
 
 .scroll-bar .thumb {
-    -fx-background-color: #c3cad4;
+    -fx-background-color: #4a5068;
     -fx-background-radius: 1em;
 }
 

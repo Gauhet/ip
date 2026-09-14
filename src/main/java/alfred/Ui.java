@@ -33,7 +33,13 @@ public class Ui {
     private static final String SUB_INDENT = "  ";
 
     /** Name the chatbot introduces itself by. */
-    private static final String NAME = "AlfredTheButler";
+    private static final String NAME = "Alfred Pennyworth";
+
+    /** First line of the greeting, said the same way in the console and the window. */
+    private static final String GREETING_INTRODUCTION = "Good day, sir. " + NAME + ", at your disposal.";
+
+    /** Second line of the greeting, the offer that invites the first command. */
+    private static final String GREETING_OFFER = "What may I do for you?";
 
     /** ASCII-art logo shown once at startup. */
     private static final String BANNER =
@@ -114,21 +120,21 @@ public class Ui {
      */
     void showWelcome() {
         if (captured != null) {
-            reply("Hello! I'm " + NAME, "What can I do for you?");
+            reply(GREETING_INTRODUCTION, GREETING_OFFER);
             return;
         }
 
         System.out.println(DIVIDER);
         System.out.println(BANNER);
-        System.out.println(INDENT + "Hello! I'm " + NAME);
-        System.out.println(INDENT + "What can I do for you?");
+        System.out.println(INDENT + GREETING_INTRODUCTION);
+        System.out.println(INDENT + GREETING_OFFER);
         System.out.println(DIVIDER);
         System.out.println();
     }
 
     /** Prints the parting message, the last thing any run prints. */
     public void showFarewell() {
-        reply("Bye. Hope to see you again soon!");
+        reply("Very good, sir. I shall be here when you need me.");
     }
 
     /**
@@ -183,9 +189,9 @@ public class Ui {
         // the user they have one task fewer than they do.
         assert taskCount > 0 : "the list holds at least the task just added";
 
-        reply("Got it. I've added this task:",
+        reply("Very good, sir. I've added this task:",
                 SUB_INDENT + task,
-                "Now you have " + describeCount(taskCount, "task") + " in the list.");
+                "That makes " + describeCount(taskCount, "task") + " on your list.");
     }
 
     /**
@@ -195,9 +201,9 @@ public class Ui {
      * @param taskCount how many tasks are left.
      */
     public void showRemoved(Task task, int taskCount) {
-        reply("Noted. I've removed this task:",
+        reply("As you wish, sir. I've removed this task:",
                 SUB_INDENT + task,
-                "Now you have " + describeCount(taskCount, "task") + " in the list.");
+                "That leaves " + describeCount(taskCount, "task") + " on your list.");
     }
 
     /**
@@ -206,7 +212,7 @@ public class Ui {
      * @param task the task that was marked.
      */
     public void showMarked(Task task) {
-        reply("Nice! I've marked this task as done:", SUB_INDENT + task);
+        reply("Splendid, sir. I've marked this task as done:", SUB_INDENT + task);
     }
 
     /**
@@ -215,7 +221,7 @@ public class Ui {
      * @param task the task that was unmarked.
      */
     public void showUnmarked(Task task) {
-        reply("OK, I've marked this task as not done yet:", SUB_INDENT + task);
+        reply("Very well, sir. I've marked this task as not done yet:", SUB_INDENT + task);
     }
 
     /**
@@ -237,7 +243,7 @@ public class Ui {
      * @param tasks the tasks to show, in the order they are stored.
      */
     public void showList(TaskList tasks) {
-        replyNumbered("Here are the tasks in your list:", numberTasks(tasks, task -> true));
+        replyNumbered("Here are the tasks on your list, sir:", numberTasks(tasks, task -> true));
     }
 
     /**
@@ -275,7 +281,7 @@ public class Ui {
             reply("I found no matching tasks, sir.");
             return;
         }
-        replyNumbered("Here are the matching tasks in your list:", lines);
+        replyNumbered("Here are the matching tasks on your list, sir:", lines);
     }
 
     /**

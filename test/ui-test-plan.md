@@ -78,12 +78,12 @@ bye
                     P E N N Y W O R T H
 
       Butler to the Wayne family  --  At your service
-     Hello! I'm AlfredTheButler
-     What can I do for you?
+     Good day, sir. Alfred Pennyworth, at your disposal.
+     What may I do for you?
     ____________________________________________________________
 
     ____________________________________________________________
-     Bye. Hope to see you again soon!
+     Very good, sir. I shall be here when you need me.
     ____________________________________________________________
 ```
 
@@ -115,30 +115,30 @@ bye
                     P E N N Y W O R T H
 
       Butler to the Wayne family  --  At your service
-     Hello! I'm AlfredTheButler
-     What can I do for you?
+     Good day, sir. Alfred Pennyworth, at your disposal.
+     What may I do for you?
     ____________________________________________________________
 
     ____________________________________________________________
-     Got it. I've added this task:
+     Very good, sir. I've added this task:
        [T][ ] read book
-     Now you have 1 task in the list.
+     That makes 1 task on your list.
     ____________________________________________________________
 
     ____________________________________________________________
-     Got it. I've added this task:
+     Very good, sir. I've added this task:
        [T][ ] buy milk
-     Now you have 2 tasks in the list.
+     That makes 2 tasks on your list.
     ____________________________________________________________
 
     ____________________________________________________________
-     Here are the tasks in your list:
+     Here are the tasks on your list, sir:
      1.[T][ ] read book
      2.[T][ ] buy milk
     ____________________________________________________________
 
     ____________________________________________________________
-     Bye. Hope to see you again soon!
+     Very good, sir. I shall be here when you need me.
     ____________________________________________________________
 ```
 
@@ -174,46 +174,46 @@ bye
                     P E N N Y W O R T H
 
       Butler to the Wayne family  --  At your service
-     Hello! I'm AlfredTheButler
-     What can I do for you?
+     Good day, sir. Alfred Pennyworth, at your disposal.
+     What may I do for you?
     ____________________________________________________________
 
     ____________________________________________________________
-     Got it. I've added this task:
+     Very good, sir. I've added this task:
        [T][ ] read book
-     Now you have 1 task in the list.
+     That makes 1 task on your list.
     ____________________________________________________________
 
     ____________________________________________________________
-     Got it. I've added this task:
+     Very good, sir. I've added this task:
        [T][ ] buy milk
-     Now you have 2 tasks in the list.
+     That makes 2 tasks on your list.
     ____________________________________________________________
 
     ____________________________________________________________
-     Nice! I've marked this task as done:
+     Splendid, sir. I've marked this task as done:
        [T][X] buy milk
     ____________________________________________________________
 
     ____________________________________________________________
-     Here are the tasks in your list:
+     Here are the tasks on your list, sir:
      1.[T][ ] read book
      2.[T][X] buy milk
     ____________________________________________________________
 
     ____________________________________________________________
-     OK, I've marked this task as not done yet:
+     Very well, sir. I've marked this task as not done yet:
        [T][ ] buy milk
     ____________________________________________________________
 
     ____________________________________________________________
-     Here are the tasks in your list:
+     Here are the tasks on your list, sir:
      1.[T][ ] read book
      2.[T][ ] buy milk
     ____________________________________________________________
 
     ____________________________________________________________
-     Bye. Hope to see you again soon!
+     Very good, sir. I shall be here when you need me.
     ____________________________________________________________
 ```
 
@@ -250,23 +250,23 @@ bye
                     P E N N Y W O R T H
 
       Butler to the Wayne family  --  At your service
-     Hello! I'm AlfredTheButler
-     What can I do for you?
+     Good day, sir. Alfred Pennyworth, at your disposal.
+     What may I do for you?
     ____________________________________________________________
 
     ____________________________________________________________
-     Got it. I've added this task:
+     Very good, sir. I've added this task:
        [D][ ] return book (by: Oct 15 2019)
-     Now you have 1 task in the list.
+     That makes 1 task on your list.
     ____________________________________________________________
 
     ____________________________________________________________
-     Here are the tasks in your list:
+     Here are the tasks on your list, sir:
      1.[D][ ] return book (by: Oct 15 2019)
     ____________________________________________________________
 
     ____________________________________________________________
-     Bye. Hope to see you again soon!
+     Very good, sir. I shall be here when you need me.
     ____________________________________________________________
 ```
 
@@ -303,23 +303,23 @@ bye
                     P E N N Y W O R T H
 
       Butler to the Wayne family  --  At your service
-     Hello! I'm AlfredTheButler
-     What can I do for you?
+     Good day, sir. Alfred Pennyworth, at your disposal.
+     What may I do for you?
     ____________________________________________________________
 
     ____________________________________________________________
-     Got it. I've added this task:
+     Very good, sir. I've added this task:
        [E][ ] project meeting (from: Dec 02 2019 to: Dec 03 2019)
-     Now you have 1 task in the list.
+     That makes 1 task on your list.
     ____________________________________________________________
 
     ____________________________________________________________
-     Here are the tasks in your list:
+     Here are the tasks on your list, sir:
      1.[E][ ] project meeting (from: Dec 02 2019 to: Dec 03 2019)
     ____________________________________________________________
 
     ____________________________________________________________
-     Bye. Hope to see you again soon!
+     Very good, sir. I shall be here when you need me.
     ____________________________________________________________
 ```
 
@@ -354,42 +354,42 @@ bye
                     P E N N Y W O R T H
 
       Butler to the Wayne family  --  At your service
-     Hello! I'm AlfredTheButler
-     What can I do for you?
+     Good day, sir. Alfred Pennyworth, at your disposal.
+     What may I do for you?
     ____________________________________________________________
 
     ____________________________________________________________
-     Got it. I've added this task:
+     Very good, sir. I've added this task:
        [T][ ] borrow book
-     Now you have 1 task in the list.
+     That makes 1 task on your list.
     ____________________________________________________________
 
     ____________________________________________________________
-     Got it. I've added this task:
+     Very good, sir. I've added this task:
        [D][ ] return book (by: Oct 15 2019)
-     Now you have 2 tasks in the list.
+     That makes 2 tasks on your list.
     ____________________________________________________________
 
     ____________________________________________________________
-     Got it. I've added this task:
+     Very good, sir. I've added this task:
        [E][ ] project meeting (from: Dec 02 2019 to: Dec 03 2019)
-     Now you have 3 tasks in the list.
+     That makes 3 tasks on your list.
     ____________________________________________________________
 
     ____________________________________________________________
-     Nice! I've marked this task as done:
+     Splendid, sir. I've marked this task as done:
        [D][X] return book (by: Oct 15 2019)
     ____________________________________________________________
 
     ____________________________________________________________
-     Here are the tasks in your list:
+     Here are the tasks on your list, sir:
      1.[T][ ] borrow book
      2.[D][X] return book (by: Oct 15 2019)
      3.[E][ ] project meeting (from: Dec 02 2019 to: Dec 03 2019)
     ____________________________________________________________
 
     ____________________________________________________________
-     Bye. Hope to see you again soon!
+     Very good, sir. I shall be here when you need me.
     ____________________________________________________________
 ```
 
@@ -427,8 +427,8 @@ bye
                     P E N N Y W O R T H
 
       Butler to the Wayne family  --  At your service
-     Hello! I'm AlfredTheButler
-     What can I do for you?
+     Good day, sir. Alfred Pennyworth, at your disposal.
+     What may I do for you?
     ____________________________________________________________
 
     ____________________________________________________________
@@ -440,7 +440,7 @@ bye
     ____________________________________________________________
 
     ____________________________________________________________
-     Bye. Hope to see you again soon!
+     Very good, sir. I shall be here when you need me.
     ____________________________________________________________
 ```
 
@@ -475,20 +475,20 @@ bye now
                     P E N N Y W O R T H
 
       Butler to the Wayne family  --  At your service
-     Hello! I'm AlfredTheButler
-     What can I do for you?
+     Good day, sir. Alfred Pennyworth, at your disposal.
+     What may I do for you?
     ____________________________________________________________
 
     ____________________________________________________________
-     Here are the tasks in your list:
+     Here are the tasks on your list, sir:
     ____________________________________________________________
 
     ____________________________________________________________
-     Here are the tasks in your list:
+     Here are the tasks on your list, sir:
     ____________________________________________________________
 
     ____________________________________________________________
-     Bye. Hope to see you again soon!
+     Very good, sir. I shall be here when you need me.
     ____________________________________________________________
 ```
 
@@ -526,30 +526,30 @@ bye
                     P E N N Y W O R T H
 
       Butler to the Wayne family  --  At your service
-     Hello! I'm AlfredTheButler
-     What can I do for you?
+     Good day, sir. Alfred Pennyworth, at your disposal.
+     What may I do for you?
     ____________________________________________________________
 
     ____________________________________________________________
-     Got it. I've added this task:
+     Very good, sir. I've added this task:
        [T][ ] read book
-     Now you have 1 task in the list.
+     That makes 1 task on your list.
     ____________________________________________________________
 
     ____________________________________________________________
-     Got it. I've added this task:
+     Very good, sir. I've added this task:
        [T][ ] return the Batmobile
-     Now you have 2 tasks in the list.
+     That makes 2 tasks on your list.
     ____________________________________________________________
 
     ____________________________________________________________
-     Here are the tasks in your list:
+     Here are the tasks on your list, sir:
      1.[T][ ] read book
      2.[T][ ] return the Batmobile
     ____________________________________________________________
 
     ____________________________________________________________
-     Bye. Hope to see you again soon!
+     Very good, sir. I shall be here when you need me.
     ____________________________________________________________
 ```
 
@@ -585,8 +585,8 @@ bye
                     P E N N Y W O R T H
 
       Butler to the Wayne family  --  At your service
-     Hello! I'm AlfredTheButler
-     What can I do for you?
+     Good day, sir. Alfred Pennyworth, at your disposal.
+     What may I do for you?
     ____________________________________________________________
 
     ____________________________________________________________
@@ -598,11 +598,11 @@ bye
     ____________________________________________________________
 
     ____________________________________________________________
-     Here are the tasks in your list:
+     Here are the tasks on your list, sir:
     ____________________________________________________________
 
     ____________________________________________________________
-     Bye. Hope to see you again soon!
+     Very good, sir. I shall be here when you need me.
     ____________________________________________________________
 ```
 
@@ -652,8 +652,8 @@ bye
                     P E N N Y W O R T H
 
       Butler to the Wayne family  --  At your service
-     Hello! I'm AlfredTheButler
-     What can I do for you?
+     Good day, sir. Alfred Pennyworth, at your disposal.
+     What may I do for you?
     ____________________________________________________________
 
     ____________________________________________________________
@@ -681,11 +681,11 @@ bye
     ____________________________________________________________
 
     ____________________________________________________________
-     Here are the tasks in your list:
+     Here are the tasks on your list, sir:
     ____________________________________________________________
 
     ____________________________________________________________
-     Bye. Hope to see you again soon!
+     Very good, sir. I shall be here when you need me.
     ____________________________________________________________
 ```
 
@@ -740,8 +740,8 @@ bye
                     P E N N Y W O R T H
 
       Butler to the Wayne family  --  At your service
-     Hello! I'm AlfredTheButler
-     What can I do for you?
+     Good day, sir. Alfred Pennyworth, at your disposal.
+     What may I do for you?
     ____________________________________________________________
 
     ____________________________________________________________
@@ -749,9 +749,9 @@ bye
     ____________________________________________________________
 
     ____________________________________________________________
-     Got it. I've added this task:
+     Very good, sir. I've added this task:
        [T][ ] read book
-     Now you have 1 task in the list.
+     That makes 1 task on your list.
     ____________________________________________________________
 
     ____________________________________________________________
@@ -787,12 +787,12 @@ bye
     ____________________________________________________________
 
     ____________________________________________________________
-     Here are the tasks in your list:
+     Here are the tasks on your list, sir:
      1.[T][ ] read book
     ____________________________________________________________
 
     ____________________________________________________________
-     Bye. Hope to see you again soon!
+     Very good, sir. I shall be here when you need me.
     ____________________________________________________________
 ```
 
@@ -837,65 +837,65 @@ bye
                     P E N N Y W O R T H
 
       Butler to the Wayne family  --  At your service
-     Hello! I'm AlfredTheButler
-     What can I do for you?
+     Good day, sir. Alfred Pennyworth, at your disposal.
+     What may I do for you?
     ____________________________________________________________
 
     ____________________________________________________________
-     Got it. I've added this task:
+     Very good, sir. I've added this task:
        [T][ ] read book
-     Now you have 1 task in the list.
+     That makes 1 task on your list.
     ____________________________________________________________
 
     ____________________________________________________________
-     Got it. I've added this task:
+     Very good, sir. I've added this task:
        [D][ ] return book (by: Oct 15 2019)
-     Now you have 2 tasks in the list.
+     That makes 2 tasks on your list.
     ____________________________________________________________
 
     ____________________________________________________________
-     Got it. I've added this task:
+     Very good, sir. I've added this task:
        [E][ ] project meeting (from: Dec 02 2019 to: Dec 03 2019)
-     Now you have 3 tasks in the list.
+     That makes 3 tasks on your list.
     ____________________________________________________________
 
     ____________________________________________________________
-     Here are the tasks in your list:
+     Here are the tasks on your list, sir:
      1.[T][ ] read book
      2.[D][ ] return book (by: Oct 15 2019)
      3.[E][ ] project meeting (from: Dec 02 2019 to: Dec 03 2019)
     ____________________________________________________________
 
     ____________________________________________________________
-     Noted. I've removed this task:
+     As you wish, sir. I've removed this task:
        [D][ ] return book (by: Oct 15 2019)
-     Now you have 2 tasks in the list.
+     That leaves 2 tasks on your list.
     ____________________________________________________________
 
     ____________________________________________________________
-     Here are the tasks in your list:
+     Here are the tasks on your list, sir:
      1.[T][ ] read book
      2.[E][ ] project meeting (from: Dec 02 2019 to: Dec 03 2019)
     ____________________________________________________________
 
     ____________________________________________________________
-     Noted. I've removed this task:
+     As you wish, sir. I've removed this task:
        [T][ ] read book
-     Now you have 1 task in the list.
+     That leaves 1 task on your list.
     ____________________________________________________________
 
     ____________________________________________________________
-     Noted. I've removed this task:
+     As you wish, sir. I've removed this task:
        [E][ ] project meeting (from: Dec 02 2019 to: Dec 03 2019)
-     Now you have 0 tasks in the list.
+     That leaves 0 tasks on your list.
     ____________________________________________________________
 
     ____________________________________________________________
-     Here are the tasks in your list:
+     Here are the tasks on your list, sir:
     ____________________________________________________________
 
     ____________________________________________________________
-     Bye. Hope to see you again soon!
+     Very good, sir. I shall be here when you need me.
     ____________________________________________________________
 ```
 
@@ -955,35 +955,35 @@ bye
                     P E N N Y W O R T H
 
       Butler to the Wayne family  --  At your service
-     Hello! I'm AlfredTheButler
-     What can I do for you?
+     Good day, sir. Alfred Pennyworth, at your disposal.
+     What may I do for you?
     ____________________________________________________________
 
     ____________________________________________________________
-     Got it. I've added this task:
+     Very good, sir. I've added this task:
        [T][ ] read book
-     Now you have 1 task in the list.
+     That makes 1 task on your list.
     ____________________________________________________________
 
     ____________________________________________________________
-     Got it. I've added this task:
+     Very good, sir. I've added this task:
        [D][ ] return book (by: Oct 15 2019)
-     Now you have 2 tasks in the list.
+     That makes 2 tasks on your list.
     ____________________________________________________________
 
     ____________________________________________________________
-     Got it. I've added this task:
+     Very good, sir. I've added this task:
        [E][ ] project meeting (from: Dec 02 2019 to: Dec 03 2019)
-     Now you have 3 tasks in the list.
+     That makes 3 tasks on your list.
     ____________________________________________________________
 
     ____________________________________________________________
-     Nice! I've marked this task as done:
+     Splendid, sir. I've marked this task as done:
        [T][X] read book
     ____________________________________________________________
 
     ____________________________________________________________
-     Bye. Hope to see you again soon!
+     Very good, sir. I shall be here when you need me.
     ____________________________________________________________
 
     ____________________________________________________________
@@ -995,8 +995,8 @@ bye
                     P E N N Y W O R T H
 
       Butler to the Wayne family  --  At your service
-     Hello! I'm AlfredTheButler
-     What can I do for you?
+     Good day, sir. Alfred Pennyworth, at your disposal.
+     What may I do for you?
     ____________________________________________________________
 
     ____________________________________________________________
@@ -1004,14 +1004,14 @@ bye
     ____________________________________________________________
 
     ____________________________________________________________
-     Here are the tasks in your list:
+     Here are the tasks on your list, sir:
      1.[T][X] read book
      2.[D][ ] return book (by: Oct 15 2019)
      3.[E][ ] project meeting (from: Dec 02 2019 to: Dec 03 2019)
     ____________________________________________________________
 
     ____________________________________________________________
-     Bye. Hope to see you again soon!
+     Very good, sir. I shall be here when you need me.
     ____________________________________________________________
 ```
 
@@ -1055,24 +1055,24 @@ bye
                     P E N N Y W O R T H
 
       Butler to the Wayne family  --  At your service
-     Hello! I'm AlfredTheButler
-     What can I do for you?
+     Good day, sir. Alfred Pennyworth, at your disposal.
+     What may I do for you?
     ____________________________________________________________
 
     ____________________________________________________________
-     Got it. I've added this task:
+     Very good, sir. I've added this task:
        [T][ ] read book
-     Now you have 1 task in the list.
+     That makes 1 task on your list.
     ____________________________________________________________
 
     ____________________________________________________________
-     Noted. I've removed this task:
+     As you wish, sir. I've removed this task:
        [T][ ] read book
-     Now you have 0 tasks in the list.
+     That leaves 0 tasks on your list.
     ____________________________________________________________
 
     ____________________________________________________________
-     Bye. Hope to see you again soon!
+     Very good, sir. I shall be here when you need me.
     ____________________________________________________________
 
     ____________________________________________________________
@@ -1084,16 +1084,16 @@ bye
                     P E N N Y W O R T H
 
       Butler to the Wayne family  --  At your service
-     Hello! I'm AlfredTheButler
-     What can I do for you?
+     Good day, sir. Alfred Pennyworth, at your disposal.
+     What may I do for you?
     ____________________________________________________________
 
     ____________________________________________________________
-     Here are the tasks in your list:
+     Here are the tasks on your list, sir:
     ____________________________________________________________
 
     ____________________________________________________________
-     Bye. Hope to see you again soon!
+     Very good, sir. I shall be here when you need me.
     ____________________________________________________________
 ```
 
@@ -1129,23 +1129,23 @@ list
                     P E N N Y W O R T H
 
       Butler to the Wayne family  --  At your service
-     Hello! I'm AlfredTheButler
-     What can I do for you?
+     Good day, sir. Alfred Pennyworth, at your disposal.
+     What may I do for you?
     ____________________________________________________________
 
     ____________________________________________________________
-     Got it. I've added this task:
+     Very good, sir. I've added this task:
        [T][ ] read book
-     Now you have 1 task in the list.
+     That makes 1 task on your list.
     ____________________________________________________________
 
     ____________________________________________________________
-     Here are the tasks in your list:
+     Here are the tasks on your list, sir:
      1.[T][ ] read book
     ____________________________________________________________
 
     ____________________________________________________________
-     Bye. Hope to see you again soon!
+     Very good, sir. I shall be here when you need me.
     ____________________________________________________________
 ```
 
@@ -1193,24 +1193,24 @@ bye
                     P E N N Y W O R T H
 
       Butler to the Wayne family  --  At your service
-     Hello! I'm AlfredTheButler
-     What can I do for you?
+     Good day, sir. Alfred Pennyworth, at your disposal.
+     What may I do for you?
     ____________________________________________________________
 
     ____________________________________________________________
-     Got it. I've added this task:
+     Very good, sir. I've added this task:
        [T][ ] a | b
-     Now you have 1 task in the list.
+     That makes 1 task on your list.
     ____________________________________________________________
 
     ____________________________________________________________
-     Got it. I've added this task:
+     Very good, sir. I've added this task:
        [D][ ] pipe | desc (by: Oct 15 2019)
-     Now you have 2 tasks in the list.
+     That makes 2 tasks on your list.
     ____________________________________________________________
 
     ____________________________________________________________
-     Bye. Hope to see you again soon!
+     Very good, sir. I shall be here when you need me.
     ____________________________________________________________
 
     ____________________________________________________________
@@ -1222,8 +1222,8 @@ bye
                     P E N N Y W O R T H
 
       Butler to the Wayne family  --  At your service
-     Hello! I'm AlfredTheButler
-     What can I do for you?
+     Good day, sir. Alfred Pennyworth, at your disposal.
+     What may I do for you?
     ____________________________________________________________
 
     ____________________________________________________________
@@ -1231,13 +1231,13 @@ bye
     ____________________________________________________________
 
     ____________________________________________________________
-     Here are the tasks in your list:
+     Here are the tasks on your list, sir:
      1.[T][ ] a | b
      2.[D][ ] pipe | desc (by: Oct 15 2019)
     ____________________________________________________________
 
     ____________________________________________________________
-     Bye. Hope to see you again soon!
+     Very good, sir. I shall be here when you need me.
     ____________________________________________________________
 ```
 
@@ -1301,8 +1301,8 @@ bye
                     P E N N Y W O R T H
 
       Butler to the Wayne family  --  At your service
-     Hello! I'm AlfredTheButler
-     What can I do for you?
+     Good day, sir. Alfred Pennyworth, at your disposal.
+     What may I do for you?
     ____________________________________________________________
 
     ____________________________________________________________
@@ -1315,13 +1315,13 @@ bye
     ____________________________________________________________
 
     ____________________________________________________________
-     Here are the tasks in your list:
+     Here are the tasks on your list, sir:
      1.[T][X] read book
      2.[E][ ] good event (from: Dec 02 2019 to: Dec 03 2019)
     ____________________________________________________________
 
     ____________________________________________________________
-     Bye. Hope to see you again soon!
+     Very good, sir. I shall be here when you need me.
     ____________________________________________________________
 ```
 
@@ -1379,8 +1379,8 @@ bye
                     P E N N Y W O R T H
 
       Butler to the Wayne family  --  At your service
-     Hello! I'm AlfredTheButler
-     What can I do for you?
+     Good day, sir. Alfred Pennyworth, at your disposal.
+     What may I do for you?
     ____________________________________________________________
 
     ____________________________________________________________
@@ -1404,11 +1404,11 @@ bye
     ____________________________________________________________
 
     ____________________________________________________________
-     Here are the tasks in your list:
+     Here are the tasks on your list, sir:
     ____________________________________________________________
 
     ____________________________________________________________
-     Bye. Hope to see you again soon!
+     Very good, sir. I shall be here when you need me.
     ____________________________________________________________
 ```
 
@@ -1465,30 +1465,30 @@ bye
                     P E N N Y W O R T H
 
       Butler to the Wayne family  --  At your service
-     Hello! I'm AlfredTheButler
-     What can I do for you?
+     Good day, sir. Alfred Pennyworth, at your disposal.
+     What may I do for you?
     ____________________________________________________________
 
     ____________________________________________________________
-     Got it. I've added this task:
+     Very good, sir. I've added this task:
        [D][ ] file taxes (by: Jan 05 2019)
-     Now you have 1 task in the list.
+     That makes 1 task on your list.
     ____________________________________________________________
 
     ____________________________________________________________
-     Got it. I've added this task:
+     Very good, sir. I've added this task:
        [D][ ] leap day (by: Feb 29 2020)
-     Now you have 2 tasks in the list.
+     That makes 2 tasks on your list.
     ____________________________________________________________
 
     ____________________________________________________________
-     Got it. I've added this task:
+     Very good, sir. I've added this task:
        [E][ ] new year (from: Dec 31 2019 to: Jan 01 2020)
-     Now you have 3 tasks in the list.
+     That makes 3 tasks on your list.
     ____________________________________________________________
 
     ____________________________________________________________
-     Bye. Hope to see you again soon!
+     Very good, sir. I shall be here when you need me.
     ____________________________________________________________
 
     ____________________________________________________________
@@ -1500,8 +1500,8 @@ bye
                     P E N N Y W O R T H
 
       Butler to the Wayne family  --  At your service
-     Hello! I'm AlfredTheButler
-     What can I do for you?
+     Good day, sir. Alfred Pennyworth, at your disposal.
+     What may I do for you?
     ____________________________________________________________
 
     ____________________________________________________________
@@ -1509,14 +1509,14 @@ bye
     ____________________________________________________________
 
     ____________________________________________________________
-     Here are the tasks in your list:
+     Here are the tasks on your list, sir:
      1.[D][ ] file taxes (by: Jan 05 2019)
      2.[D][ ] leap day (by: Feb 29 2020)
      3.[E][ ] new year (from: Dec 31 2019 to: Jan 01 2020)
     ____________________________________________________________
 
     ____________________________________________________________
-     Bye. Hope to see you again soon!
+     Very good, sir. I shall be here when you need me.
     ____________________________________________________________
 ```
 
@@ -1557,8 +1557,8 @@ bye
                     P E N N Y W O R T H
 
       Butler to the Wayne family  --  At your service
-     Hello! I'm AlfredTheButler
-     What can I do for you?
+     Good day, sir. Alfred Pennyworth, at your disposal.
+     What may I do for you?
     ____________________________________________________________
 
     ____________________________________________________________
@@ -1566,18 +1566,18 @@ bye
     ____________________________________________________________
 
     ____________________________________________________________
-     Got it. I've added this task:
+     Very good, sir. I've added this task:
        [E][ ] one day (from: Jan 01 2020 to: Jan 01 2020)
-     Now you have 1 task in the list.
+     That makes 1 task on your list.
     ____________________________________________________________
 
     ____________________________________________________________
-     Here are the tasks in your list:
+     Here are the tasks on your list, sir:
      1.[E][ ] one day (from: Jan 01 2020 to: Jan 01 2020)
     ____________________________________________________________
 
     ____________________________________________________________
-     Bye. Hope to see you again soon!
+     Very good, sir. I shall be here when you need me.
     ____________________________________________________________
 ```
 
@@ -1640,26 +1640,26 @@ bye
                     P E N N Y W O R T H
 
       Butler to the Wayne family  --  At your service
-     Hello! I'm AlfredTheButler
-     What can I do for you?
+     Good day, sir. Alfred Pennyworth, at your disposal.
+     What may I do for you?
     ____________________________________________________________
 
     ____________________________________________________________
-     Got it. I've added this task:
+     Very good, sir. I've added this task:
        [T][ ] no date
-     Now you have 1 task in the list.
+     That makes 1 task on your list.
     ____________________________________________________________
 
     ____________________________________________________________
-     Got it. I've added this task:
+     Very good, sir. I've added this task:
        [D][ ] return book (by: Dec 02 2019)
-     Now you have 2 tasks in the list.
+     That makes 2 tasks on your list.
     ____________________________________________________________
 
     ____________________________________________________________
-     Got it. I've added this task:
+     Very good, sir. I've added this task:
        [E][ ] conference (from: Dec 01 2019 to: Dec 03 2019)
-     Now you have 3 tasks in the list.
+     That makes 3 tasks on your list.
     ____________________________________________________________
 
     ____________________________________________________________
@@ -1687,7 +1687,7 @@ bye
     ____________________________________________________________
 
     ____________________________________________________________
-     Nice! I've marked this task as done:
+     Splendid, sir. I've marked this task as done:
        [E][X] conference (from: Dec 01 2019 to: Dec 03 2019)
     ____________________________________________________________
 
@@ -1697,7 +1697,7 @@ bye
     ____________________________________________________________
 
     ____________________________________________________________
-     Bye. Hope to see you again soon!
+     Very good, sir. I shall be here when you need me.
     ____________________________________________________________
 ```
 
@@ -1741,14 +1741,14 @@ bye
                     P E N N Y W O R T H
 
       Butler to the Wayne family  --  At your service
-     Hello! I'm AlfredTheButler
-     What can I do for you?
+     Good day, sir. Alfred Pennyworth, at your disposal.
+     What may I do for you?
     ____________________________________________________________
 
     ____________________________________________________________
-     Got it. I've added this task:
+     Very good, sir. I've added this task:
        [T][ ] read book
-     Now you have 1 task in the list.
+     That makes 1 task on your list.
     ____________________________________________________________
 
     ____________________________________________________________
@@ -1764,12 +1764,12 @@ bye
     ____________________________________________________________
 
     ____________________________________________________________
-     Here are the tasks in your list:
+     Here are the tasks on your list, sir:
      1.[T][ ] read book
     ____________________________________________________________
 
     ____________________________________________________________
-     Bye. Hope to see you again soon!
+     Very good, sir. I shall be here when you need me.
     ____________________________________________________________
 ```
 
@@ -1827,52 +1827,52 @@ bye
                     P E N N Y W O R T H
 
       Butler to the Wayne family  --  At your service
-     Hello! I'm AlfredTheButler
-     What can I do for you?
+     Good day, sir. Alfred Pennyworth, at your disposal.
+     What may I do for you?
     ____________________________________________________________
 
     ____________________________________________________________
-     Got it. I've added this task:
+     Very good, sir. I've added this task:
        [T][ ] read book
-     Now you have 1 task in the list.
+     That makes 1 task on your list.
     ____________________________________________________________
 
     ____________________________________________________________
-     Got it. I've added this task:
+     Very good, sir. I've added this task:
        [T][ ] buy milk
-     Now you have 2 tasks in the list.
+     That makes 2 tasks on your list.
     ____________________________________________________________
 
     ____________________________________________________________
-     Got it. I've added this task:
+     Very good, sir. I've added this task:
        [D][ ] return book (by: Jun 06 2019)
-     Now you have 3 tasks in the list.
+     That makes 3 tasks on your list.
     ____________________________________________________________
 
     ____________________________________________________________
-     Nice! I've marked this task as done:
+     Splendid, sir. I've marked this task as done:
        [T][X] read book
     ____________________________________________________________
 
     ____________________________________________________________
-     Nice! I've marked this task as done:
+     Splendid, sir. I've marked this task as done:
        [D][X] return book (by: Jun 06 2019)
     ____________________________________________________________
 
     ____________________________________________________________
-     Here are the matching tasks in your list:
+     Here are the matching tasks on your list, sir:
      1.[T][X] read book
      3.[D][X] return book (by: Jun 06 2019)
     ____________________________________________________________
 
     ____________________________________________________________
-     Here are the matching tasks in your list:
+     Here are the matching tasks on your list, sir:
      1.[T][X] read book
      3.[D][X] return book (by: Jun 06 2019)
     ____________________________________________________________
 
     ____________________________________________________________
-     Here are the matching tasks in your list:
+     Here are the matching tasks on your list, sir:
      2.[T][ ] buy milk
     ____________________________________________________________
 
@@ -1881,24 +1881,24 @@ bye
     ____________________________________________________________
 
     ____________________________________________________________
-     Noted. I've removed this task:
+     As you wish, sir. I've removed this task:
        [T][ ] buy milk
-     Now you have 2 tasks in the list.
+     That leaves 2 tasks on your list.
     ____________________________________________________________
 
     ____________________________________________________________
-     Here are the matching tasks in your list:
+     Here are the matching tasks on your list, sir:
      1.[T][X] read book
      2.[D][X] return book (by: Jun 06 2019)
     ____________________________________________________________
 
     ____________________________________________________________
-     OK, I've marked this task as not done yet:
+     Very well, sir. I've marked this task as not done yet:
        [D][ ] return book (by: Jun 06 2019)
     ____________________________________________________________
 
     ____________________________________________________________
-     Bye. Hope to see you again soon!
+     Very good, sir. I shall be here when you need me.
     ____________________________________________________________
 ```
 
@@ -1949,8 +1949,8 @@ bye
                     P E N N Y W O R T H
 
       Butler to the Wayne family  --  At your service
-     Hello! I'm AlfredTheButler
-     What can I do for you?
+     Good day, sir. Alfred Pennyworth, at your disposal.
+     What may I do for you?
     ____________________________________________________________
 
     ____________________________________________________________
@@ -1962,13 +1962,13 @@ bye
     ____________________________________________________________
 
     ____________________________________________________________
-     Got it. I've added this task:
+     Very good, sir. I've added this task:
        [T][ ] read book tonight
-     Now you have 1 task in the list.
+     That makes 1 task on your list.
     ____________________________________________________________
 
     ____________________________________________________________
-     Here are the matching tasks in your list:
+     Here are the matching tasks on your list, sir:
      1.[T][ ] read book tonight
     ____________________________________________________________
 
@@ -1977,17 +1977,17 @@ bye
     ____________________________________________________________
 
     ____________________________________________________________
-     Here are the matching tasks in your list:
+     Here are the matching tasks on your list, sir:
      1.[T][ ] read book tonight
     ____________________________________________________________
 
     ____________________________________________________________
-     Here are the tasks in your list:
+     Here are the tasks on your list, sir:
      1.[T][ ] read book tonight
     ____________________________________________________________
 
     ____________________________________________________________
-     Bye. Hope to see you again soon!
+     Very good, sir. I shall be here when you need me.
     ____________________________________________________________
 ```
 
@@ -2024,20 +2024,20 @@ bye
                     P E N N Y W O R T H
 
       Butler to the Wayne family  --  At your service
-     Hello! I'm AlfredTheButler
-     What can I do for you?
+     Good day, sir. Alfred Pennyworth, at your disposal.
+     What may I do for you?
     ____________________________________________________________
 
     ____________________________________________________________
-     Got it. I've added this task:
+     Very good, sir. I've added this task:
        [T][ ] read book
-     Now you have 1 task in the list.
+     That makes 1 task on your list.
     ____________________________________________________________
 
     ____________________________________________________________
-     Got it. I've added this task:
+     Very good, sir. I've added this task:
        [T][ ] submit report
-     Now you have 2 tasks in the list.
+     That makes 2 tasks on your list.
     ____________________________________________________________
 
     ____________________________________________________________
@@ -2046,13 +2046,13 @@ bye
     ____________________________________________________________
 
     ____________________________________________________________
-     Here are the tasks in your list:
+     Here are the tasks on your list, sir:
      1.[T][ ] read book
      2.[T][ ][HIGH] submit report
     ____________________________________________________________
 
     ____________________________________________________________
-     Bye. Hope to see you again soon!
+     Very good, sir. I shall be here when you need me.
     ____________________________________________________________
 
 ```
@@ -2091,14 +2091,14 @@ bye
                     P E N N Y W O R T H
 
       Butler to the Wayne family  --  At your service
-     Hello! I'm AlfredTheButler
-     What can I do for you?
+     Good day, sir. Alfred Pennyworth, at your disposal.
+     What may I do for you?
     ____________________________________________________________
 
     ____________________________________________________________
-     Got it. I've added this task:
+     Very good, sir. I've added this task:
        [T][ ] submit report
-     Now you have 1 task in the list.
+     That makes 1 task on your list.
     ____________________________________________________________
 
     ____________________________________________________________
@@ -2112,7 +2112,7 @@ bye
     ____________________________________________________________
 
     ____________________________________________________________
-     Here are the tasks in your list:
+     Here are the tasks on your list, sir:
      1.[T][ ][HIGH] submit report
     ____________________________________________________________
 
@@ -2122,12 +2122,12 @@ bye
     ____________________________________________________________
 
     ____________________________________________________________
-     Here are the tasks in your list:
+     Here are the tasks on your list, sir:
      1.[T][ ] submit report
     ____________________________________________________________
 
     ____________________________________________________________
-     Bye. Hope to see you again soon!
+     Very good, sir. I shall be here when you need me.
     ____________________________________________________________
 
 ```
@@ -2171,14 +2171,14 @@ bye
                     P E N N Y W O R T H
 
       Butler to the Wayne family  --  At your service
-     Hello! I'm AlfredTheButler
-     What can I do for you?
+     Good day, sir. Alfred Pennyworth, at your disposal.
+     What may I do for you?
     ____________________________________________________________
 
     ____________________________________________________________
-     Got it. I've added this task:
+     Very good, sir. I've added this task:
        [T][ ] read book
-     Now you have 1 task in the list.
+     That makes 1 task on your list.
     ____________________________________________________________
 
     ____________________________________________________________
@@ -2202,12 +2202,12 @@ bye
     ____________________________________________________________
 
     ____________________________________________________________
-     Here are the tasks in your list:
+     Here are the tasks on your list, sir:
      1.[T][ ] read book
     ____________________________________________________________
 
     ____________________________________________________________
-     Bye. Hope to see you again soon!
+     Very good, sir. I shall be here when you need me.
     ____________________________________________________________
 
 ```
