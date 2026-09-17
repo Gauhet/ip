@@ -5,63 +5,31 @@ import alfred.command.ExitCommand;
 import alfred.task.TaskList;
 
 /**
- * Runs Alfred the Butler, a personal chatbot that keeps a list of tasks, taking
- * one command per line until the user says {@code bye} or the input runs out.
- * The list is saved to disk after every change and read back at startup.
- *
- * <p>This class holds the command loop and nothing else that can be given a
- * home of its own: {@link Ui} owns what the user sees and types, {@link Parser}
- * what a typed line means, the {@link Command} what to do about it,
- * {@link TaskList} the tasks, and {@link Storage} the save file.
- *
- * <p>There are two ways in. {@link #run()} is the console one. The window uses
- * {@link #getGreeting()} and {@link #getResponse(String)} instead, one line at
- * a time. Both reach the commands by the same path.
+ * Runs Alfred the Butler, a personal chatbot that keeps a list of tasks.
+ * The console uses {@link #run()}; the window uses {@link #getGreeting()} and
+ * {@link #getResponse(String)} one line at a time.
  */
 public class AlfredTheButler {
-    /**
-     * Names the file a normal run keeps its tasks in. Kept here rather than
-     * inside {@link Storage}, so that the class that does the saving does not
-     * also decide where to save.
-     */
     private static final String SAVE_FILE = "data/alfred.txt";
 
-    /** Everything the user sees and types. */
     private final Ui ui;
 
-    /** The save file this run reads from and writes to. */
     private final Storage storage;
 
-    /** The tasks. Not final, because the list read back at startup replaces the empty one. */
     private TaskList tasks;
 
-    /**
-     * Records the kind of the command last carried out, named by its class, or
-     * null before any has been. Kept so that the window can color a reply by
-     * the kind of command it answers.
-     */
+    /** The class name of the last command carried out, so the window can color its reply. */
     private String commandType;
 
-    /**
-     * Records whether the last reply was a refusal or a fault rather than an
-     * answer. Kept so that the window can show an error in a way that catches
-     * the eye.
-     */
     private boolean isLastResponseError;
 
     /**
-     * Sets up a run that keeps its tasks in one named file.
-     *
-     * <p>Nothing is read here: loading has something to say to the user, and it
-     * belongs after the greeting.
+     * Sets up a run that keeps its tasks in one named file. Nothing is read
+     * until the greeting is shown.
      *
      * @param filePath where to keep the tasks, such as {@code data/alfred.txt}.
      */
     public AlfredTheButler(String filePath) {
-        // The program picks the save file, never the user, so a missing or
-        // blank one is a fault here. It would otherwise go unnoticed until the
-        // first command tried to save and failed for a reason that named no
-        // file.
         assert filePath != null && !filePath.isBlank() : "a run needs a save file";
 
         ui = new Ui();
@@ -69,21 +37,14 @@ public class AlfredTheButler {
         tasks = new TaskList();
     }
 
-    /** Sets up a run that keeps its tasks where a normal run keeps them. */
+    /** Sets up a run that keeps its tasks in the usual file. */
     public AlfredTheButler() {
         this(SAVE_FILE);
     }
 
     /**
      * Greets the user, then handles one command per line until {@code bye} or
-     * the end of the input: {@code list}, {@code find <keyword>},
-     * {@code on <date>}, {@code mark <number>}, {@code unmark <number>},
-     * {@code delete <number>}, {@code priority <number> <level>}, and the three
-     * that add a task, {@code todo}, {@code deadline}, and {@code event}. Any
-     * other word is refused rather than guessed at.
-     *
-     * <p>Commands run inside a {@code try} so that a mistake in what was typed
-     * becomes an ordinary reply.
+     * the end of the input, which is treated the same way.
      */
     public void run() {
         boolean isExit = false;
@@ -92,21 +53,16 @@ public class AlfredTheButler {
         restoreTasks();
         while (!isExit) {
             try {
-                // End of input is treated as `bye`, so that a piped session that
-                // runs out of lines finishes the same way a typed one does.
                 Command command = ui.hasNextCommand()
                         ? Parser.parse(ui.readCommand())
                         : new ExitCommand();
                 command.execute(tasks, ui, storage);
-                // Asked after the command has run, and skipped if it threw, so
-                // that a command which could not be carried out cannot end the
-                // session on its way out.
+                // Skipped if the command threw, so a refused command cannot end the session.
                 isExit = command.isExit();
             } catch (AlfredException e) {
                 ui.showError(e.getMessage());
             } catch (RuntimeException e) {
-                // A safety net for the mistakes in this program, so that a bug
-                // in one command costs that command rather than the session.
+                // A bug in one command costs that command rather than the session.
                 ui.showInternalError(e);
             }
         }
@@ -115,10 +71,6 @@ public class AlfredTheButler {
     /**
      * Returns Alfred's opening words, and reads back the tasks the last run
      * left behind.
-     *
-     * <p>What {@link #run()} does before its loop, for a caller that has no
-     * loop. Loading is part of it because a window that had not loaded would
-     * save an empty list over the tasks on disk.
      *
      * @return the greeting, and what came of reading the save file.
      */
@@ -131,25 +83,19 @@ public class AlfredTheButler {
 
     /**
      * Returns what Alfred says back to one line sent from the window.
-     *
-     * <p>What this does not do is end the session: there is no loop here to
-     * stop, so {@code bye} is answered like any other command.
+     * {@code bye} is answered like any other command; nothing ends here.
      *
      * @param input the line the user typed.
-     * @return the reply, as the console would have printed it, one line per line.
+     * @return the reply, as the console would have printed it.
      */
     public String getResponse(String input) {
         ui.startCapturing();
         try {
-            // Trimmed for the same reason the console trims what it reads: a
-            // window hands over the text field exactly as it stands.
             Command command = Parser.parse(input.trim());
             command.execute(tasks, ui, storage);
             commandType = command.getClass().getSimpleName();
             isLastResponseError = false;
         } catch (AlfredException e) {
-            // Forgotten rather than left as it was, so that a refusal is not
-            // colored as though the command before it had just run again.
             commandType = null;
             isLastResponseError = true;
             ui.showError(e.getMessage());
@@ -163,42 +109,31 @@ public class AlfredTheButler {
 
     /**
      * Returns whether the last reply from {@link #getResponse(String)} was an
-     * error rather than an answer: a line that was refused, or a fault in the
-     * program while carrying it out.
+     * error rather than an answer.
      *
-     * @return true if the last reply was an error, and false otherwise, including
-     *     before any line has been answered.
+     * @return true if the last reply was an error.
      */
     public boolean isLastResponseError() {
         return isLastResponseError;
     }
 
     /**
-     * Returns the kind of the command last carried out, named by its class.
+     * Returns the class name of the command last carried out.
      *
-     * @return the class name of the last command, or null before one has been
-     *     carried out.
+     * @return the class name, or null if the last line was refused.
      */
     public String getCommandType() {
         return commandType;
     }
 
-    /**
-     * Reads back the tasks the last run left behind, and says what came of it.
-     *
-     * <p>This has a {@code try} of its own because it runs before the loop.
-     */
+    /** Reads back the tasks the last run left behind, and says what came of it. */
     private void restoreTasks() {
         try {
             Storage.LoadResult loadResult = storage.load();
             tasks = new TaskList(loadResult.tasks());
-            // Said only when there is something to say. On a first run there is
-            // no file yet, and announcing that nothing came back would be noise.
             if (!tasks.isEmpty()) {
                 ui.showLoaded(tasks.size());
             }
-            // Warned about separately, and even when nothing else was restored,
-            // because the damaged lines are dropped as soon as the list changes.
             if (loadResult.skippedLines() > 0) {
                 ui.showSkippedLines(loadResult.skippedLines(), loadResult.backup());
             }
@@ -210,7 +145,7 @@ public class AlfredTheButler {
     /**
      * Starts one run of the chatbot, saving to the usual file.
      *
-     * @param args ignored; the save file is not yet something to choose.
+     * @param args ignored.
      */
     public static void main(String[] args) {
         new AlfredTheButler(SAVE_FILE).run();

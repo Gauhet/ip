@@ -4,28 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import alfred.AlfredException;
-import alfred.Storage;
 
 /**
- * Keeps the user's tasks in the order they were added, with the operations
- * that change that order or its contents.
- *
- * <p>The operations that act on a stored task return that task, because each is
- * followed by showing the user what was affected. Those three also check the
- * index they are given, since it comes from a number the user typed and only
- * this class knows how many tasks there are. {@link #get(int)} is the exception
- * and takes its index on trust, being how the list is walked for display.
+ * Keeps the user's tasks in the order they were added. The operations that
+ * take an index check it, since it comes from a number the user typed;
+ * {@link #get(int)} is the exception, being how the list is walked for
+ * display.
  */
 public class TaskList {
-    /** The tasks, in the order they were added, which is the order they are shown and saved in. */
     private final List<Task> tasks;
 
     /**
-     * Creates a list holding the tasks named, in the order they are named, or an
-     * empty list if none are named.
-     *
-     * <p>One varargs constructor covers both, rather than two that have to be
-     * kept in step.
+     * Creates a list holding the tasks named, or an empty list if none are.
      *
      * @param tasks the tasks to start with, in the order they are to be kept.
      */
@@ -34,11 +24,7 @@ public class TaskList {
     }
 
     /**
-     * Creates a list holding the given tasks, in the order given, which is how a
-     * run starts from what the save file held.
-     *
-     * <p>The tasks are copied, so that whoever supplied them cannot go on
-     * changing this list afterwards.
+     * Creates a list holding a copy of the given tasks, in the order given.
      *
      * @param tasks the tasks to start with, in the order they are to be kept.
      */
@@ -71,11 +57,6 @@ public class TaskList {
      * @return the task stored there.
      */
     public Task get(int index) {
-        // The operations that act on a stored task check the index, because it
-        // comes from a number the user typed. This one is how the list is
-        // walked for display, so its index comes from a loop over size(): an
-        // index outside the list is a fault here, not something to complain to
-        // the user about.
         assert index >= 0 && index < tasks.size() : "no task at index " + index;
 
         return tasks.get(index);
@@ -83,19 +64,14 @@ public class TaskList {
 
     /**
      * Adds a task to the end of the list, unless the same task is already on
-     * it.
-     *
-     * <p>Only additions are checked. The tasks a list is created with are
-     * taken as they are, so a save file edited by hand to hold a task twice
-     * still loads in full rather than losing one of them.
+     * it. Only additions are checked; the tasks a list is created with are
+     * taken as they are.
      *
      * @param task the task to store.
      * @throws AlfredException if the list already holds the same task, as
      *         {@link Task#isSameTask(Task)} judges it.
      */
     public void add(Task task) throws AlfredException {
-        // Walked by index rather than searched, because the refusal names the
-        // number the user would see next to the task they already have.
         for (int i = 0; i < tasks.size(); i++) {
             if (tasks.get(i).isSameTask(task)) {
                 throw new AlfredException("You already have that task, sir, as number " + (i + 1) + ".");
@@ -164,9 +140,6 @@ public class TaskList {
     /**
      * Refuses an index that names no stored task.
      *
-     * <p>Checked before the list is asked, because the list would answer with an
-     * exception that reads as a fault rather than as a reply to the user.
-     *
      * @param index the index to check, counting from 0.
      * @throws AlfredException if it falls outside the stored tasks.
      */
@@ -177,9 +150,7 @@ public class TaskList {
     }
 
     /**
-     * Returns the tasks as a plain list, for the sake of {@link Storage}.
-     *
-     * <p>The list is a copy, so that saving cannot change what is stored.
+     * Returns a copy of the tasks as a plain list, for saving.
      *
      * @return the tasks, in the order they are stored.
      */

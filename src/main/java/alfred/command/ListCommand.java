@@ -6,16 +6,9 @@ import alfred.task.TaskList;
 
 /**
  * Shows every stored task, in the order they are stored.
- *
- * <p>Nothing is saved, because nothing has changed.
  */
 public class ListCommand extends Command {
-    /**
-     * Creates a command that will show the whole list.
-     *
-     * <p>Nothing is passed in: the list arrives as an argument to
-     * {@link #execute(TaskList, Ui, Storage)}.
-     */
+    /** Creates a command that will show the whole list. */
     public ListCommand() {
     }
 

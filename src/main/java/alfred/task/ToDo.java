@@ -17,11 +17,6 @@ public class ToDo extends Task {
         super(description);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * <p>A todo carries no dates, so it adds nothing at the end.
-     */
     @Override
     public List<String> toFileFields() {
         return buildFileFields("T");

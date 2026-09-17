@@ -10,7 +10,6 @@ import alfred.task.TaskList;
  * Sets how much one task matters, or takes its priority off again.
  */
 public class PriorityCommand extends Command {
-    /** Which task to change, counting from 0, as yet unchecked against the list. */
     private final int index;
 
     /** The level to give it, {@link Priority#NONE} meaning take its priority off. */

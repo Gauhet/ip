@@ -6,12 +6,8 @@ import alfred.task.TaskList;
 
 /**
  * Shows the tasks whose description contains a keyword.
- *
- * <p>Nothing is saved, because searching changes nothing, which is the same
- * reason {@link ListCommand} and {@link OnCommand} save nothing.
  */
 public class FindCommand extends Command {
-    /** The text being searched for. */
     private final String keyword;
 
     /**

@@ -9,50 +9,34 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
 
 /**
- * Controls what the main window does, as against what it looks like.
- *
- * <p>The arrangement of the window is described in
- * {@code view/MainWindow.fxml}, and this class holds what happens in it. The two
- * are joined by name: a control given an {@code fx:id} in the file is set on the
- * field of the same name here, and a handler named in the file is this class's
- * method of that name.
+ * Controls what the main window does; {@code view/MainWindow.fxml} describes
+ * what it looks like. The two are joined by name: each {@code fx:id} in the
+ * file is set on the field of the same name here.
  */
 public class MainWindow extends VBox {
-    /** The scroll position that shows the foot of the conversation. */
     private static final double SCROLL_TO_BOTTOM = 1.0;
 
-    /** The scrolling view onto the conversation. */
     @FXML
     private ScrollPane scrollPane;
 
-    /** The conversation so far, one dialog box per message. */
     @FXML
     private VBox dialogContainer;
 
-    /** Where the user types. */
     @FXML
     private TextField userInput;
 
-    /** What the user presses to send what they typed. */
     @FXML
     private Button sendButton;
 
-    /** The chatbot the window asks for an answer to each line. */
     private AlfredTheButler alfred;
 
-    /** The avatar shown beside what Alfred says. */
     private final Image alfredImage =
             new Image(this.getClass().getResourceAsStream("/images/DaAlfred.png"));
 
     /**
-     * Finishes setting up the window, once the loader has filled in its parts.
-     *
-     * <p>The pane is scrolled to the end whenever the conversation grows taller.
-     * Binding its position to that height instead would leave the user unable to
-     * scroll back.
-     *
-     * <p>The send button is grayed out while there is nothing to send, so that
-     * it says at a glance whether pressing it would do anything.
+     * Finishes setting up the window once the loader has filled in its parts:
+     * scrolls to the end as the conversation grows, and grays out the send
+     * button while there is nothing to send.
      */
     @FXML
     public void initialize() {
@@ -62,9 +46,8 @@ public class MainWindow extends VBox {
     }
 
     /**
-     * Gives the window the chatbot it asks for an answer to each line.
-     *
-     * <p>Alfred greets the user here rather than in {@link #initialize()}, which
+     * Gives the window the chatbot it asks for an answer to each line, and
+     * shows the greeting. This cannot happen in {@link #initialize()}, which
      * runs while there is still no chatbot to ask.
      *
      * @param alfred the chatbot to ask.
@@ -75,22 +58,14 @@ public class MainWindow extends VBox {
                 DialogBox.getAlfredDialog(alfred.getGreeting(), alfredImage));
     }
 
-    /**
-     * Puts the keyboard focus in the text field, so that the user can type a
-     * command as soon as the window opens.
-     */
+    /** Puts the keyboard focus in the text field. */
     public void focusInput() {
         userInput.requestFocus();
     }
 
     /**
-     * Adds the line the user sent and Alfred's answer to it to the end of the
-     * conversation, then empties the text field ready for the next line.
-     *
-     * <p>Both boxes are added at once, so that a line and its answer arrive
-     * together as they do in a conversation. A blank line is not sent at all:
-     * in a window it is almost always a stray press of Enter, and answering it
-     * with a refusal would only add noise.
+     * Adds the line the user sent and Alfred's answer to the conversation, then
+     * empties the text field. A blank line is not sent at all.
      */
     @FXML
     private void handleUserInput() {

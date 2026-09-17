@@ -1,8 +1,7 @@
 package alfred;
 
 /**
- * Signals something the program can tell the user about and carry on from: a
- * mistake in what they typed, or a save file that cannot be read or written.
+ * Signals a problem the program can tell the user about and carry on from.
  * The message is shown to the user word for word.
  */
 public class AlfredException extends Exception {

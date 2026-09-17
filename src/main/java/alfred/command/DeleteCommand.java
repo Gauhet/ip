@@ -8,12 +8,8 @@ import alfred.task.TaskList;
 
 /**
  * Drops one task from the list.
- *
- * <p>The task is held on to as it is removed, because it is shown to the user
- * afterwards and by then it is no longer in the list to look up.
  */
 public class DeleteCommand extends Command {
-    /** Which task to remove, counting from 0, as yet unchecked against the list. */
     private final int index;
 
     /**

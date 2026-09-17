@@ -15,9 +15,7 @@ import alfred.task.Task;
 import alfred.task.ToDo;
 
 /**
- * Keeps the task list on the hard disk, so that tasks outlive a single run of
- * the program. One line of the file describes one task, in the order the tasks
- * are stored:
+ * Keeps the task list on the hard disk, one line per task:
  *
  * <pre>
  * T | 1 | read book
@@ -25,24 +23,15 @@ import alfred.task.ToDo;
  * E | 0 | project meeting | 2019-12-02 | 2019-12-03 | MEDIUM
  * </pre>
  *
- * <p>The first field is the type letter, the second is 1 for a task that is
- * done and 0 for one that is not, and the third is the description. Any fields
- * after that belong to the type, each written as {@code yyyy-mm-dd}. A
- * description may itself contain the separator, as in {@code todo a | b}, so
- * that character is escaped on the way out and restored on the way in.
- *
- * <p>A task with a priority carries it in one last field, after the dates. A
- * task without one has no such field, so a file written before this program
- * knew about priorities is still read.
+ * <p>The fields are the type letter, 1 or 0 for done or not, the description,
+ * then the type's own dates as {@code yyyy-mm-dd}, and finally a priority if
+ * the task has one. A {@code |} inside a description is escaped.
  */
 public class Storage {
-    /** What goes between two fields of a line, with a space on each side. */
     private static final String SEPARATOR = " | ";
 
-    /** The character the separator is built from, and which therefore has to be escaped. */
     private static final char SEPARATOR_CHAR = '|';
 
-    /** Marks the character after it as part of a field rather than as a separator. */
     private static final char ESCAPE_CHAR = '\\';
 
     /** How many fields a line has, by type letter, not counting a priority. */
@@ -52,28 +41,21 @@ public class Storage {
 
     private static final int FIELDS_EVENT = 5;
 
-    /** Where the type letter sits among a line's fields. */
     private static final int INDEX_TYPE = 0;
 
-    /** Where the done-or-not digit sits. */
     private static final int INDEX_STATUS = 1;
 
-    /** Where the description sits, the last field every type of task shares. */
     private static final int INDEX_DESCRIPTION = 2;
 
-    /** Where a deadline's due date sits, and where an event's start date sits. */
+    /** A deadline's due date, or an event's start date. */
     private static final int INDEX_FIRST_DATE = 3;
 
-    /** Where an event's end date sits. No other type reaches this far. */
     private static final int INDEX_SECOND_DATE = 4;
 
-    /** What is added to the save file's name to name the copy kept of a damaged one. */
     private static final String BACKUP_SUFFIX = ".bak";
 
     /**
-     * Holds what one call to {@link Storage#load()} found: the tasks it could
-     * read, how many lines it had to give up on, and where it kept a copy of
-     * the file if it gave up on any.
+     * Holds what one call to {@link Storage#load()} found.
      *
      * @param tasks the tasks that were read, in the order they were saved.
      * @param skippedLines how many lines could not be understood.
@@ -83,14 +65,10 @@ public class Storage {
      */
     record LoadResult(List<Task> tasks, int skippedLines, Path backup) { }
 
-    /** Where the tasks are kept, as given to the constructor. */
     private final Path file;
 
     /**
      * Prepares to keep the tasks in one named file.
-     *
-     * <p>A relative path is read against the directory the program was started
-     * from.
      *
      * @param filePath where to keep the tasks, such as {@code data/alfred.txt}.
      */
@@ -102,8 +80,6 @@ public class Storage {
      * Writes the whole task list to the save file, replacing whatever it held
      * before, and creating the file and its folder if they are not there yet.
      *
-     * <p>A full rewrite cannot leave the file half-updated.
-     *
      * @param tasks the tasks to save, in the order they are stored.
      * @throws AlfredException if the file cannot be written.
      */
@@ -113,7 +89,7 @@ public class Storage {
                 .toList();
         try {
             Path folder = file.getParent();
-            // Null when the path is a bare filename, naming no folder to create.
+            // Null when the path is a bare filename.
             if (folder != null) {
                 Files.createDirectories(folder);
             }
@@ -124,17 +100,9 @@ public class Storage {
     }
 
     /**
-     * Reads the saved tasks back, in the order they were written.
-     *
-     * <p>A missing file is what the first ever run sees, and is not a problem.
-     * A bad line is skipped rather than abandoning the whole file, and a file
-     * with any such line in it is copied aside first, because the next save
-     * rewrites the file from the tasks that were read and the skipped lines
-     * would be gone for good.
-     *
-     * <p>Skipping works by catching {@link AlfredException}, so everything that
-     * can refuse a line has to raise that one and not an unchecked exception.
-     * {@link Dates#parse(String)} is the case to watch.
+     * Reads the saved tasks back. A missing file is not a problem. A bad line
+     * is skipped rather than abandoning the whole file, and the file is copied
+     * aside first, since the next save would drop the skipped lines for good.
      *
      * @return the tasks that could be read, how many lines were skipped, and
      *         where the file was copied to if any were.
@@ -150,14 +118,9 @@ public class Storage {
         try {
             lines = Files.readAllLines(file);
         } catch (IOException e) {
-            // A file that cannot be opened at all is different from a file with
-            // a bad line in it: there is nothing to salvage.
             throw new AlfredException("I could not read your saved tasks, sir: " + describe(e));
         }
 
-        // Left as a loop rather than a stream: a stream would have to carry the
-        // count of skipped lines in a mutable box, and its lambda could not throw
-        // the checked exception that a bad line is reported with.
         int skippedLines = 0;
         for (String line : lines) {
             if (line.isBlank()) {
@@ -169,21 +132,15 @@ public class Storage {
                 skippedLines++;
             }
         }
+
         Path backup = skippedLines > 0 ? copyAside() : null;
         return new LoadResult(tasks, skippedLines, backup);
     }
 
     /**
-     * Copies the save file to a backup beside it, so that lines this program
-     * could not read are not lost when it next writes the file.
-     *
-     * <p>An earlier backup is overwritten. It was a copy of the same file, and
-     * one that has since been rewritten cleanly makes no new backup, so the
-     * copy on disk is always of the most recently damaged file.
+     * Copies the save file to a backup beside it, overwriting an earlier one.
      *
      * @return where the copy was made, or null if the copy could not be made.
-     *         Failing to keep a copy is reported rather than thrown, because
-     *         the tasks that were read are still worth starting with.
      */
     private Path copyAside() {
         Path backup = file.resolveSibling(file.getFileName() + BACKUP_SUFFIX);
@@ -196,13 +153,11 @@ public class Storage {
     }
 
     /**
-     * Describes a file problem in a way that says what went wrong.
-     *
-     * <p>The message of a file exception is often only the path, so the class
-     * name is used to say what kind of failure it was.
+     * Describes a file problem by the kind of failure and the path, since the
+     * exception's own message is often only the path.
      *
      * @param e the problem that came back from the file system.
-     * @return a short description naming the kind of failure and the path.
+     * @return a short description of it.
      */
     private static String describe(IOException e) {
         String kind = e.getClass().getSimpleName();
@@ -224,10 +179,7 @@ public class Storage {
                 .map(Storage::escape)
                 .collect(Collectors.joining(SEPARATOR));
 
-        // The escaping is only worth anything if the line reads back as the
-        // fields it was built from, and escape() and splitFields() have to be
-        // changed together to keep that true. Saying so here is what would
-        // catch a change to one of them that forgot the other.
+        // escape() and splitFields() have to be changed together to keep this true.
         assert splitFields(line).equals(fields) : "line does not read back as its fields: " + line;
 
         return line;
@@ -251,9 +203,6 @@ public class Storage {
     /**
      * Splits a line into its fields and undoes the escaping in one pass.
      *
-     * <p>Scanning character by character is what lets an escaped separator be
-     * told apart from a real one.
-     *
      * @param line one line of the save file.
      * @return the fields of that line, in order, with the escaping removed.
      */
@@ -263,8 +212,6 @@ public class Storage {
         for (int i = 0; i < line.length(); i++) {
             char current = line.charAt(i);
             if (current == ESCAPE_CHAR && i + 1 < line.length()) {
-                // The character after the mark is part of the field whatever it
-                // is, which is what makes an escaped separator harmless.
                 field.append(line.charAt(i + 1));
                 i++;
             } else if (current == SEPARATOR_CHAR) {
@@ -279,10 +226,8 @@ public class Storage {
     }
 
     /**
-     * Builds the task that one line of the save file describes.
-     *
-     * <p>Every part of the line is checked, because the file can be edited by
-     * hand and a wrong line should cost only itself.
+     * Builds the task that one line of the save file describes. Every part of
+     * the line is checked, because the file can be edited by hand.
      *
      * @param line a single line of the save file.
      * @return the task that line describes.
@@ -290,9 +235,6 @@ public class Storage {
      */
     private static Task parseTask(String line) throws AlfredException {
         List<String> fields = splitFields(line);
-        // splitFields adds the field it is building when the line runs out, so
-        // it hands back at least one field even for an empty line. That is what
-        // lets the type be read without a length check first.
         assert !fields.isEmpty() : "splitFields returns at least one field";
 
         String type = fields.get(INDEX_TYPE);
@@ -380,7 +322,7 @@ public class Storage {
     }
 
     /**
-     * Returns the description a save line carries, which every type of task has.
+     * Returns the description a save line carries.
      *
      * @param fields the fields the line was split into.
      * @return the description the line gives.
@@ -396,10 +338,6 @@ public class Storage {
 
     /**
      * Marks a task done or not done, as the status field of its save line says.
-     *
-     * <p>The field is checked rather than compared against {@code 1} alone, so
-     * that anything else is treated as damage instead of quietly meaning "not
-     * done".
      *
      * @param task the task the rest of the line described.
      * @param status the status field of that line.

@@ -9,7 +9,6 @@ import alfred.task.TaskList;
  * Marks one task as not done after all.
  */
 public class UnmarkCommand extends Command {
-    /** Which task to unmark, counting from 0, as yet unchecked against the list. */
     private final int index;
 
     /**

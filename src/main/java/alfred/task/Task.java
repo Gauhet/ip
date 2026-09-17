@@ -5,8 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
-import alfred.Storage;
-
 /**
  * Represents a task the user has asked Alfred to remember, together with
  * whether it has been completed and how much it matters. Each kind of task is
@@ -14,13 +12,10 @@ import alfred.Storage;
  * display form defined here.
  */
 public abstract class Task {
-    /** What the user has to do, in the words they described it in. */
     private final String name;
 
-    /** Whether the task has been completed. */
     private boolean isDone;
 
-    /** How much the task matters. */
     private Priority priority = Priority.NONE;
 
     /**
@@ -34,10 +29,8 @@ public abstract class Task {
     }
 
     /**
-     * Tells whether this task falls on the given day.
-     *
-     * <p>A task with no date falls on no day, which is the answer inherited by
-     * {@link ToDo}. The kinds that carry a date override it.
+     * Tells whether this task falls on the given day. A task with no date
+     * falls on no day; the kinds that carry a date override this.
      *
      * @param date the day being asked about.
      * @return true if this task falls on that day.
@@ -47,11 +40,8 @@ public abstract class Task {
     }
 
     /**
-     * Tells whether this task's description contains the given keyword, ignoring
-     * the difference between uppercase and lowercase.
-     *
-     * <p>Only the description is searched, and a keyword matches anywhere inside
-     * it, so that {@code find book} also finds {@code bookshop}.
+     * Tells whether this task's description contains the given keyword,
+     * ignoring case.
      *
      * @param keyword the text being searched for.
      * @return true if the description contains it.
@@ -62,12 +52,9 @@ public abstract class Task {
 
     /**
      * Tells whether another task is the same task as this one: one of the same
-     * kind, with the same description, spelled the same way apart from case.
-     *
-     * <p>Being done, or carrying a priority, does not make a task a different
-     * one, so neither is compared. The kinds that carry dates add those to the
-     * comparison, since {@code return book} due on two different days is two
-     * tasks.
+     * kind, with the same description ignoring case. Being done or having a
+     * priority does not make a task different; the kinds that carry dates add
+     * those to the comparison.
      *
      * @param other the task to compare with.
      * @return true if the two describe the same task.
@@ -99,24 +86,14 @@ public abstract class Task {
      * the status, the description, whatever the kind of task carries of its own,
      * and last of all the priority, if it has one.
      *
-     * <p>The fields are returned separately rather than joined into a line, so
-     * that only {@link Storage} knows what separates them.
-     *
      * @return a list holding this task's fields, in the order they are saved.
      */
     public abstract List<String> toFileFields();
 
     /**
-     * Returns the fields of one save line: the type letter, then the status and
-     * the description that every task saves, then any fields this kind adds of
-     * its own, then the priority. The status is a digit rather than a box,
-     * because the file is read by the program rather than by a person.
-     *
-     * <p>The extra fields are varargs because each kind has a different number
-     * of them: none for a todo, one for a deadline, two for an event.
-     *
-     * <p>The priority goes last and is left out when there is none, so a list
-     * without priorities saves as the file earlier versions wrote.
+     * Returns the fields of one save line. The priority goes last and is left
+     * out when there is none, so a list without priorities saves as the file
+     * earlier versions wrote.
      *
      * @param type the letter naming the kind of task, such as {@code D}.
      * @param extraFields the fields this kind adds after the description, in the
@@ -124,9 +101,6 @@ public abstract class Task {
      * @return an unmodifiable list holding the whole line's fields, in order.
      */
     protected List<String> buildFileFields(String type, String... extraFields) {
-        // Storage tells one kind of task from another by this single letter, so
-        // a longer one would go into a line that could never be read back. Only
-        // the subclasses call this, so a wrong letter is a fault here.
         assert type.length() == 1 : "a save line's type is one letter, not '" + type + "'";
 
         Stream<String> fields = Stream.concat(Stream.of(type, isDone ? "1" : "0", name),

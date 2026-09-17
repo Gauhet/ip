@@ -14,35 +14,24 @@ import alfred.task.Task;
 import alfred.task.TaskList;
 
 /**
- * Handles everything the user sees and types: the banner, the reply blocks,
- * and the line-by-line reading of commands.
- *
- * <p>The window is served by {@link #startCapturing()} and
- * {@link #stopCapturing()}: between the two, a reply is collected and handed
- * back rather than printed. Every message goes through {@link #reply}, so
- * neither the commands nor the task list can tell which interface they are
- * answering.
+ * Handles everything the user sees and types. Between {@link #startCapturing()}
+ * and {@link #stopCapturing()}, replies are collected for the window instead
+ * of printed.
  */
 public class Ui {
-    /** Horizontal rule that opens and closes every message block. */
     private static final String DIVIDER = "    " + "_".repeat(60);
 
-    /** Indent for message text, one space deeper than the divider. */
     private static final String INDENT = "     ";
 
     /** Extra indent for a line that belongs under the one above it, such as a marked task. */
     private static final String SUB_INDENT = "  ";
 
-    /** Name the chatbot introduces itself by. */
     private static final String NAME = "Alfred Pennyworth";
 
-    /** First line of the greeting, said the same way in the console and the window. */
     private static final String GREETING_INTRODUCTION = "Good day, sir. " + NAME + ", at your disposal.";
 
-    /** Second line of the greeting, the offer that invites the first command. */
     private static final String GREETING_OFFER = "What may I do for you?";
 
-    /** ASCII-art logo shown once at startup. */
     private static final String BANNER =
             "            _     _      _____  ____   _____  ____\n"
             + "           / \\   | |    |  ___||  _ \\ | ____||  _ \\\n"
@@ -53,17 +42,13 @@ public class Ui {
             + "\n"
             + "      Butler to the Wayne family  --  At your service";
 
-    /** Where the user's commands are read from, kept open for the whole run. */
+    /** Never closed, because that would close standard input. */
     private final Scanner scanner = new Scanner(System.in);
 
     /** The lines said since capturing began, or null while replies are being printed. */
     private List<String> captured;
 
-    /**
-     * Opens the console interface a run talks through.
-     *
-     * <p>The scanner is never closed, because that would close standard input.
-     */
+    /** Opens the console interface a run talks through. */
     public Ui() {
     }
 
@@ -77,8 +62,7 @@ public class Ui {
     }
 
     /**
-     * Reads the next command line, trimmed so that a stray space around a
-     * command does not stop it being recognized.
+     * Reads the next command line, trimmed.
      *
      * @return the line the user typed, without leading or trailing spaces.
      */
@@ -88,9 +72,6 @@ public class Ui {
 
     /** Starts collecting what is said instead of printing it. */
     void startCapturing() {
-        // One reply is collected at a time, and stopCapturing() is what hands it
-        // back and clears it. Starting a second time would silently throw away
-        // whatever the first had collected.
         assert captured == null : "already capturing";
 
         captured = new ArrayList<>();
@@ -103,9 +84,6 @@ public class Ui {
      * @return what was said, or an empty string if nothing was.
      */
     String stopCapturing() {
-        // The two window methods wrap every command in a startCapturing() and a
-        // stopCapturing(). Without the first, this would fail with a null
-        // pointer, well away from the caller that left it out.
         assert captured != null : "stopCapturing without startCapturing";
 
         String said = String.join("\n", captured);
@@ -113,12 +91,7 @@ public class Ui {
         return said;
     }
 
-    /**
-     * Prints the banner and the welcome message.
-     *
-     * <p>The banner is left out of a captured greeting: it needs a fixed-width
-     * font.
-     */
+    /** Prints the banner and the welcome message. A captured greeting leaves out the banner. */
     void showWelcome() {
         if (captured != null) {
             reply(GREETING_INTRODUCTION, GREETING_OFFER);
@@ -133,7 +106,7 @@ public class Ui {
         System.out.println();
     }
 
-    /** Prints the parting message, the last thing any run prints. */
+    /** Prints the parting message. */
     public void showFarewell() {
         reply("Very good, sir. I shall be here when you need me.");
     }
@@ -150,10 +123,6 @@ public class Ui {
     /**
      * Warns that part of the save file could not be understood, and says
      * whether a copy of it was kept.
-     *
-     * <p>Only the name of the copy is given, not its whole path, because it
-     * sits beside the save file and a path would be written differently on
-     * different systems.
      *
      * @param skippedLines how many lines were left out.
      * @param backup where a copy of the file was kept, or null if none could
@@ -191,16 +160,12 @@ public class Ui {
     }
 
     /**
-     * Confirms that a task has been stored, showing the task itself so the user
-     * can see how it was understood.
+     * Confirms that a task has been stored.
      *
      * @param task the task that was just added.
      * @param taskCount how many tasks are stored now that it has been added.
      */
     public void showAdded(Task task, int taskCount) {
-        // The count is the size of the list once the task is in it, so it
-        // counts at least that task. A count taken before the add would tell
-        // the user they have one task fewer than they do.
         assert taskCount > 0 : "the list holds at least the task just added";
 
         reply("Very good, sir. I've added this task:",
@@ -221,7 +186,7 @@ public class Ui {
     }
 
     /**
-     * Confirms that a task is now done, showing it with its new mark.
+     * Confirms that a task is now done.
      *
      * @param task the task that was marked.
      */
@@ -230,7 +195,7 @@ public class Ui {
     }
 
     /**
-     * Confirms that a task is no longer done, showing it with its new mark.
+     * Confirms that a task is no longer done.
      *
      * @param task the task that was unmarked.
      */
@@ -239,7 +204,7 @@ public class Ui {
     }
 
     /**
-     * Confirms that a task's priority has changed, showing it with its new box.
+     * Confirms that a task's priority has changed.
      *
      * @param task the task whose priority was set or cleared.
      */
@@ -251,8 +216,7 @@ public class Ui {
     }
 
     /**
-     * Prints the stored tasks as a numbered list under a heading, numbered
-     * from 1.
+     * Prints the stored tasks as a numbered list, numbered from 1.
      *
      * @param tasks the tasks to show, in the order they are stored.
      */
@@ -261,10 +225,8 @@ public class Ui {
     }
 
     /**
-     * Prints the tasks that fall on one day, in the order they are stored.
-     *
-     * <p>Numbered by place in the whole list, not among the matches, because
-     * {@code mark 2} acts on the whole list.
+     * Prints the tasks that fall on one day, each numbered by its place in
+     * the whole list so that the number works with {@code mark}.
      *
      * @param tasks every stored task, in the order they are stored.
      * @param date the day being asked about.
@@ -280,11 +242,8 @@ public class Ui {
     }
 
     /**
-     * Prints the tasks whose description contains a keyword, in the order they
-     * are stored.
-     *
-     * <p>Numbered by place in the whole list, for the same reason as
-     * {@link #showTasksOn(TaskList, LocalDate)}.
+     * Prints the tasks whose description contains a keyword, each numbered by
+     * its place in the whole list.
      *
      * @param tasks every stored task, in the order they are stored.
      * @param keyword the text being searched for.
@@ -301,11 +260,6 @@ public class Ui {
     /**
      * Returns the display lines for the tasks a test accepts, each numbered by
      * its place in the whole list.
-     *
-     * <p>The stream runs over the positions rather than over the tasks, because
-     * a task's number is where it sits in the whole list, which a stream of the
-     * tasks themselves would have lost. A test that accepts every task numbers
-     * the whole list.
      *
      * @param tasks every stored task, in the order they are stored.
      * @param isShown the test a task has to pass to be shown.
@@ -330,13 +284,11 @@ public class Ui {
 
     /**
      * Prints one or more lines inside a divider block, each indented, followed
-     * by a blank line — or collects them, while capturing.
+     * by a blank line, or collects them while capturing.
      *
      * @param lines the lines to display, in order.
      */
     private void reply(String... lines) {
-        // Every caller has something to say. A block with no lines would print
-        // as two dividers with nothing between them, which reads as a fault.
         assert lines.length > 0 : "a reply needs at least one line";
 
         if (captured != null) {
@@ -353,17 +305,14 @@ public class Ui {
     }
 
     /**
-     * Returns a count with its noun, made plural unless there is exactly one of
-     * them, for example {@code 1 task} or {@code 2 tasks}.
+     * Returns a count with its noun, made plural unless there is exactly one,
+     * for example {@code 1 task} or {@code 2 tasks}.
      *
      * @param count how many there are.
      * @param noun the singular form of what is being counted.
      * @return the count and the noun, ready to drop into a sentence.
      */
     private static String describeCount(int count, String noun) {
-        // Every count reaching here is the size of a list or a tally of lines,
-        // so a negative one means the arithmetic went wrong somewhere earlier.
-        // The user reading "-1 tasks" would be the first sign of it.
         assert count >= 0 : "cannot describe " + count + " of " + noun;
 
         return count + " " + noun + (count == 1 ? "" : "s");

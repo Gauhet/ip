@@ -3,12 +3,9 @@ package alfred.gui;
 import javafx.application.Application;
 
 /**
- * Starts the graphical version of Alfred.
- *
- * <p>A class that extends {@link Application} cannot be the main class of a JAR
- * that bundles JavaFX inside it: the runtime refuses to start when its own
- * classes were loaded from the classpath rather than as modules. This launcher
- * does not extend {@code Application}, so it is not subject to that check.
+ * Starts the graphical version of Alfred. A class that extends
+ * {@link Application} cannot be the main class of a JAR that bundles JavaFX,
+ * so this one does not.
  */
 public class Launcher {
     /**
