@@ -23,6 +23,8 @@ public class AlfredTheButler {
 
     private boolean isLastResponseError;
 
+    private boolean isLastCommandExit;
+
     /**
      * Sets up a run that keeps its tasks in one named file. Nothing is read
      * until the greeting is shown.
@@ -82,8 +84,8 @@ public class AlfredTheButler {
     }
 
     /**
-     * Returns what Alfred says back to one line sent from the window.
-     * {@code bye} is answered like any other command; nothing ends here.
+     * Returns what Alfred says back to one line sent from the window. Nothing
+     * ends here: the window asks {@link #isLastCommandExit()} and closes itself.
      *
      * @param input the line the user typed.
      * @return the reply, as the console would have printed it.
@@ -95,13 +97,16 @@ public class AlfredTheButler {
             command.execute(tasks, ui, storage);
             commandType = command.getClass().getSimpleName();
             isLastResponseError = false;
+            isLastCommandExit = command.isExit();
         } catch (AlfredException e) {
             commandType = null;
             isLastResponseError = true;
+            isLastCommandExit = false;
             ui.showError(e.getMessage());
         } catch (RuntimeException e) {
             commandType = null;
             isLastResponseError = true;
+            isLastCommandExit = false;
             ui.showInternalError(e);
         }
         return ui.stopCapturing();
@@ -115,6 +120,16 @@ public class AlfredTheButler {
      */
     public boolean isLastResponseError() {
         return isLastResponseError;
+    }
+
+    /**
+     * Returns whether the last line asked to end the session, so that the
+     * window can close once its farewell has been read.
+     *
+     * @return true if the last command was {@code bye}.
+     */
+    public boolean isLastCommandExit() {
+        return isLastCommandExit;
     }
 
     /**

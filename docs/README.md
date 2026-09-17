@@ -177,7 +177,7 @@ A task with a priority shows it in a box after its status box, in `list` and eve
 
 ### Exiting the program: `bye`
 
-Alfred says goodbye. In the window, you then close it as you would any other window.
+Alfred says goodbye, and the window closes a moment later.
 
 Format: `bye`
 

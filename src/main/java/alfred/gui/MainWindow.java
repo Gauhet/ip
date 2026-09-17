@@ -1,12 +1,15 @@
 package alfred.gui;
 
 import alfred.AlfredTheButler;
+import javafx.animation.PauseTransition;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 
 /**
  * Controls what the main window does; {@code view/MainWindow.fxml} describes
@@ -15,6 +18,9 @@ import javafx.scene.layout.VBox;
  */
 public class MainWindow extends VBox {
     private static final double SCROLL_TO_BOTTOM = 1.0;
+
+    /** How long the farewell stays on screen before the window closes. */
+    private static final Duration EXIT_DELAY = Duration.seconds(1);
 
     @FXML
     private ScrollPane scrollPane;
@@ -65,7 +71,9 @@ public class MainWindow extends VBox {
 
     /**
      * Adds the line the user sent and Alfred's answer to the conversation, then
-     * empties the text field. A blank line is not sent at all.
+     * empties the text field. A blank line is not sent at all. After a
+     * {@code bye}, the window closes once the farewell has had a moment on
+     * screen.
      */
     @FXML
     private void handleUserInput() {
@@ -83,5 +91,12 @@ public class MainWindow extends VBox {
                 DialogBox.getUserDialog(userText.trim()),
                 alfredDialog);
         userInput.clear();
+
+        if (alfred.isLastCommandExit()) {
+            userInput.setDisable(true);
+            PauseTransition delay = new PauseTransition(EXIT_DELAY);
+            delay.setOnFinished(event -> Platform.exit());
+            delay.play();
+        }
     }
 }

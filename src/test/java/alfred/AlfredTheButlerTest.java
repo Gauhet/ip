@@ -200,6 +200,31 @@ public class AlfredTheButlerTest {
     }
 
     @Test
+    public void isLastCommandExit_beforeAnyCommand_false() {
+        assertFalse(alfred.isLastCommandExit());
+    }
+
+    @Test
+    public void isLastCommandExit_byeCommand_true() {
+        alfred.getResponse("bye");
+        assertTrue(alfred.isLastCommandExit());
+    }
+
+    @Test
+    public void isLastCommandExit_ordinaryCommand_false() {
+        alfred.getResponse("todo polish the silver");
+        assertFalse(alfred.isLastCommandExit());
+    }
+
+    @Test
+    public void isLastCommandExit_refusedLineAfterBye_falseAgain() {
+        // A refusal cannot end the session, even straight after a bye.
+        alfred.getResponse("bye");
+        alfred.getResponse("blah");
+        assertFalse(alfred.isLastCommandExit());
+    }
+
+    @Test
     public void isLastResponseError_commandAfterAnError_falseAgain() {
         alfred.getResponse("blah");
 
