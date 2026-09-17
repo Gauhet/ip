@@ -47,10 +47,15 @@ public class Event extends Task {
      */
     @Override
     public boolean isSameTask(Task other) {
-        // The cast is safe: the parent has already checked that the other task
-        // is of this class.
+        // The parent's check comes first, so that the cast below is only
+        // reached once the other task is known to be an event. Cast before
+        // the check, a todo or a deadline compared with this event would
+        // throw rather than merely differ.
+        if (!super.isSameTask(other)) {
+            return false;
+        }
         Event otherEvent = (Event) other;
-        return super.isSameTask(other) && from.equals(otherEvent.from) && to.equals(otherEvent.to);
+        return from.equals(otherEvent.from) && to.equals(otherEvent.to);
     }
 
     /**

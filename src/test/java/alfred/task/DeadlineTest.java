@@ -61,6 +61,13 @@ public class DeadlineTest {
     }
 
     @Test
+    public void isSameTask_eventWithSameDescription_false() {
+        // A different kind of task is a different task, and comparing with one
+        // has to answer false rather than fail.
+        assertFalse(createDeadline().isSameTask(new Event("return book", OCT_15, OCT_16)));
+    }
+
+    @Test
     public void isSameTask_sameDescriptionDifferentDate_false() {
         // The same errand due on another day is another task, so the date is
         // part of the comparison and not only the description.

@@ -2292,6 +2292,76 @@ bye
 
 ---
 
+## TC30: Tasks of other kinds can be added after an event
+
+**Aim:** A deadline and a todo are both accepted once an event is on the list,
+and `list` shows all three in the order they were added.
+
+Every addition is checked against each task already on the list, to refuse a
+repeat. The check compares kinds before anything else, so an event held up
+against a deadline has to answer "different" and move on rather than fail. A
+version that looked at the event's dates before settling the kind crashed on
+exactly this input, and no other case caught it: the event is the last task
+added in every case that has one, so nothing was ever compared against it.
+
+**Input:**
+
+```
+event project meeting /from 2019-12-02 /to 2019-12-03
+deadline return book /by 2019-10-15
+todo read book
+list
+bye
+```
+
+**Expected output:**
+
+```
+    ____________________________________________________________
+            _     _      _____  ____   _____  ____
+           / \   | |    |  ___||  _ \ | ____||  _ \
+          / _ \  | |    | |_   | |_) ||  _|  | | | |
+         / ___ \ | |___ |  _|  |  _ < | |___ | |_| |
+        /_/   \_\|_____||_|    |_| \_\|_____||____/
+                    P E N N Y W O R T H
+
+      Butler to the Wayne family  --  At your service
+     Good day, sir. Alfred Pennyworth, at your disposal.
+     What may I do for you?
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Very good, sir. I've added this task:
+       [E][ ] project meeting (from: Dec 02 2019 to: Dec 03 2019)
+     That makes 1 task on your list.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Very good, sir. I've added this task:
+       [D][ ] return book (by: Oct 15 2019)
+     That makes 2 tasks on your list.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Very good, sir. I've added this task:
+       [T][ ] read book
+     That makes 3 tasks on your list.
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Here are the tasks on your list, sir:
+     1.[E][ ] project meeting (from: Dec 02 2019 to: Dec 03 2019)
+     2.[D][ ] return book (by: Oct 15 2019)
+     3.[T][ ] read book
+    ____________________________________________________________
+
+    ____________________________________________________________
+     Very good, sir. I shall be here when you need me.
+    ____________________________________________________________
+```
+
+---
+
 ## Known gaps (not yet covered)
 
 No invalid command crashes the program any more. Blank input, an unknown

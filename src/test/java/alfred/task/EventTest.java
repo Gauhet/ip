@@ -76,6 +76,19 @@ public class EventTest {
     }
 
     @Test
+    public void isSameTask_deadlineWithSameDescription_false() {
+        // A different kind of task is a different task, and comparing with one
+        // has to answer false rather than fail: a list that holds an event
+        // checks every later addition against it, whatever kind it is.
+        assertFalse(createThreeDayEvent().isSameTask(new Deadline("project meeting", DEC_2)));
+    }
+
+    @Test
+    public void isSameTask_toDoWithSameDescription_false() {
+        assertFalse(createThreeDayEvent().isSameTask(new ToDo("project meeting")));
+    }
+
+    @Test
     public void toString_notDone_datesShownInReadersForm() {
         assertEquals("[E][ ] project meeting (from: Dec 02 2019 to: Dec 04 2019)",
                 createThreeDayEvent().toString());
