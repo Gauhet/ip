@@ -13,21 +13,8 @@ import org.junit.jupiter.api.io.TempDir;
 
 /**
  * Tests the two methods the window uses, {@link AlfredTheButler#getGreeting()}
- * and {@link AlfredTheButler#getResponse(String)}.
- *
- * <p>Between them they are the whole of the window's side of the program: a
- * command typed into a window reaches the task list through
- * {@code getResponse} and nowhere else, and what it returns is what the user
- * reads. The command loop is the other way in, and the text UI tests cover
- * that from the outside.
- *
- * <p>Each test gets a save file of its own under {@code @TempDir}, so the
- * commands that save do not touch the tasks of whoever runs the tests.
- *
- * <p>What these check is that a line is really carried out — that the task list
- * changes, and that a mistake comes back as a refusal rather than a crash —
- * and that the reply arrives without the dividers and the indent the console
- * wraps it in, since a dialog box does that job itself.
+ * and {@link AlfredTheButler#getResponse(String)}: that a line is really
+ * carried out, and that the reply arrives without the console's dividers.
  */
 public class AlfredTheButlerTest {
     private String saveFile;

@@ -16,30 +16,13 @@ import org.junit.jupiter.api.function.Executable;
 import alfred.AlfredException;
 
 /**
- * Tests {@link TaskList}, the list the whole program works through.
- *
- * <p>Three things here are worth more than the rest.
- *
- * <p>The first is the index check. It stands between a number the user typed and
- * a list that would throw an unchecked exception of its own, so every operation
- * that takes an index is tried just below the list, just above it, and against
- * an empty list. Those are the three places an off-by-one shows up.
- *
- * <p>The second is the copying. The class promises that the tasks handed in
- * cannot be changed from outside afterwards, whether they arrive as a list or as
- * the array behind a varargs call, and that the list handed out cannot be used
- * to change what is stored. None of those promises is visible in ordinary use,
- * and each would be quietly broken by keeping or returning what was passed, so
- * each gets a test.
- *
- * <p>The third is the assertion in {@link TaskList#get(int)}. An assertion that
- * is never tried is indistinguishable from one that has been switched off, so
- * the one test that expects an {@link AssertionError} stands for all of them.
+ * Tests {@link TaskList}. Every operation that takes an index is tried just
+ * below the list, just above it, and against an empty list, which are the
+ * three places an off-by-one shows up.
  */
 public class TaskListTest {
     private static final String NO_SUCH_TASK = "There is no such task, sir.";
 
-    /** A list holding three todos, rebuilt for every test. */
     private TaskList tasks;
 
     @BeforeEach
@@ -49,11 +32,8 @@ public class TaskListTest {
 
     @Test
     public void get_indexPastEndOfList_assertionFails() {
-        // get() takes its index on trust, so an index outside the list is a
-        // fault in the caller rather than something to tell the user about.
-        // This case also fails if assertions are switched off, which is the
-        // only way to tell a live assertion from an inert one: without them the
-        // call comes back with an IndexOutOfBoundsException instead.
+        // Also fails if assertions are switched off: the call would throw
+        // IndexOutOfBoundsException instead.
         assertThrows(AssertionError.class, () -> tasks.get(3));
     }
 
@@ -81,8 +61,6 @@ public class TaskListTest {
 
     @Test
     public void add_sameTaskAlreadyStored_refusedNamingItsNumber() {
-        // The number is the one the user sees, counting from 1, so the second
-        // stored task is number 2.
         AlfredException e = assertThrows(AlfredException.class, () -> tasks.add(new ToDo("second")));
         assertEquals("You already have that task, sir, as number 2.", e.getMessage());
         assertEquals(3, tasks.size());
@@ -90,15 +68,12 @@ public class TaskListTest {
 
     @Test
     public void add_sameDescriptionAsDoneTask_stillRefused() throws AlfredException {
-        // Being done does not make it a different task; the user can unmark it.
         tasks.markDone(1);
         assertThrows(AlfredException.class, () -> tasks.add(new ToDo("second")));
     }
 
     @Test
     public void newList_sameTaskTwice_bothKept() {
-        // Only additions are checked, so a save file holding a task twice
-        // still loads whole rather than quietly losing one of them.
         TaskList twice = new TaskList(new ToDo("read book"), new ToDo("read book"));
         assertEquals(2, twice.size());
     }
@@ -108,8 +83,6 @@ public class TaskListTest {
         Task removed = tasks.delete(1);
         assertEquals("[T][ ] second", removed.toString());
         assertEquals(2, tasks.size());
-        // The task after the removed one moves up a number, which is what the
-        // user sees the next time they list the tasks.
         assertEquals("[T][ ] third", tasks.get(1).toString());
     }
 
@@ -140,8 +113,6 @@ public class TaskListTest {
     @Test
     public void markDone_validIndex_storedTaskMarkedAndReturned() throws AlfredException {
         Task marked = tasks.markDone(1);
-        // The stored task itself comes back, not a copy, so what the user is
-        // shown is what the list now holds.
         assertSame(tasks.get(1), marked);
         assertEquals("[T][X] second", tasks.get(1).toString());
         assertEquals("[T][ ] first", tasks.get(0).toString());
@@ -222,8 +193,7 @@ public class TaskListTest {
 
     @Test
     public void newList_sourceArrayChangedAfterwards_storedTasksUnaffected() {
-        // An array passed to a varargs parameter is the caller's own array, not
-        // one the call made, so the copying the class promises has to cover it.
+        // An array passed to a varargs parameter is the caller's own array.
         Task[] source = { new ToDo("first") };
         TaskList list = new TaskList(source);
         source[0] = new ToDo("swapped in behind the list's back");
@@ -253,8 +223,7 @@ public class TaskListTest {
     }
 
     /**
-     * Checks that an operation refuses an index naming no stored task, with the
-     * message written for the person who typed the number.
+     * Checks that an operation refuses an index naming no stored task.
      *
      * @param operation the call to try.
      */

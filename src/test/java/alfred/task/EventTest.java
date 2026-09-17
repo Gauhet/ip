@@ -10,14 +10,8 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests {@link Event}, whose {@link Event#occursOn(LocalDate)} is the only task
- * kind that answers for a stretch of days rather than one.
- *
- * <p>That range is where the tests are concentrated. Both ends count as part of
- * the event, so both are checked, along with the days just outside them: an
- * event running from Monday to Wednesday is one the user has on Monday, and a
- * range that quietly excluded an end would hide a task from the {@code on}
- * command on the very day it starts.
+ * Tests {@link Event}, the one task kind that spans a stretch of days. Both
+ * ends of the range are checked, along with the days just outside them.
  */
 public class EventTest {
     private static final LocalDate DEC_1 = LocalDate.of(2019, 12, 1);
@@ -70,16 +64,12 @@ public class EventTest {
 
     @Test
     public void isSameTask_differentEnd_false() {
-        // Both ends are compared, so an event that shares a start but not an
-        // end is not mistaken for the same one.
         assertFalse(createThreeDayEvent().isSameTask(new Event("project meeting", DEC_2, DEC_5)));
     }
 
     @Test
     public void isSameTask_deadlineWithSameDescription_false() {
-        // A different kind of task is a different task, and comparing with one
-        // has to answer false rather than fail: a list that holds an event
-        // checks every later addition against it, whatever kind it is.
+        // Comparing with another kind has to answer false rather than fail.
         assertFalse(createThreeDayEvent().isSameTask(new Deadline("project meeting", DEC_2)));
     }
 

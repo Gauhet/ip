@@ -11,12 +11,6 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Tests {@link Deadline}, which falls on the single day it is due.
- *
- * <p>The two forms its date takes are both checked, because they are
- * deliberately different and each has a reader that depends on it: the display
- * form is what the user reads, and the {@code yyyy-mm-dd} form is what the save
- * file holds and reads back. A change that made the saved field match the shown
- * one would look tidy and would stop every existing save file loading.
  */
 public class DeadlineTest {
     private static final LocalDate OCT_14 = LocalDate.of(2019, 10, 14);
@@ -42,9 +36,6 @@ public class DeadlineTest {
 
     @Test
     public void matches_dueDate_false() {
-        // Only the description is searched. Were the whole display form searched
-        // instead, find oct would turn up every task due in October, which is a
-        // date question the on command already answers properly.
         Deadline deadline = createDeadline();
         assertFalse(deadline.matches("2019-10-15"));
         assertFalse(deadline.matches("Oct"));
@@ -62,15 +53,11 @@ public class DeadlineTest {
 
     @Test
     public void isSameTask_eventWithSameDescription_false() {
-        // A different kind of task is a different task, and comparing with one
-        // has to answer false rather than fail.
         assertFalse(createDeadline().isSameTask(new Event("return book", OCT_15, OCT_16)));
     }
 
     @Test
     public void isSameTask_sameDescriptionDifferentDate_false() {
-        // The same errand due on another day is another task, so the date is
-        // part of the comparison and not only the description.
         assertFalse(createDeadline().isSameTask(new Deadline("return book", OCT_16)));
     }
 

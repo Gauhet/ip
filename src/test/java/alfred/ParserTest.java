@@ -25,26 +25,9 @@ import alfred.command.UnmarkCommand;
 import alfred.task.TaskList;
 
 /**
- * Tests {@link Parser#parse(String)}, which turns a typed line into the command
- * it asks for.
- *
- * <p>Three things are worth checking, and they are checked separately.
- *
- * <p>The first is which command a keyword names, which is answered by the type
- * of the object that comes back.
- *
- * <p>The second is what the parser read out of the rest of the line, which the
- * command keeps to itself. A command holds no getters, so the only honest way
- * to see what it was built from is to carry it out and look at what changed.
- * These tests do that, against a task list of their own and a save file in a
- * scratch folder. It reaches past one method, which is the price of the parser
- * having nothing to show for its work otherwise, and it is what catches the
- * mistakes that matter most here: a description sliced at the wrong offset, or
- * a task number that acts on its neighbor.
- *
- * <p>The third is what the parser refuses, and with what wording. Every refusal
- * is text a user has to act on, so each is checked word for word rather than by
- * exception type alone.
+ * Tests {@link Parser#parse(String)}. A command has no getters, so what the
+ * parser read is checked by carrying the command out against a task list of
+ * its own. Refusals are checked word for word, since the user acts on them.
  */
 public class ParserTest {
     private static final String DEADLINE_COMPLAINT = "A deadline needs a description and a /by date, sir.";
@@ -61,7 +44,6 @@ public class ParserTest {
 
     private static final String FROM_BEFORE_TO = "The /from date has to come before the /to date, sir.";
 
-    /** The list a parsed command is carried out against, fresh for every test. */
     private TaskList tasks;
 
     private Ui ui;
@@ -69,8 +51,7 @@ public class ParserTest {
     private Storage storage;
 
     /**
-     * Gives each test its own task list and its own save file, so that no test
-     * can see what another one wrote.
+     * Gives each test its own task list and save file.
      *
      * @param tempDir a scratch folder JUnit creates and deletes per test.
      */
@@ -155,11 +136,7 @@ public class ParserTest {
 
     @Test
     public void parse_tabsAndRunsOfSpaces_lineReadAsIfSingleSpaced() throws AlfredException {
-        // The window hands over its text field as it stands, and a tab between
-        // the keyword and the rest would otherwise make the keyword
-        // "mark<tab>1", which names no command. Every command's parts have to
-        // be found through the extra spacing, and a description stored with
-        // single spaces.
+        // A tab after the keyword would otherwise make it "mark<tab>1".
         run("   todo\tread    book   ");
         run("deadline   return book   /by   2019-10-15");
         run("mark\t1");
@@ -170,8 +147,6 @@ public class ParserTest {
 
     @Test
     public void parse_separatorInsideAnotherWord_descriptionKeptWhole() throws AlfredException {
-        // Only /by standing as a word of its own separates the two parts, so a
-        // description can contain the three characters without being cut.
         run("deadline fix a/by bug /by 2019-10-15");
         assertEquals("[D][ ] fix a/by bug (by: Oct 15 2019)", tasks.get(0).toString());
     }
@@ -191,8 +166,7 @@ public class ParserTest {
 
     @Test
     public void parse_eventDescriptionContainingTo_separatorAfterFromUsed() throws AlfredException {
-        // The /to inside the description must not be mistaken for the one that
-        // starts the end date, which is why the parser looks for it after /from.
+        // The /to inside the description must not be taken for the separator.
         run("event lunch /to dinner /from 2019-12-02 /to 2019-12-03");
         assertEquals("[E][ ] lunch /to dinner (from: Dec 02 2019 to: Dec 03 2019)",
                 tasks.get(0).toString());
@@ -210,8 +184,6 @@ public class ParserTest {
         run("todo first");
         run("todo second");
         run("mark 2");
-        // The user counts from 1 and the list from 0, so a task number that is
-        // converted wrongly marks the task next to the one that was named.
         assertEquals("[T][ ] first", tasks.get(0).toString());
         assertEquals("[T][X] second", tasks.get(1).toString());
     }
@@ -287,25 +259,19 @@ public class ParserTest {
 
     @Test
     public void parse_deadlineWithUnreadableDate_dateRefusalSurfaces() {
-        // The parser leaves this refusal to Dates, so the reply is about the
-        // date rather than about the shape of the command.
         assertRefused("deadline return book /by Sunday",
                 "I don't know 'Sunday' as a date, sir. Do use yyyy-mm-dd, as in 2019-10-15.");
     }
 
     @Test
     public void parse_deadlineWithByTwice_exceptionThrown() {
-        // Without this check the second /by would become part of the date,
-        // and the user would be told that a date they never typed is unreadable.
-        // The event keywords go through the same check, so one case stands
-        // for all three.
+        // Without this check the second /by would become part of the date.
         assertRefused("deadline return book /by 2019-10-15 /by 2019-10-16",
                 "You've given /by more than once, sir. Once will do.");
     }
 
     @Test
     public void parse_eventWithToBeforeFrom_orderExplained() {
-        // Both keywords are there, so "the /to is missing" would be untrue.
         assertRefused("event meeting /to 2019-12-03 /from 2019-12-02", FROM_BEFORE_TO);
     }
 
@@ -402,8 +368,7 @@ public class ParserTest {
     }
 
     /**
-     * Reads a line and carries out the command it asks for, so that what the
-     * parser built can be seen in the task list afterwards.
+     * Reads a line and carries out the command it asks for.
      *
      * @param line the line to read, as the user would type it.
      * @throws AlfredException if the line is refused, or the command fails.

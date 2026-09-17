@@ -22,25 +22,9 @@ import alfred.task.Task;
 import alfred.task.ToDo;
 
 /**
- * Tests {@link Storage#save(List)} and {@link Storage#load()}, the two halves of
- * keeping the task list on disk.
- *
- * <p>Most of the tests save and load in one go rather than checking either
- * alone. What matters about this class is not the shape of a line but that the
- * list a run ends with is the list the next run starts from, and a round trip is
- * the only thing that says so. It also catches the failure the two halves can
- * have between them, where each is self-consistent and they disagree with each
- * other.
- *
- * <p>One test does pin the file format line by line, because the format is
- * documented and a silent change to it would strand every file already written.
- *
- * <p>The rest cover a save file that has been edited by hand, which is the case
- * the class is careful about: a damaged line has to cost that line alone and be
- * counted, rather than taking the file down with it.
- *
- * <p>Every test writes inside a scratch folder that JUnit makes and removes, so
- * nothing here touches the real save file.
+ * Tests {@link Storage#save(List)} and {@link Storage#load()}, mostly as a
+ * round trip, since what matters is that the list a run ends with is the list
+ * the next run starts from. Every test writes inside a scratch folder.
  */
 public class StorageTest {
     private static final LocalDate OCT_15 = LocalDate.of(2019, 10, 15);
@@ -49,7 +33,6 @@ public class StorageTest {
 
     private static final LocalDate DEC_3 = LocalDate.of(2019, 12, 3);
 
-    /** The save file under test, inside the scratch folder. */
     private Path file;
 
     private Storage storage;
@@ -128,9 +111,7 @@ public class StorageTest {
     @Test
     public void saveThenLoad_descriptionContainingEscapedSeparator_descriptionRestored()
             throws AlfredException {
-        // An escape character followed by a separator, both typed by the user.
-        // Reading the line by looking backwards for an escape character gets
-        // this one wrong, which is why the fields are scanned forwards.
+        // Scanning backwards for an escape character gets this one wrong.
         assertDescriptionSurvives("a \\| b");
     }
 
@@ -152,7 +133,6 @@ public class StorageTest {
         Files.write(file, List.of("", "T | 0 | read book", "   ", ""));
         Storage.LoadResult result = storage.load();
         assertEquals(1, result.tasks().size());
-        // A blank line is not damage, so it is not held against the file.
         assertEquals(0, result.skippedLines());
     }
 
@@ -173,7 +153,6 @@ public class StorageTest {
 
     @Test
     public void load_statusNeitherZeroNorOne_lineSkipped() throws AlfredException, IOException {
-        // A status of anything else is damage rather than a quiet "not done".
         assertLineSkipped("T | 2 | read book");
     }
 
@@ -189,8 +168,6 @@ public class StorageTest {
 
     @Test
     public void load_dateNamingNoRealDay_lineSkipped() throws AlfredException, IOException {
-        // Caught as an AlfredException rather than escaping as an unchecked one,
-        // which is what keeps the rest of the file readable.
         assertLineSkipped("D | 0 | return book | 2019-02-30");
     }
 
@@ -257,8 +234,6 @@ public class StorageTest {
         Files.write(file, List.of("T | 0 | read book", "X | 0 | broken"));
         Storage.LoadResult result = storage.load();
         storage.save(result.tasks());
-        // The save rewrote the file from the one task it could read, so the
-        // damaged line survives only in the copy, which sits beside the file.
         assertEquals(file.resolveSibling("tasks.txt.bak"), result.backup());
         assertEquals(List.of("T | 0 | read book"), Files.readAllLines(file));
         assertEquals(List.of("T | 0 | read book", "X | 0 | broken"), Files.readAllLines(result.backup()));
@@ -302,8 +277,8 @@ public class StorageTest {
     }
 
     /**
-     * Returns the tasks as the text they are shown by, which is what makes a
-     * restored list comparable without every task class needing an equals.
+     * Returns the tasks as the text they are shown by, so that a restored list
+     * can be compared without every task class needing an equals.
      *
      * @param tasks the tasks to describe.
      * @return one display form per task, in the order given.

@@ -9,26 +9,8 @@ import java.util.Locale;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests {@link Dates}.
- *
- * <p>The {@link Dates#parse(String)} tests are grouped by the three things that
- * method can do, because those are the three things a caller has to be able to
- * rely on: it returns the day the text names, it refuses text that is not
- * shaped like a date, or it refuses text that is shaped like one but names no
- * real day. The last two are checked by their message and not only by the
- * exception type, since both throw an {@link AlfredException} and telling them
- * apart is the whole point of the distinction.
- *
- * <p>The {@link Dates#format(LocalDate)} tests cover the form a date takes when
- * it is shown, and pin the one property of it that is a decision rather than an
- * accident: the month is named in English whatever locale the machine is set
- * to. Left to the default locale, the same task would read differently from one
- * machine to the next, so a test guards it.
- *
- * <p>The test class sits in package {@code alfred} because {@code parse} is
- * package-private. That is deliberate: the visibility stays as narrow as the
- * program needs it, and the test reaches the method by being a neighbor rather
- * than by the method being opened up for it.
+ * Tests {@link Dates}. The refusals are checked by their message, since both
+ * throw an {@link AlfredException} and telling them apart is the point.
  */
 public class DatesTest {
     @Test
@@ -84,8 +66,6 @@ public class DatesTest {
 
     @Test
     public void parse_trailingText_formatExceptionThrown() {
-        // A date followed by anything else is still the wrong format: the shape
-        // has to account for the whole text, not merely appear somewhere in it.
         assertFormatRefused("2019-10-15 please");
     }
 
@@ -143,8 +123,7 @@ public class DatesTest {
             Locale.setDefault(Locale.GERMANY);
             assertEquals("Oct 15 2019", Dates.format(LocalDate.of(2019, 10, 15)));
         } finally {
-            // Restored whatever the assertion did, so that a failure here
-            // cannot leak a locale into the tests that run after it.
+            // Restored so that a failure cannot leak a locale into later tests.
             Locale.setDefault(original);
         }
     }

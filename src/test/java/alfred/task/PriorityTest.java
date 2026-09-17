@@ -8,8 +8,7 @@ import org.junit.jupiter.api.Test;
 import alfred.AlfredException;
 
 /**
- * Tests {@link Priority}, where a level typed by the user and a level read out
- * of the save file are both settled.
+ * Tests {@link Priority}.
  */
 public class PriorityTest {
     private static final String NOT_A_LEVEL = "I know high, medium, low, and none as priorities, sir.";
